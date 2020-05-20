@@ -114,6 +114,8 @@ struct pcache_set {
 	 * Eviction Algorithms Specific
 	 */
 
+	atomic_t       nr_pinned; // number of pinned pcms,cannot exceed a threshold
+
 #ifdef CONFIG_PCACHE_EVICT_LRU
 	struct list_head	lru_list;
 	atomic_t		nr_lru;
@@ -205,6 +207,7 @@ struct pcache_meta {
 	 * They are reset when pcm is allocated.
 	 */
 	unsigned long		bits;
+	unsigned long       pin_flag; // if it's pinned, the flag is set to 1 and cannot be evicted. 
 	atomic_t		mapcount;
 	atomic_t		_refcount;
 

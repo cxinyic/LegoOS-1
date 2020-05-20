@@ -534,7 +534,7 @@ unlock_pte:
  * after we acquire the lock. But pte lock can not gurantee us spurious TLB fault:
  * the case where TLB entries have different permission from page table entries.
  */
-static int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
+int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
 				   pte_t *pte, pmd_t *pmd, unsigned long flags)
 {
 	pte_t entry;

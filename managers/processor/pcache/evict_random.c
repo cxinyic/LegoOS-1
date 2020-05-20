@@ -97,8 +97,14 @@ struct pcache_meta *evict_find_line_random(struct pcache_set *pset)
 		 * 2) not under writeback
 		 * 3) not used by others
 		 */
-		SetPcacheReclaim(pcm);
-		goto out;
+		if (likely(pcm->pin_flag==0)){
+			SetPcacheReclaim(pcm);
+			goto out;
+		}
+		else{
+			goto unlock;
+		}
+		
 
 unlock:
 		unlock_pcache(pcm);

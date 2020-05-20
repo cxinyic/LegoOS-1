@@ -55,6 +55,8 @@ extern u64 pcache_way_cache_stride;
 extern struct pcache_set *pcache_set_map;
 extern struct pcache_meta *pcache_meta_map;
 
+extern u64 pcache_max_pinned;
+
 /**
  * user_vaddr_to_set_index
  *
@@ -549,7 +551,7 @@ enum piggyback_options {
 
 /* Allocate one pcache line from the pset @address maps to */
 struct pcache_meta *pcache_alloc(unsigned long address,
-				 enum piggyback_options piggyback);
+				 enum piggyback_options piggyback, int pin);
 
 int pcache_flush_one(struct pcache_meta *pcm);
 void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr);
@@ -656,6 +658,13 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 			pte_t *page_table, pte_t orig_pte, pmd_t *pmd,
 			unsigned long flags, fill_func_t fill_func, void *arg,
 			enum rmap_caller caller, enum piggyback_options piggyback);
+
+int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
+				   pte_t *pte, pmd_t *pmd, unsigned long flags);
+int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len);
+int try_unpin(struct mm_struct *mm, unsigned long virt_address, unsigned long len);
+
+
 
 #include <processor/pcache_victim.h>
 #include <processor/pcache_evict.h>

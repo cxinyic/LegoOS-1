@@ -133,10 +133,16 @@ struct pcache_meta *evict_find_line_lru(struct pcache_set *pset)
 		 *
 		 * Remove it from LRU list, and set Reclaim
 		 */
-		found = true;
-		__del_from_lru_list(pcm, pset);
-		SetPcacheReclaim(pcm);
-		goto unlock_lru;
+		if(likely(pcm->pin_flag==0)){
+			found = true;
+			__del_from_lru_list(pcm, pset);
+			SetPcacheReclaim(pcm);
+			goto unlock_lru;
+		}
+		else{
+			goto unlock_pcache;
+		}
+		
 
 unlock_pcache:
 		unlock_pcache(pcm);

@@ -26,7 +26,7 @@ asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long len){
 #ifdef CONFIG_COMP_PROCESSOR
 
     int ret;
-    ret = try_unpin(current->mm, addr, len);
+    ret = try_unpin(current->mm, old_addr, len);
     return ret;
 
 

@@ -49,7 +49,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     // data is in pcache
     if (likely(pte_present(*old_pte))){ 
         old_pcm = pte_to_pcache_meta(*old_pte);
-        &old_pcm->pin_flag = 1;
+        old_pcm->pin_flag = 1;
     
     }
     // data is in remote memory
@@ -70,7 +70,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
             return ret;
         }
         new_pcm = pte_to_pcache_meta(*new_pte);
-        &new_pcm->pin_flag = 1;
+        new_pcm->pin_flag = 1;
         
     }
     atomic_inc(&pset->nr_pinned);
@@ -97,7 +97,7 @@ int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)
     }
     if (likely(pte_present(*old_pte))){ 
         old_pcm = pte_to_pcache_meta(*old_pte);
-        &old_pcm->pin_flag = 0;
+        old_pcm->pin_flag = 0;
         pset = user_vaddr_to_pcache_set(virt_address);
         atomic_dec(&pset->nr_pinned);
         return 0;

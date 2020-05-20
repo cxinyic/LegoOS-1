@@ -551,7 +551,7 @@ enum piggyback_options {
 
 /* Allocate one pcache line from the pset @address maps to */
 struct pcache_meta *pcache_alloc(unsigned long address,
-				 enum piggyback_options piggyback, int pin);
+				 enum piggyback_options piggyback);
 
 int pcache_flush_one(struct pcache_meta *pcm);
 void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr);

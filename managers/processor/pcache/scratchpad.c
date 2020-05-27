@@ -50,6 +50,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     if (likely(pte_present(*old_pte))){ 
         old_pcm = pte_to_pcache_meta(*old_pte);
         old_pcm->pin_flag = 1;
+        __del_from_lru_list(old_pcm,pset);
     
     }
     // data is in remote memory
@@ -71,9 +72,11 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         }
         new_pcm = pte_to_pcache_meta(*new_pte);
         new_pcm->pin_flag = 1;
+        __del_from_lru_list(new_pcm,pset);
         
     }
     atomic_inc(&pset->nr_pinned);
+
     return 0;
 }
 int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)

@@ -29,6 +29,7 @@ struct pcache_meta *evict_find_line_random(struct pcache_set *pset)
 
 	pcache_for_each_way_set(pcm, pset, way) {
 		if (pcm->pin_flag==1){
+			pr_info("meet a pinned page");
 			continue;
 		}
 		/*

@@ -29,7 +29,7 @@ struct pcache_meta *evict_find_line_random(struct pcache_set *pset)
 
 	pcache_for_each_way_set(pcm, pset, way) {
 		if (pcm->pin_flag==1){
-			goto put;
+			continue;
 		}
 		/*
 		 * Still under alloc setup, or

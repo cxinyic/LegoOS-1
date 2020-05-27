@@ -93,7 +93,7 @@ struct pcache_meta *evict_find_line_lru(struct pcache_set *pset)
 	spin_lock(&pset->lru_lock);
 	list_for_each_entry_reverse(pcm, &pset->lru_list, lru) {
 		if (pcm->pin_flag==1){
-			goto put_pcache;
+			continue;
 		}
 		PCACHE_BUG_ON_PCM(PcacheReclaim(pcm), pcm);
 

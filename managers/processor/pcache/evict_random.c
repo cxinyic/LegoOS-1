@@ -28,6 +28,9 @@ struct pcache_meta *evict_find_line_random(struct pcache_set *pset)
 	int way;
 
 	pcache_for_each_way_set(pcm, pset, way) {
+		if (pcm->pin_flag==1){
+			goto put;
+		}
 		/*
 		 * Still under alloc setup, or
 		 * freed by someone else before this checking
@@ -97,13 +100,9 @@ struct pcache_meta *evict_find_line_random(struct pcache_set *pset)
 		 * 2) not under writeback
 		 * 3) not used by others
 		 */
-		if (likely(pcm->pin_flag==0)){
-			SetPcacheReclaim(pcm);
-			goto out;
-		}
-		else{
-			goto unlock;
-		}
+		
+		SetPcacheReclaim(pcm);
+		goto out;
 		
 
 unlock:

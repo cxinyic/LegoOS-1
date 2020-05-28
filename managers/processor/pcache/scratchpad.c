@@ -111,7 +111,7 @@ int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)
     
     }
     else{
-        return -1;
+        return 0;
     }
 
 

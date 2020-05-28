@@ -19,7 +19,7 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len, unsigned long t
         ret = 0;
     }
     if (try_best_flag==0 && ret == -1){
-        ret = try_unpin(current->mm, old_addr, len);
+        ret = try_unpin(current->mm, addr, len);
     }
     return ret;
 

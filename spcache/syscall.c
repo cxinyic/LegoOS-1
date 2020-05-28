@@ -10,11 +10,17 @@
 #include <processor/processor.h>
 
 
-asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
+asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len, unsigned long try_best_flag) {
 #ifdef CONFIG_COMP_PROCESSOR
 
     int ret;
     ret = try_pin(current->mm, addr, len);
+    if (try_best_flag==1 && ret = -1){
+        ret = 0;
+    }
+    if (try_best_flag==0 && ret = -1){
+        ret = try_unpin(current->mm, old_addr, len);
+    }
     return ret;
 
 #else

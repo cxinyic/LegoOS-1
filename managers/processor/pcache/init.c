@@ -118,7 +118,7 @@ void __init pcache_early_init(void)
 	nr_cachelines = nr_units * nr_cachelines_per_page;
 	nr_cachesets = nr_cachelines / PCACHE_ASSOCIATIVITY;
 	// currently we assume that 75% of the cachelines can be used. 
-	pcache_max_pinned = PCACHE_ASSOCIATIVITY-4;
+	pcache_max_pinned = PCACHE_ASSOCIATIVITY-PCACHE_ASSOCIATIVITY/4;
 
 	/* How many 4K pages are used for cache line? */
 	nr_pages_cacheline = nr_cachelines * PCACHE_LINE_NR_PAGES;

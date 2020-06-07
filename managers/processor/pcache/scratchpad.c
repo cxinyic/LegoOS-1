@@ -67,7 +67,9 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 	    if (!new_pte)
 		    return VM_FAULT_OOM;
         pr_info("try_pin_one_page:debug1");
+        PROFILE_START(pcache_handle_pte_fault);
         ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
+        PROFILE_LEAVE(pcache_handle_pte_fault);
         if (ret<0){
             return ret;
         }

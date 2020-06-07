@@ -146,6 +146,7 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 	 * 2) victim cache
 	 * 3) zerofill
 	 */
+	pr_info("sp:debug2");
 	ret = fill_func(address, flags, pcm, arg);
 	if (unlikely(ret)) {
 		ret = VM_FAULT_SIGSEGV;
@@ -569,6 +570,7 @@ int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
 			 *
 			 * All of them fall-back and merge into this:
 			 */
+			pr_info("sp:debug1");
 			return pcache_do_fill_page(mm, address, pte, entry, pmd, flags);
 		}
 		return pcache_do_zerofill_page(mm, address, pte, entry, pmd, flags);

@@ -43,10 +43,12 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     pr_info("try_pin_one_page:debug1");
     
     pset = user_vaddr_to_pcache_set(virt_address);
+    pr_info("try_pin_one_page:debug12");
 	if(atomic_read(&pset->nr_pinned)+1>pcache_max_pinned){
         pr_info("Error: exceed max pinned number");
 		return -1;
 	}
+    pr_info("try_pin_one_page:debug13");
     // data is in pcache
     if (likely(pte_present(*old_pte))){ 
         pr_info("try_pin_one_page:debug2");

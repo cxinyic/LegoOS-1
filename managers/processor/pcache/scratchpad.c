@@ -51,16 +51,17 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 	}*/
     //pr_info("try_pin_one_page:debug13");
     // data is in pcache
+    /*
     if (likely(pte_present(*old_pte))){ 
         pr_info("try_pin_one_page:debug2");
         old_pcm = pte_to_pcache_meta(*old_pte);
         old_pcm->pin_flag = 1;
         del_from_lru_list(old_pcm,pset);
     
-    }
+    }*/
     // data is in remote memory
     //emulate a page fault
-    else{
+    //else{
         pr_info("try_pin_one_page:debug3");
         new_pgd = pgd_offset(mm, virt_address);
 	    new_pud = pud_alloc(mm, new_pgd, virt_address);
@@ -84,7 +85,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         new_pcm->pin_flag = 1;
         del_from_lru_list(new_pcm,pset);
         
-    }
+    //}
     atomic_inc(&pset->nr_pinned);
 
     return 0;

@@ -66,10 +66,12 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 	    new_pte = pte_alloc(mm, new_pmd, virt_address);
 	    if (!new_pte)
 		    return VM_FAULT_OOM;
+        pr_info("try_pin_one_page:debug1");
         ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
         if (ret<0){
             return ret;
         }
+        pr_info("try_pin_one_page:debug2");
         new_pcm = pte_to_pcache_meta(*new_pte);
         new_pcm->pin_flag = 1;
         del_from_lru_list(new_pcm,pset);

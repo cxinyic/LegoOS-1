@@ -83,10 +83,12 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("try_pin_one_page:debug5");
         new_pcm = pte_to_pcache_meta(*new_pte);
         new_pcm->pin_flag = 1;
+        pr_info("try_pin_one_page:debug6");
         del_from_lru_list(new_pcm,pset);
+        pr_info("try_pin_one_page:debug7");
         
     //}
-    atomic_inc(&pset->nr_pinned);
+    //atomic_inc(&pset->nr_pinned);
 
     return 0;
 }

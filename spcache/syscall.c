@@ -14,6 +14,7 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len, unsigned long t
 #ifdef CONFIG_COMP_PROCESSOR
 
     int ret;
+    pr_info("pin_syscall:debug1");
     ret = try_pin(current->mm, addr, len);
     if (try_best_flag==1 && ret == -1){
         ret = 0;

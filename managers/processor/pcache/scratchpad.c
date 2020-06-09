@@ -77,7 +77,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("try_pin_one_page:debug4");
         new_pcm = pte_to_pcache_meta(*new_pte);
 
-        pr_info("virt_address:  %#llx\n", virt_address);
+        pr_info("virt_address3:  %#llx\n", virt_address);
         pr_info("new_pmd:  %#llx\n", new_pmd);
         pr_info("new_pte:  %#llx\n", new_pte);
         
@@ -160,7 +160,7 @@ int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
     int nr_pcm_pin = len / PAGE_SIZE;
     int i=0;
     for (i=0;i<nr_pcm_pin;i++){
-        pr_info("try_pin:debug");
+        pr_info("virt_address2:  %#llx\n", virt_address);
         PROFILE_START(try_pin_one_page);
         ret = try_pin_one_page(mm,virt_address+i*PAGE_SIZE);
         PROFILE_LEAVE(try_pin_one_page);

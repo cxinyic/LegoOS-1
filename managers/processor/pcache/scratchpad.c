@@ -76,15 +76,24 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 
         pr_info("try_pin_one_page:debug4");
         new_pcm = pte_to_pcache_meta(*new_pte);
+
+        pr_info("virt_address:  %#llx\n", virt_address);
+        pr_info("new_pmd:  %#llx\n", new_pmd);
+        pr_info("new_pte:  %#llx\n", new_pte);
         
-        pr_info("try_pin_one_page:debug5");
+        
+        
         PROFILE_START(pcache_handle_pte_fault);
+        pr_info("try_pin_one_page:debug5");
+        
+
         ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
+        pr_info("try_pin_one_page:debug6");
         PROFILE_LEAVE(pcache_handle_pte_fault);
         if (ret<0){
             return ret;
         }
-        pr_info("try_pin_one_page:debug6");
+        
         
         new_pcm->pin_flag = 1;
         pr_info("try_pin_one_page:debug7");

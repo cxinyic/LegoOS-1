@@ -61,6 +61,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("old_pte:  %#llx\n", old_pte);
         //old_pcm->pin_flag = 1;
         pr_info("try_pin_one_page:debug4");
+        pr_info("old_pcm:  %#llx\n", old_pcm);
         PROFILE_START(detach_from_lru);
         detach_from_lru(old_pcm);
         PROFILE_LEAVE(detach_from_lru);
@@ -104,6 +105,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         
         
         //new_pcm->pin_flag = 1;
+        pr_info("new_pcm:  %#llx\n", new_pcm);
         pr_info("try_pin_one_page:debug7");
         PROFILE_START(detach_from_lru);
         detach_from_lru(new_pcm);

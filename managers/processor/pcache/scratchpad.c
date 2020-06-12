@@ -52,10 +52,13 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     //pr_info("try_pin_one_page:debug13");
     // data is in pcache
     
-    //if (likely(pte_present(*old_pte))){ 
+    if (likely(pte_present(*old_pte))){ 
         pr_info("try_pin_one_page:debug2");
         old_pcm = pte_to_pcache_meta(*old_pte);
         pr_info("try_pin_one_page:debug3");
+        pr_info("virt_address3:  %#llx\n", virt_address);
+        pr_info("old_pmd:  %#llx\n", old_pmd);
+        pr_info("old_pte:  %#llx\n", old_pte);
         //old_pcm->pin_flag = 1;
         pr_info("try_pin_one_page:debug4");
         PROFILE_START(detach_from_lru);
@@ -63,7 +66,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         PROFILE_LEAVE(detach_from_lru);
         pr_info("try_pin_one_page:debug5");
     
-    //}
+    }
     // data is in remote memory
     //emulate a page fault
     /*else{

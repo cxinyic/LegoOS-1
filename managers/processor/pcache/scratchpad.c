@@ -69,8 +69,8 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     }
     // data is in remote memory
     //emulate a page fault
-    /*else{
-        pr_info("try_pin_one_page:debug3");
+    else{
+        pr_info("try_pin_one_page_remote:debug3");
         new_pgd = pgd_offset(mm, virt_address);
 	    new_pud = pud_alloc(mm, new_pgd, virt_address);
 	    if (!new_pud)
@@ -82,21 +82,21 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 	    if (!new_pte)
 		    return VM_FAULT_OOM;
 
-        pr_info("try_pin_one_page:debug4");
+        pr_info("try_pin_one_page:debug4_remote");
         new_pcm = pte_to_pcache_meta(*new_pte);
 
-        pr_info("virt_address3:  %#llx\n", virt_address);
+        pr_info("virt_address4:  %#llx\n", virt_address);
         pr_info("new_pmd:  %#llx\n", new_pmd);
         pr_info("new_pte:  %#llx\n", new_pte);
         
         
         
         PROFILE_START(pcache_handle_pte_fault);
-        pr_info("try_pin_one_page:debug5");
+        pr_info("try_pin_one_page_remote:debug5");
         
 
         ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
-        pr_info("try_pin_one_page:debug6");
+        pr_info("try_pin_one_page_remote:debug6");
         PROFILE_LEAVE(pcache_handle_pte_fault);
         if (ret<0){
             return ret;
@@ -107,8 +107,8 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("try_pin_one_page:debug7");
         //del_from_lru_list(new_pcm,pset);
         pr_info("try_pin_one_page:debug8");
-    */    
-    //}
+        
+    }
     //atomic_inc(&pset->nr_pinned);
 
     return 0;

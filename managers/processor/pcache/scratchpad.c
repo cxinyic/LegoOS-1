@@ -97,14 +97,14 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("try_pin_one_page_remote:debug5");
         
 
-        /*ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
+        ret= pcache_handle_pte_fault(mm, virt_address, new_pte, new_pmd, 0);
         pr_info("try_pin_one_page_remote:debug6");
         PROFILE_LEAVE(pcache_handle_pte_fault);
         if (ret<0){
             return ret;
         }
         
-        
+        /*
         //new_pcm->pin_flag = 1;
         new_pcm = pte_to_pcache_meta(*new_pte);
         unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;

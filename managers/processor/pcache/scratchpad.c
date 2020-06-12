@@ -110,12 +110,12 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;
         pr_info("new_pa: %#llx\n", new_pa);
         pr_info("new_pcm:  %#llx\n", new_pcm);
-        pr_info("try_pin_one_page:debug7");
+        pr_info("try_pin_one_page_remote:debug7");
         PROFILE_START(detach_from_lru);
         detach_from_lru(new_pcm);
         PROFILE_LEAVE(detach_from_lru);
         //del_from_lru_list(new_pcm,pset);
-        pr_info("try_pin_one_page:debug8");
+        pr_info("try_pin_one_page_remote:debug8");
         
     //}
     //atomic_inc(&pset->nr_pinned);

@@ -40,6 +40,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         }
 
     }
+    pr_info("old_pte:  %#llx\n", old_pte);
     pr_info("try_pin_one_page:debug1");
     
     pset = user_vaddr_to_pcache_set(virt_address);

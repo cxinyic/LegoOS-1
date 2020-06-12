@@ -84,7 +84,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 		    return VM_FAULT_OOM;
 
         pr_info("try_pin_one_page:debug4_remote");
-        new_pcm = pte_to_pcache_meta(*new_pte);
+        
 
         pr_info("virt_address4:  %#llx\n", virt_address);
         pr_info("new_pmd:  %#llx\n", new_pmd);
@@ -105,6 +105,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         
         
         //new_pcm->pin_flag = 1;
+        new_pcm = pte_to_pcache_meta(*new_pte);
         pr_info("new_pcm:  %#llx\n", new_pcm);
         pr_info("try_pin_one_page:debug7");
         PROFILE_START(detach_from_lru);

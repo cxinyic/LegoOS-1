@@ -105,7 +105,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         
         
         //new_pcm->pin_flag = 1;
-        new_pcm = pte_to_pcache_meta(*new_pte);
+        /*new_pcm = pte_to_pcache_meta(*new_pte);
         unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;
         pr_info("new_pa: %#llx\n", new_pa);
         pr_info("new_pcm:  %#llx\n", new_pcm);
@@ -115,7 +115,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         PROFILE_LEAVE(detach_from_lru);
         //del_from_lru_list(new_pcm,pset);
         pr_info("try_pin_one_page:debug8");
-        
+        */
     }
     //atomic_inc(&pset->nr_pinned);
 

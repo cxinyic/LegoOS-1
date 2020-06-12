@@ -95,7 +95,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         }
         
         
-        new_pcm->pin_flag = 1;
+        //new_pcm->pin_flag = 1;
         pr_info("try_pin_one_page:debug7");
         del_from_lru_list(new_pcm,pset);
         pr_info("try_pin_one_page:debug8");

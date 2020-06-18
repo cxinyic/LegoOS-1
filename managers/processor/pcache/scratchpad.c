@@ -43,7 +43,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("old_pud:  %#llx\n", old_pud);
         old_pmd = pmd_offset(old_pud, virt_address);
         pr_info("try_pin_one_page:debug03");
-	    if (!pmd_none(*pmd)){
+	    if (!pmd_none(*old_pmd)){
             pr_info("old_pmd:  %#llx\n", old_pmd);
             old_pte = pte_offset(old_pmd,virt_address);
             pr_info("try_pin_one_page:debug04");

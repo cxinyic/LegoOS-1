@@ -118,7 +118,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         }
         
         
-        new_pcm->pin_flag = 1;
+        //new_pcm->pin_flag = 1;
         new_pcm = pte_to_pcache_meta(*new_pte);
         unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;
         pr_info("new_pa: %#llx\n", new_pa);

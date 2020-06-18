@@ -33,14 +33,22 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     pr_info("try_pin_one_page:debug0");
 
     old_pgd = pgd_offset(mm, virt_address);
-	old_pud = pud_offset(old_pgd, virt_address);
+    pr_info("try_pin_one_page:debug01");
+    if(old_pgd){
+        old_pud = pud_offset(old_pgd, virt_address);
+        pr_info("try_pin_one_page:debug02");
 	if (old_pud){
         old_pmd = pmd_offset(old_pud, virt_address);
+        pr_info("try_pin_one_page:debug03");
 	    if (old_pmd){
             old_pte = pte_offset(old_pmd,virt_address);
+            pr_info("try_pin_one_page:debug04");
         }
 
     }
+
+    }
+	
     //pr_info("old_pte:  %#llx\n", old_pte);
     pr_info("try_pin_one_page:debug1");
     

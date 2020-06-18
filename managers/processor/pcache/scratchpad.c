@@ -117,6 +117,7 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("try_pin_one_page_remote:debug6");
         PROFILE_LEAVE(pcache_handle_pte_fault);
         if (ret!=0){
+            pr_info("bad return: %lu\n", ret);
             return ret;
         }
         
@@ -197,7 +198,7 @@ int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
         PROFILE_START(try_pin_one_page);
         ret = try_pin_one_page(mm,virt_address+i*PAGE_SIZE);
         PROFILE_LEAVE(try_pin_one_page);
-        if (ret<0){
+        if (ret!=0){
             return -1;
         }
     }

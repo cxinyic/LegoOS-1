@@ -152,6 +152,7 @@ static void do_handle_p2m_pcache_miss(struct lego_task_struct *p,
 
 	ret = common_handle_p2m_miss(p, vaddr, flags, &new_page);
 	if (unlikely(ret & VM_FAULT_ERROR)) {
+		pr_info("do_handle_p2m_pcache_miss, %lu\n", ret);
 		if (ret & VM_FAULT_OOM)
 			ret = RET_ENOMEM;
 		else if (ret & (VM_FAULT_SIGBUS | VM_FAULT_SIGSEGV))
@@ -271,6 +272,7 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 	}
 
 	if (unlikely(fault_in_kernel_space(vaddr))) {
+		pr_info("handle_p2m_pcache_miss:fault in kernel space");
 		pcache_miss_error(RET_EFAULT, p, vaddr, tb);
 		return;
 	}

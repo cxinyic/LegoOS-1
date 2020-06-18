@@ -149,6 +149,7 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 
 	ret = fill_func(address, flags, pcm, arg);
 	if (unlikely(ret)) {
+		pr_info("bad return00: %lu\n", ret);
 		ret = VM_FAULT_SIGSEGV;
 		goto out;
 	}
@@ -284,6 +285,7 @@ fallback:
 		if (likely(len == sizeof(int))) {
 			/* remote reported error */
 			ret = -EFAULT;
+			pr_info("bad return01: %lu\n", ret);
 			goto out;
 		} else if (len < 0) {
 			/*

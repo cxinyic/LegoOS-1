@@ -103,6 +103,9 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         pr_info("virt_address4:  %#llx\n", virt_address);
         pr_info("new_pmd:  %#llx\n", new_pmd);
         pr_info("new_pte:  %#llx\n", new_pte);
+
+        unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;
+        pr_info("new_pa: %#llx\n", new_pa);
         
         
         
@@ -120,8 +123,8 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
         
         //new_pcm->pin_flag = 1;
         new_pcm = pte_to_pcache_meta(*new_pte);
-        unsigned long new_pa = pte_val(*new_pte) & PTE_PFN_MASK;
-        pr_info("new_pa: %#llx\n", new_pa);
+        unsigned long new_pa1 = pte_val(*new_pte) & PTE_PFN_MASK;
+        pr_info("new_pa: %#llx\n", new_pa1);
         pr_info("new_pcm:  %#llx\n", new_pcm);
         pr_info("try_pin_one_page_remote:debug7");
         PROFILE_START(detach_from_lru);

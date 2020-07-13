@@ -149,7 +149,6 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 
 	ret = fill_func(address, flags, pcm, arg);
 	if (unlikely(ret)) {
-		pr_info("bad return00: %lu\n", ret);
 		ret = VM_FAULT_SIGSEGV;
 		goto out;
 	}
@@ -164,7 +163,6 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 	ret = pcache_add_rmap(pcm, page_table, address,
 			      mm, current->group_leader, caller);
 	if (unlikely(ret)) {
-		pr_info("bad return11: %lu\n", ret);
 		pte_clear(page_table);
 		ret = VM_FAULT_OOM;
 		goto out;
@@ -286,7 +284,6 @@ fallback:
 		if (likely(len == sizeof(int))) {
 			/* remote reported error */
 			ret = -EFAULT;
-			pr_info("bad return01: %lu\n", ret);
 			goto out;
 		} else if (len < 0) {
 			/*
@@ -338,7 +335,6 @@ __pcache_do_zerofill_page(unsigned long address, unsigned long flags,
 
 	pcache_kva = pcache_meta_to_kva(pcm);
 	memset(pcache_kva, 0, PCACHE_LINE_SIZE);
-	pr_info("Debug:pcache_do_zerofill_page");
 
 	/*
 	 * Notify remote memory about this zerofill.

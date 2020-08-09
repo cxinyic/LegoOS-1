@@ -36,6 +36,11 @@ u64 nr_cachesets __read_mostly;
 
 atomic_long_t nr_used_cachelines;
 
+
+
+u64 nr_spcache_call;
+unsigned long spcache_first_address;
+
 /*
  * Original physical and ioremap'd kernel virtual address
  * These are read frequently to calculate offsets between structures:

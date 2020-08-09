@@ -179,6 +179,10 @@ int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)
 
 int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
 {
+    nr_spcache_call+=1;
+    if (nr_spcache_call==1){
+        spcache_first_address = virt_address;
+    }
     unsigned long prev_len = len;
     unsigned long offset;
     int ret;

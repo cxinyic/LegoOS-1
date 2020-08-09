@@ -644,6 +644,9 @@ int pcache_handle_fault(struct mm_struct *mm,
 	pte = pte_alloc(mm, pmd, address);
 	if (!pte)
 		return VM_FAULT_OOM;
+	if (address==spcache_first_address){
+		pr_info("Debug: pcache_handle_fault");
+	}
 
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));

@@ -59,9 +59,10 @@ int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
     pset = user_vaddr_to_pcache_set(virt_address);
     //pr_info("try_pin_one_page:debug12");
     
-	/*if(atomic_read(&pset->nr_pinned)+1>pcache_max_pinned){
-        pr_info("Error: exceed max pinned number");
-		return -1;
+	/*if(atomic_read(&pset->nr_pinned)+1==pcache_max_pinned){
+        spcache_first_address = virt_address;
+        atomic_inc(&pset->nr_pinned);
+        return 0;
 	}*/
     //pr_info("try_pin_one_page:debug13");
     // data is in pcache
@@ -180,8 +181,9 @@ int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)
 int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
 {
     nr_spcache_call+=1;
-    if (nr_spcache_call==1){
+    if(nr_spcache_call==12001){
         spcache_first_address = virt_address;
+        return 0;
     }
     unsigned long prev_len = len;
     unsigned long offset;

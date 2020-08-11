@@ -104,7 +104,7 @@ void __init pcache_early_init(void)
 	unit_size = nr_cachelines_per_page * PCACHE_LINE_SIZE;
 	unit_size += PAGE_SIZE;
 	nr_spcache_call=0;
-	spcache_first_address = 0;
+	
 
 	/*
 	 * nr_cachelines_per_page must already be a power of 2.

@@ -626,6 +626,7 @@ unlock:
  *
  * Return 0 on success, otherwise return VM_FAULT_XXX flags.
  */
+int print_flag=0;
 int pcache_handle_fault(struct mm_struct *mm,
 			unsigned long address, unsigned long flags)
 {
@@ -646,6 +647,14 @@ int pcache_handle_fault(struct mm_struct *mm,
 		return VM_FAULT_OOM;
 	
 	int i=0;
+	if(nr_spcache_call>8000&&print_flag==0){
+		for(i;i<20;i++){
+			pr_info("Debug: pcache_handle_fault, virt_address: %lx \n", spcache_first_address[i]);
+		}
+		print_flag=1;
+
+	}
+	
 	for(i;i<20;i++){
 		if(address==spcache_first_address[i]){
 			pr_info("Debug: pcache_handle_fault: %d \n", i);

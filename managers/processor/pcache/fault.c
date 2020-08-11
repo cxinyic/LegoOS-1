@@ -657,7 +657,7 @@ int pcache_handle_fault(struct mm_struct *mm,
 			pg_fault_count+=1;
 		}
 	}
-	if(pg_fault_count%1000==0){
+	if(pg_fault_count%10000==0){
 		pr_info("pg_fault_count: %d \n", pg_fault_count);
 	}
 	

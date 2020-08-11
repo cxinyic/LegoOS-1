@@ -59,7 +59,7 @@ extern u64 pcache_max_pinned;
 
 extern u64 nr_spcache_call;
 
-extern unsigned long spcache_first_address[20];
+extern unsigned long spcache_first_address[13000];
 
 /**
  * user_vaddr_to_set_index

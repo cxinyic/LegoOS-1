@@ -648,18 +648,10 @@ int pcache_handle_fault(struct mm_struct *mm,
 		return VM_FAULT_OOM;
 	
 	int i=0;
-	if(nr_spcache_call>8000&&print_flag==0){
-		for(i;i<20;i++){
-			pr_info("Debug: pcache_handle_fault, virt_address: %lx \n", spcache_first_address[i]);
-		}
-		pr_info("Debug: pcache_handle_fault, page fault address: %lx \n", address);
-		
-		print_flag=1;
-
-	}
+	
 	unsigned long new_address = PAGE_ALIGN(address);
-	i=0;
-	for(i;i<20;i++){
+    
+	for(i;i<12000;i++){
 		if(new_address==spcache_first_address[i]){
 			pr_info("Debug: pcache_handle_fault: %d \n", i);
 		}

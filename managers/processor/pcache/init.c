@@ -39,7 +39,7 @@ atomic_long_t nr_used_cachelines;
 
 
 u64 nr_spcache_call;
-unsigned long spcache_first_address;
+unsigned long spcache_first_address[20]={0};
 
 /*
  * Original physical and ioremap'd kernel virtual address

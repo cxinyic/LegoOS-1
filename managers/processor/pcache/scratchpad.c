@@ -181,12 +181,12 @@ int try_unpin_one_page(struct mm_struct *mm, unsigned long virt_address)
 int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
 {
     nr_spcache_call+=1;
-    if(nr_spcache_call==1){
+    if(nr_spcache_call%1000==0){
         pr_info("Debug: virt_address is %lx \n", virt_address);
-        spcache_first_address = virt_address;
+        spcache_first_address[nr_spcache_call/1000] = virt_address;
         return 0;
     }
-    unsigned long prev_len = len;
+    /*unsigned long prev_len = len;
     unsigned long offset;
     int ret;
     len = PAGE_ALIGN(len);
@@ -208,7 +208,7 @@ int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
         if (ret!=0){
             return -1;
         }
-    }
+    }*/
     return 0;
 }
 

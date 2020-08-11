@@ -645,10 +645,14 @@ int pcache_handle_fault(struct mm_struct *mm,
 	if (!pte)
 		return VM_FAULT_OOM;
 	
-	
-	if (address==spcache_first_address){
-		pr_info("Debug: pcache_handle_fault \n");
+	int i=0;
+	for(i;i<20;i++){
+		if(address==spcache_first_address[i]){
+			pr_info("Debug: pcache_handle_fault: %d \n", i);
+		}
 	}
+	
+	
 
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));

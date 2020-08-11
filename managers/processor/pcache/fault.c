@@ -627,7 +627,7 @@ unlock:
  * Return 0 on success, otherwise return VM_FAULT_XXX flags.
  */
 int print_flag=0;
-int pg_fault_count=0;
+int pg_fault_count=1;
 
 int pcache_handle_fault(struct mm_struct *mm,
 			unsigned long address, unsigned long flags)

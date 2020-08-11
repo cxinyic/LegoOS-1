@@ -654,9 +654,10 @@ int pcache_handle_fault(struct mm_struct *mm,
 		print_flag=1;
 
 	}
-	
+	unsigned long new_address = PAGE_ALIGN(address);
+	i=0;
 	for(i;i<20;i++){
-		if(address==spcache_first_address[i]){
+		if(new_address==spcache_first_address[i]){
 			pr_info("Debug: pcache_handle_fault: %d \n", i);
 		}
 	}

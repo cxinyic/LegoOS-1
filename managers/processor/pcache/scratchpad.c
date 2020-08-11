@@ -184,11 +184,10 @@ int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
     
     
     //pr_info("Debug: virt_address is %lx \n", virt_address);
-    spcache_first_address[nr_spcache_call] = virt_address;
+
+    spcache_first_address[nr_spcache_call] = PAGE_ALIGN(virt_address);
     nr_spcache_call+=1;
-    if(PAGE_ALIGN(virt_address)!=virt_address){
-        pr_info("Debug: fail on page align\n");
-    }
+    
     return 0;
     
     /*unsigned long prev_len = len;

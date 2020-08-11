@@ -14,6 +14,7 @@
 #include <processor/pcache.h>
 #include <processor/processor.h>
 #include <processor/distvm.h>
+#include "assert.h"
 
 int try_pin_one_page(struct mm_struct *mm, unsigned long virt_address)
 {

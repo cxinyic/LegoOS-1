@@ -648,7 +648,7 @@ int pcache_handle_fault(struct mm_struct *mm,
 	if (!pte)
 		return VM_FAULT_OOM;
 	
-	int i=0;
+	/*int i=0;
 	
 	unsigned long new_address = PAGE_ALIGN(address);
     
@@ -659,7 +659,7 @@ int pcache_handle_fault(struct mm_struct *mm,
 	}
 	if(pg_fault_count%10000==0){
 		pr_info("pg_fault_count: %d \n", pg_fault_count);
-	}
+	}*/
 	
 	
 

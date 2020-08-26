@@ -655,10 +655,8 @@ int pcache_handle_fault(struct mm_struct *mm,
 	for(i;i<nr_spcache_call;i++){
 		if(new_address==spcache_first_address[i]){
 			pg_fault_count+=1;
+			pr_info("pg_fault_count: %d \n", pg_fault_count);
 		}
-	}
-	if(pg_fault_count%100==0){
-		pr_info("pg_fault_count: %d \n", pg_fault_count);
 	}
 	
 	

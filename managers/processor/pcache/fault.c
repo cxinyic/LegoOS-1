@@ -648,18 +648,18 @@ int pcache_handle_fault(struct mm_struct *mm,
 	if (!pte)
 		return VM_FAULT_OOM;
 	
-	/*int i=0;
+	int i=0;
 	
 	unsigned long new_address = PAGE_ALIGN(address);
     
-	for(i;i<12000;i++){
+	for(i;i<nr_spcache_call;i++){
 		if(new_address==spcache_first_address[i]){
 			pg_fault_count+=1;
 		}
 	}
 	if(pg_fault_count%10000==0){
 		pr_info("pg_fault_count: %d \n", pg_fault_count);
-	}*/
+	}
 	
 	
 

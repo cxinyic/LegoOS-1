@@ -195,6 +195,10 @@ int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len)
             return 0;
         }
     }
+    if (nr_spcache_call%100){
+        pr_info("nr_spcache_call : %d \n", nr_spcache_call);
+    }
+
     
     spcache_first_address[nr_spcache_call] = new_address;
     nr_spcache_call+=1;

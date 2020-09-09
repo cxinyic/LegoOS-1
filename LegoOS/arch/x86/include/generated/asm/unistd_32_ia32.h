@@ -1,5 +1,0 @@
-#ifndef _ASM_X86_UNISTD_32_IA32_H
-#define _ASM_X86_UNISTD_32_IA32_H 1
-
-
-#endif /* _ASM_X86_UNISTD_32_IA32_H */

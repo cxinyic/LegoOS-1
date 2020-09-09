@@ -1,1 +1,0 @@
-cmd_drivers/infiniband/core/ib_core.o := ld  -r -o drivers/infiniband/core/ib_core.o drivers/infiniband/core/ud_header.o drivers/infiniband/core/packer.o drivers/infiniband/core/verbs.o drivers/infiniband/core/device.o drivers/infiniband/core/cache.o 

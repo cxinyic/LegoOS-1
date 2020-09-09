@@ -1,1 +1,0 @@
-cmd_arch/x86/pci/built-in.o :=  ld  -r -o arch/x86/pci/built-in.o arch/x86/pci/common.o arch/x86/pci/direct.o arch/x86/pci/irq.o arch/x86/pci/mmconfig-shared.o arch/x86/pci/mmconfig_64.o arch/x86/pci/bus_numa.o 

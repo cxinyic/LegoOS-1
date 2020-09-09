@@ -1,1 +1,0 @@
-cmd_arch/x86/boot/compressed/vmImage := ld -m elf_x86_64  -T arch/x86/boot/compressed/vmImage.lds arch/x86/boot/compressed/head_64.o arch/x86/boot/compressed/piggy.o -o arch/x86/boot/compressed/vmImage

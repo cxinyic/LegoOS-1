@@ -1,1 +1,0 @@
-cmd_kernel/time/built-in.o :=  ld  -r -o kernel/time/built-in.o kernel/time/clocksource.o kernel/time/clockevents.o kernel/time/jiffies.o kernel/time/time.o kernel/time/timekeeping.o kernel/time/timer.o kernel/time/posix-timers.o kernel/time/ntp.o kernel/time/tick-common.o 

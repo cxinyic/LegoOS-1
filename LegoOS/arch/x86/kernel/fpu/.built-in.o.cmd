@@ -1,1 +1,0 @@
-cmd_arch/x86/kernel/fpu/built-in.o :=  ld  -r -o arch/x86/kernel/fpu/built-in.o arch/x86/kernel/fpu/init.o arch/x86/kernel/fpu/core.o arch/x86/kernel/fpu/xstate.o arch/x86/kernel/fpu/signal.o arch/x86/kernel/fpu/regset.o 

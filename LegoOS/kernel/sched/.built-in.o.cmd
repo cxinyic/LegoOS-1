@@ -1,1 +1,0 @@
-cmd_kernel/sched/built-in.o :=  ld  -r -o kernel/sched/built-in.o kernel/sched/core.o kernel/sched/wait.o kernel/sched/idle.o kernel/sched/completion.o kernel/sched/cputime.o kernel/sched/debug.o kernel/sched/task_stop.o kernel/sched/task_rt.o kernel/sched/task_dl.o kernel/sched/task_fair.o kernel/sched/task_idle.o 

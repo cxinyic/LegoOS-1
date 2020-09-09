@@ -1,0 +1,1 @@
+cmd_managers/processor/fs/dev/built-in.o :=  ld  -r -o managers/processor/fs/dev/built-in.o managers/processor/fs/dev/core.o managers/processor/fs/dev/dev_random.o managers/processor/fs/dev/dev_null.o 

@@ -1,0 +1,1 @@
+cmd_managers/processor/built-in.o :=  ld  -r -o managers/processor/built-in.o managers/processor/core.o managers/processor/fork.o managers/processor/exec.o managers/processor/pgtable.o managers/processor/wait.o managers/processor/prctl.o managers/processor/mmap/built-in.o managers/processor/fs/built-in.o managers/processor/monitor/built-in.o managers/processor/pcache/built-in.o 

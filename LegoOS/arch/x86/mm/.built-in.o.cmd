@@ -1,0 +1,1 @@
+cmd_arch/x86/mm/built-in.o :=  ld  -r -o arch/x86/mm/built-in.o arch/x86/mm/init.o arch/x86/mm/fault.o arch/x86/mm/ioremap.o arch/x86/mm/numa.o arch/x86/mm/pgtable.o arch/x86/mm/tlb.o arch/x86/mm/extable.o arch/x86/mm/debug.o arch/x86/mm/dumppgtable.o 

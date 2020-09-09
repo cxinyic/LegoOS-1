@@ -1,0 +1,1 @@
+cmd_drivers/built-in.o :=  ld  -r -o drivers/built-in.o drivers/tty/built-in.o drivers/base/built-in.o drivers/acpi/built-in.o drivers/pci/built-in.o drivers/infiniband/built-in.o drivers/eth/built-in.o 

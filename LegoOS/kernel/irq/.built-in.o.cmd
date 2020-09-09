@@ -1,0 +1,1 @@
+cmd_kernel/irq/built-in.o :=  ld  -r -o kernel/irq/built-in.o kernel/irq/handle.o kernel/irq/dummychip.o kernel/irq/chip.o kernel/irq/irqdesc.o kernel/irq/irqaction.o kernel/irq/irqdomain.o kernel/irq/msi.o 

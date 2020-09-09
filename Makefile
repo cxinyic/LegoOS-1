@@ -230,7 +230,7 @@ NOSTDINC_FLAGS	=
 LDFLAGS_vmImage	=
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common \
+		   -fno-strict-aliasing -fno-common -fno-pie \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -Werror=uninitialized \
@@ -548,7 +548,7 @@ ifeq ($(KBUILD_EXTMOD),)
 # Objects that will be linked into final vmImage
 # These variables are initialized in arch Makefile
 init-y		:= init/
-core-y		+= kernel/ mm/ managers/  spcache/
+core-y		+= kernel/ mm/ managers/ dcroutors/
 drivers-y	+= drivers/
 net-y		:= net/
 libs-y		+= lib/

@@ -1,0 +1,1 @@
+cmd_drivers/pci/built-in.o :=  ld  -r -o drivers/pci/built-in.o drivers/pci/access.o drivers/pci/bus.o drivers/pci/probe.o drivers/pci/search.o drivers/pci/host-bridge.o drivers/pci/driver.o drivers/pci/pci.o drivers/pci/msi.o 

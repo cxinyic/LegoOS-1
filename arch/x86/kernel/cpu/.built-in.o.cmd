@@ -1,0 +1,1 @@
+cmd_arch/x86/kernel/cpu/built-in.o :=  ld  -r -o arch/x86/kernel/cpu/built-in.o arch/x86/kernel/cpu/common.o arch/x86/kernel/cpu/intel.o arch/x86/kernel/cpu/scattered.o arch/x86/kernel/cpu/capflags.o arch/x86/kernel/cpu/powerflags.o arch/x86/kernel/cpu/topology.o 

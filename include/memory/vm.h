@@ -196,6 +196,10 @@ int __vma_adjust(struct vm_area_struct *vma, unsigned long start,
 	unsigned long end, pgoff_t pgoff, struct vm_area_struct *insert,
 	struct vm_area_struct *expand);
 
+// QZ: add for mm_struct
+void __vma_link_rb_mm(struct mm_struct *mm, struct vm_area_struct *vma,
+		struct rb_node **rb_link, struct rb_node *rb_parent);
+
 static inline int vma_adjust(struct vm_area_struct *vma, unsigned long start,
 	unsigned long end, pgoff_t pgoff, struct vm_area_struct *insert)
 {
@@ -297,6 +301,9 @@ void lego_free_pgtables(struct vm_area_struct *start_vma,
 
 void lego_unmap_page_range(struct vm_area_struct *vma,
 			   unsigned long addr, unsigned long end);
+//QZ: dcRoutors related
+int copy_mm_from_lego(struct mm_struct *dst, struct lego_mm_struct *src,
+		struct vm_area_struct *vma, struct task_struct *tsk);
 
 /* debug.c */
 void dump_all_vmas_simple(struct lego_mm_struct *mm);

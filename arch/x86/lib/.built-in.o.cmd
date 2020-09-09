@@ -1,0 +1,1 @@
+cmd_arch/x86/lib/built-in.o :=  ld  -r -o arch/x86/lib/built-in.o arch/x86/lib/delay.o arch/x86/lib/usercopy.o arch/x86/lib/getuser.o arch/x86/lib/putuser.o arch/x86/lib/uaccess.o arch/x86/lib/rwsem.o arch/x86/lib/memset_64.o arch/x86/lib/memcpy_64.o arch/x86/lib/memmove_64.o arch/x86/lib/csum-partial_64.o 

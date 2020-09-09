@@ -92,9 +92,6 @@ struct pcache_meta *evict_find_line_lru(struct pcache_set *pset)
 	 */
 	spin_lock(&pset->lru_lock);
 	list_for_each_entry_reverse(pcm, &pset->lru_list, lru) {
-		/*if (pcm->pin_flag==1){
-			continue;
-		}*/
 		PCACHE_BUG_ON_PCM(PcacheReclaim(pcm), pcm);
 
 		/*
@@ -136,13 +133,10 @@ struct pcache_meta *evict_find_line_lru(struct pcache_set *pset)
 		 *
 		 * Remove it from LRU list, and set Reclaim
 		 */
-		
-			found = true;
-			__del_from_lru_list(pcm, pset);
-			SetPcacheReclaim(pcm);
-			goto unlock_lru;
-		
-		
+		found = true;
+		__del_from_lru_list(pcm, pset);
+		SetPcacheReclaim(pcm);
+		goto unlock_lru;
 
 unlock_pcache:
 		unlock_pcache(pcm);

@@ -47,6 +47,8 @@
 #include <lego/comp_common.h>
 #include <processor/processor.h>
 
+#include <lego/dcroutors/c_routor.h>
+
 #include <asm/io.h>
 #include <asm/asm.h>
 #include <asm/page.h>
@@ -182,6 +184,11 @@ static void rest_init(void)
 	pid = kernel_thread(kthreadd, NULL, 0);
 	kthreadd_task = find_task_by_pid(pid);
 	complete(&kthreadd_done);
+#ifdef CONFIG_COMP_MEMORY
+    // QZ: Start c_routor here.
+	pid = kernel_thread(c_routor, NULL, 0);
+	c_routor_task = find_task_by_pid(pid);
+#endif
 
 	/*
 	 * The boot idle thread must execute schedule()

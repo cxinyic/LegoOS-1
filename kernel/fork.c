@@ -351,12 +351,16 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
 		return NULL;
 	}
 
+// QZ: as memory node can also execute this function,
+//     calling get_memory_home_node will trigger a BUG.
+#ifdef CONFIG_COMP_PROCESSOR
 	/* Processor: init distributed VMA resource */
 	if (processor_distvm_init(mm, get_memory_home_node(p))) {
 		pgd_free(mm, mm->pgd);
 		kfree(mm);
 		return NULL;
 	}
+#endif
 
 	return mm;
 }
@@ -949,6 +953,7 @@ pid_t do_fork(unsigned long clone_flags,
 	struct completion vfork;
 	pid_t pid;
 
+    pr_debug("QZ: do_fork(): CLONE_VM?: %lu, stack_start: %lx, stack_size: %lu, p_tidptr: %p, c_tidptr: %p, tls: %lx\n", clone_flags & CLONE_VM, stack_start, stack_size, parent_tidptr, child_tidptr, tls);
 	p = copy_process(clone_flags, stack_start, stack_size,
 			 child_tidptr, tls, NUMA_NO_NODE);
 	if (IS_ERR(p))
@@ -1042,6 +1047,8 @@ SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp,
 	 * Libraries may use clone() instead of fork()
 	 * to create new process. Add global flag if so:
 	 */
+    // QZ: profile clone
+    pr_debug("QZ: clone(): CLONE_VM?: %lu, newsp: %lx, p_tidptr: %p, c_tidptr: %p, tls: %lx\n", clone_flags & CLONE_VM, newsp, parent_tidptr, child_tidptr, tls);
 	if (!(clone_flags & CLONE_THREAD))
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	pid = do_fork(clone_flags, newsp, 0, parent_tidptr, child_tidptr, tls);

@@ -1,0 +1,1 @@
+cmd_mm/built-in.o :=  ld  -r -o mm/built-in.o mm/debug.o mm/memory.o mm/init-mm.o mm/vmalloc.o mm/dmapool.o mm/memblock.o mm/page_alloc.o mm/early_ioremap.o mm/percpu.o mm/maccess.o mm/mbind.o mm/vmstat.o mm/slab_common.o mm/slob.o mm/sparse.o mm/sparse-vmemmap.o 

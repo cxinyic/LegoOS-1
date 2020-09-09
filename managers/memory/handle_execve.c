@@ -132,8 +132,11 @@ out:
 	kfree(argv);
 	kfree(argv_len);
 
-	execve_debug("reply_status: %s, new_ip: %#Lx, new_sp: %#Lx",
+    // QZ: debug execve
+	pr_info("reply_status: %s, new_ip: %#Lx, new_sp: %#Lx",
 		ret_to_string(reply->status), reply->new_ip, reply->new_sp);
+	// execve_debug("reply_status: %s, new_ip: %#Lx, new_sp: %#Lx",
+	//	ret_to_string(reply->status), reply->new_ip, reply->new_sp);
 
 #ifdef CONFIG_DEBUG_VMA
 	dump_reply(&reply->map);

@@ -875,7 +875,9 @@ static int load_elf_binary(struct lego_task_struct *tsk, struct lego_binprm *bpr
 	start_data += load_bias;
 	end_data += load_bias;
 
-	loader_debug("code: [%#lx-%#lx] data: [%#lx-%#lx] "
+    // QZ: debug loader
+	// loader_debug("code: [%#lx-%#lx] data: [%#lx-%#lx] "
+	pr_info("QZ - ELF loader: code: [%#lx-%#lx] data: [%#lx-%#lx] "
 		     "elf_bss: %#lx, elf_brk: %#lx",
 		     start_code, end_code, start_data, end_data,
 		     elf_bss, elf_brk);

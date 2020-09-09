@@ -314,6 +314,9 @@ rmap_get_pte_locked(struct pcache_meta *pcm, struct pcache_rmap *rmap,
 	struct mm_struct *mm = rmap->owner_mm;
 	unsigned long address = rmap->address;
 
+//	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//		pr_info("QZ: %s() rmap->address = %#lx\n", __func__, address);
+//	}
 	pmd = rmap_get_pmd(mm, address);
 	ptep = pte_offset(pmd, address);
 
@@ -330,9 +333,45 @@ rmap_get_pte_locked(struct pcache_meta *pcm, struct pcache_rmap *rmap,
 	}
 
 	ptl = pte_lockptr(mm, pmd);
+//	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//		pr_info("QZ: %s() lock is computed: ptl = %#lx, \n", __func__, (unsigned long)ptl);
+//	}
+//	if (spin_is_locked(ptl)) {
+//		pr_info("QZ: %s() spin is locked!: ptl = %#lx, \n", __func__, (unsigned long)ptl);
+//	}
 	spin_lock(ptl);
 	*ptlp = ptl;
 
+out:
+	return ptep;
+}
+
+// QZ: add no lock version
+static __always_inline pte_t *
+rmap_get_pte_no_lock(struct pcache_meta *pcm, struct pcache_rmap *rmap)
+{
+	pte_t *ptep;
+	pmd_t *pmd;
+	struct mm_struct *mm = rmap->owner_mm;
+	unsigned long address = rmap->address;
+
+//	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//		pr_info("QZ: %s() rmap->address = %#lx\n", __func__, address);
+//	}
+	pmd = rmap_get_pmd(mm, address);
+	ptep = pte_offset(pmd, address);
+
+	if (unlikely(ptep != rmap->page_table)) {
+		report_bad_rmap(pcm, rmap, address, ptep, NULL);
+		ptep = NULL;
+		goto out;
+	}
+
+	if (unlikely(pcache_meta_to_pfn(pcm) != pte_pfn(*ptep))) {
+		report_bad_rmap(pcm, rmap, address, ptep, NULL);
+		ptep = NULL;
+		goto out;
+	}
 out:
 	return ptep;
 }
@@ -621,14 +660,17 @@ static int pcache_move_pte_fastpath(struct mm_struct *mm,
 	pte_t old_ptent;
 
 	old_ptent = *old_pte;
+//	pr_info("QZ: %s(): get the meta of old pte\n", __func__);
 	pcm = pte_to_pcache_meta(old_ptent);
 	BUG_ON(!pcm);
 
 	/* See comments on pcache_zap_pte */
 	if (unlikely(!trylock_pcache(pcm))) {
+//		pr_info("QZ: %s(): get pcache for pcm\n", __func__);
 		get_pcache(pcm);
 		spin_unlock(old_ptl);
 
+//		pr_info("QZ: %s(): lock pcache on pcm\n", __func__);
 		lock_pcache(pcm);
 		spin_lock(old_ptl);
 
@@ -637,13 +679,17 @@ static int pcache_move_pte_fastpath(struct mm_struct *mm,
 			put_pcache(pcm);
 			return -EAGAIN;
 		}
+//		pr_info("QZ: %s(): put pcache on pcm\n", __func__);
 		put_pcache(pcm);
 	}
+//	pr_info("QZ: %s(): before walking on rmap\n", __func__);
 	rmap_walk(pcm, &rwc);
+//	pr_info("QZ: %s(): after walking on rmap\n", __func__);
 	unlock_pcache(pcm);
 
 	/* Failure is not an option. */
 	BUG_ON(!mpi.updated);
+//	pr_info("QZ: %s(): exiting\n", __func__);
 	return 0;
 }
 
@@ -744,7 +790,9 @@ static int pcache_move_pte_slowpath(struct mm_struct *mm,
 	BUG_ON(!old_pcm);
 
 	/* Alloc a line in the new set */
+//	pr_info("QZ: %s(): allocating a new pcm for new_addr = %#lx\n", __func__, new_addr);
 	new_pcm = pcache_alloc(new_addr, DISABLE_PIGGYBACK);
+//	pr_info("QZ: %s(): after the new pcm allocation\n", __func__);
 	if (unlikely(!new_pcm)) {
 		ret = -ENOMEM;
 		goto out;
@@ -753,9 +801,11 @@ static int pcache_move_pte_slowpath(struct mm_struct *mm,
 
 	/* See comments on pcache_zap_pte */
 	if (unlikely(!trylock_pcache(old_pcm))) {
+//		pr_info("QZ: %s(): get pcache for old pcm\n", __func__);
 		get_pcache(old_pcm);
 		spin_unlock(old_ptl);
 
+//		pr_info("QZ: %s(): lock pcache on old pcm\n", __func__);
 		lock_pcache(old_pcm);
 		spin_lock(old_ptl);
 
@@ -764,9 +814,12 @@ static int pcache_move_pte_slowpath(struct mm_struct *mm,
 			put_pcache(old_pcm);
 			return -EAGAIN;
 		}
+//		pr_info("QZ: %s(): put pcache on old pcm\n", __func__);
 		put_pcache(old_pcm);
 	}
+//	pr_info("QZ: %s(): before walking on rmap\n", __func__);
 	rmap_walk(old_pcm, &rwc);
+//	pr_info("QZ: %s(): after walking on rmap\n", __func__);
 	unlock_pcache(old_pcm);
 
 	/* Failure is not an option */
@@ -776,10 +829,13 @@ static int pcache_move_pte_slowpath(struct mm_struct *mm,
 	 * Try to free the old pcm.
 	 * Similar to pcache_zap_pte's last step.
 	 */
+//	pr_info("QZ: %s(): before free old pcm\n", __func__);
 	put_pcache(old_pcm);
+//	pr_info("QZ: %s(): after free old pcm\n", __func__);
 
 	ret = 0;
 out:
+//	pr_info("QZ: %s(): exiting\n", __func__);
 	return ret;
 }
 
@@ -794,14 +850,19 @@ int pcache_move_pte(struct mm_struct *mm, pte_t *old_pte, pte_t *new_pte,
 {
 	unsigned long old_index, new_index;
 
+	// // QZ: debug
+	// pr_info("QZ: %s(): moving one pte\n", __func__);
+
 	old_index = user_vaddr_to_set_index(old_addr);
 	new_index = user_vaddr_to_set_index(new_addr);
 
 	if (old_index == new_index) {
+		// pr_info("QZ: %s(): old_index == new_index, going to fast path\n", __func__);
 		inc_pcache_event(PCACHE_MREMAP_PSET_SAME);
 		return pcache_move_pte_fastpath(mm, old_pte, new_pte,
 						old_addr, new_addr, old_ptl);
 	} else {
+		// pr_info("QZ: %s(): old_index != new_index, going to slow path\n", __func__);
 		inc_pcache_event(PCACHE_MREMAP_PSET_DIFF);
 		return pcache_move_pte_slowpath(mm, old_pte, new_pte,
 						old_addr, new_addr, old_ptl);
@@ -992,17 +1053,32 @@ static int pcache_try_to_unmap_reserve_one(struct pcache_meta *pcm,
 {
 	int ret = PCACHE_RMAP_AGAIN;
 	bool *dirty = arg;
-	spinlock_t *ptl = NULL;
+	// spinlock_t *ptl = NULL; // QZ: no lock
 	pte_t *pte;
 	pte_t pteval;
 
 	PCACHE_BUG_ON_RMAP(RmapReserved(rmap), rmap);
 
-	pte = rmap_get_pte_locked(pcm, rmap, &ptl);
+	// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+	//	pr_info("QZ: %s() before get the lock\n", __func__);
+	// }
+	// QZ: old version
+	// pte = rmap_get_pte_locked(pcm, rmap, &ptl);
+	// QZ: no lock version
+	pte = rmap_get_pte_no_lock(pcm, rmap);
+	// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+	//	pr_info("QZ: %s() after get the lock\n", __func__);
+	// }
 	if (unlikely(!pte))
 		return ret;
 
+	// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+	//	pr_info("QZ: %s() before clear pte\n", __func__);
+	// }
 	pteval = ptep_get_and_clear(0, pte);
+	// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+	//	pr_info("QZ: %s() after clear pte\n", __func__);
+	// }
 
 	if (likely(pte_present(pteval))) {
 		/*
@@ -1017,14 +1093,29 @@ static int pcache_try_to_unmap_reserve_one(struct pcache_meta *pcm,
 		 * After this, pgfault on other cores will
 		 * follow immediately, if they access this page.
 		 */
+		// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+		//	pr_info("QZ: %s() before flush tlb\n", __func__);
+		// }
 		flush_tlb_mm_range(rmap->owner_mm,
 				   rmap->address,
 				   rmap->address + PAGE_SIZE -1);
+		// if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+		//	pr_info("QZ: %s() after flush tlb\n", __func__);
+		// }
 	}
 
 	SetRmapReserved(rmap);
 
+	// QZ: no lock version - remove below
+	/*
+	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+		pr_info("QZ: %s() unlocking spin lock\n", __func__);
+	}
 	spin_unlock(ptl);
+	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+		pr_info("QZ: %s() Exit\n", __func__);
+	}
+	*/
 	return ret;
 }
 
@@ -1117,6 +1208,8 @@ int pcache_try_to_unmap_reserve(struct pcache_meta *pcm)
  * we return if the @pcm is dirty or not. Caller may have different
  * actions depends on dirty status.
  */
+// QZ: debug
+// bool pcache_try_to_unmap_reserve_check_dirty(struct pcache_meta *pcm, unsigned long address)
 bool pcache_try_to_unmap_reserve_check_dirty(struct pcache_meta *pcm)
 {
 	bool dirty = false;
@@ -1128,7 +1221,11 @@ bool pcache_try_to_unmap_reserve_check_dirty(struct pcache_meta *pcm)
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 
+	// if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+	//	pr_info("QZ: %s() before rmap_walk for pcm = %#lx.\n", __func__, (unsigned long)pcm);
 	rmap_walk(pcm, &rwc);
+	// if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+	//	pr_info("QZ: %s() after rmap_walk.\n", __func__);
 	return dirty;
 }
 
@@ -1383,7 +1480,15 @@ int rmap_walk(struct pcache_meta *pcm, struct rmap_walk_control *rwc)
 	if (unlikely(list_empty(&pcm->rmap)))
 		return ret;
 
+//	// QZ: debug
+//	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//		pr_info("QZ: %s() inside rmap_walk with function = %pF.\n", __func__, rwc->rmap_one);
+//	}
+
 	list_for_each_entry_safe(rmap, keeper, &pcm->rmap, next) {
+//		if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//			pr_info("QZ: %s() in the loop, cur rmap = %#lx.\n", __func__, (unsigned long)rmap);
+//		}
 		ret = rwc->rmap_one(pcm, rmap, rwc->arg);
 		if (ret != PCACHE_RMAP_AGAIN)
 			break;
@@ -1391,6 +1496,9 @@ int rmap_walk(struct pcache_meta *pcm, struct rmap_walk_control *rwc)
 		if (rwc->done && rwc->done(pcm))
 			break;
 	}
+//	if (((unsigned long)pcm) == 0xffff8801106c4d80 || ((unsigned long)pcm) == 0xffff8801107dfe80) {
+//		pr_info("QZ: %s() after the loop. Exit.\n", __func__);
+//	}
 
 	return ret;
 }

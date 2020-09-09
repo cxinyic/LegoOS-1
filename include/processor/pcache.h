@@ -55,12 +55,6 @@ extern u64 pcache_way_cache_stride;
 extern struct pcache_set *pcache_set_map;
 extern struct pcache_meta *pcache_meta_map;
 
-extern u64 pcache_max_pinned;
-
-extern u64 nr_spcache_call;
-
-extern unsigned long spcache_first_address[100000];
-
 /**
  * user_vaddr_to_set_index
  *
@@ -648,6 +642,8 @@ int rmap_walk(struct pcache_meta *pcm, struct rmap_walk_control *rwc);
 int pcache_try_to_unmap(struct pcache_meta *pcm);
 bool pcache_try_to_unmap_check_dirty(struct pcache_meta *pcm);
 bool pcache_try_to_unmap_reserve_check_dirty(struct pcache_meta *pcm);
+// QZ: debug
+// bool pcache_try_to_unmap_reserve_check_dirty(struct pcache_meta *pcm, unsigned long address);
 int pcache_wrprotect(struct pcache_meta *pcm);
 int pcache_referenced(struct pcache_meta *pcm);
 void pcache_referenced_trylock(struct pcache_meta *pcm,
@@ -662,13 +658,6 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 			pte_t *page_table, pte_t orig_pte, pmd_t *pmd,
 			unsigned long flags, fill_func_t fill_func, void *arg,
 			enum rmap_caller caller, enum piggyback_options piggyback);
-
-int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
-				   pte_t *pte, pmd_t *pmd, unsigned long flags);
-int try_pin(struct mm_struct *mm, unsigned long virt_address, unsigned long len);
-int try_unpin(struct mm_struct *mm, unsigned long virt_address, unsigned long len);
-
-
 
 #include <processor/pcache_victim.h>
 #include <processor/pcache_evict.h>

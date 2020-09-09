@@ -464,6 +464,12 @@ static inline spinlock_t *pte_lockptr(struct mm_struct *mm, pmd_t *pmd)
 	return ptlock_ptr(pmd_page(*pmd));
 }
 
+// QZ: spin lock by pte -- This doesn't make sense as there is no pte page initialized.
+static inline spinlock_t *pte_lockptr_by_pte(pte_t *pte)
+{
+	return ptlock_ptr(pte_page(*pte));
+}
+
 static inline bool ptlock_init(struct page *page)
 {
 	spin_lock_init(ptlock_ptr(page));

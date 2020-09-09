@@ -1,0 +1,1 @@
+cmd_managers/memory/replica/built-in.o :=  ld  -r -o managers/memory/replica/built-in.o managers/memory/replica/memory_core.o managers/memory/replica/memory_flush.o managers/memory/replica/memory_debug.o 

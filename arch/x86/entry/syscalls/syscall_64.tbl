@@ -125,11 +125,10 @@
 291	common	epoll_create1		sys_epoll_create1
 309	common	getcpu			sys_getcpu
 
-# scratchpad related SYSCALL
-317 64 sp_pin    sys_sp_pin
-318 64 sp_unpin    sys_sp_unpin
- 
-
+# dcRoutors SYSCALL
+315	64	remote_aggregate	sys_remote_aggregate
+316	64	c_pushdown	sys_c_pushdown
+317	64	c_syncmem	sys_c_syncmem
 
 #
 # Lego specific SYSCALL

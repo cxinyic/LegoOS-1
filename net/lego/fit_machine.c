@@ -39,15 +39,15 @@ struct fit_machine_info *lego_cluster[CONFIG_FIT_NR_NODES];
  * raw numbers.
  */
 static const char *lego_cluster_hostnames[CONFIG_FIT_NR_NODES] = {
-	[0]	=	"node-0",
-	[1]	=	"node-1",
-	[2] = 	"node-2",
+	[0]	=	"zebra04",
+	[1]	=	"zebra03",
+	[2] 	= 	"zebra05",
 };
 
-static struct fit_machine_info WUKLAB_CLUSTER[] = {
-[0]	= {	.hostname =	"node-0",	.lid =	62,	},
-[1]	= {	.hostname =	"node-1",	.lid =	60,	},
-[2]	= {	.hostname =	"node-2",	.lid =	63,	},
+static struct fit_machine_info ZEBRA_CLUSTER[] = {
+[0]	= {	.hostname =	"zebra04",	.lid =	14,	},
+[1]	= {	.hostname =	"zebra03",	.lid =	13,	},
+[2]	= {	.hostname =	"zebra05",	.lid =	16,	},
 /*[3]	= {	.hostname =	"wuklab03",	.lid =	9,	},
 [4]	= {	.hostname =	"wuklab04",	.lid =	7,	},
 [5]	= {	.hostname =	"wuklab05",	.lid =	3,	},
@@ -99,7 +99,7 @@ static int assign_fit_machine(unsigned int nid, struct fit_machine_info *machine
 {
 	unsigned int machine_index;
 
-	machine_index = machine - WUKLAB_CLUSTER;
+	machine_index = machine - ZEBRA_CLUSTER;
 	if (test_and_set_bit(machine_index, cluster_used_machines))
 		return 1;
 
@@ -116,8 +116,8 @@ static struct fit_machine_info *find_fit_machine(const char *hostname)
 	int i;
 
 	/* Linear search for a small cluster */
-	for (i = 0; i < ARRAY_SIZE(WUKLAB_CLUSTER); i++) {
-		machine = &WUKLAB_CLUSTER[i];
+	for (i = 0; i < ARRAY_SIZE(ZEBRA_CLUSTER); i++) {
+		machine = &ZEBRA_CLUSTER[i];
 		if (!strncmp(hostname, machine->hostname, FIT_HOSTNAME_MAX))
 			return machine;
 	}

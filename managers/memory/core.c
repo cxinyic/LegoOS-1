@@ -195,6 +195,21 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 		inc_mm_stat(HANDLE_WRITE);
 		handle_p2m_write(payload, hdr, buffer);
 		break;
+/* QZ: dcRoutors */	
+// remote_aggregate
+	case P2M_REMOTE_AGGREGATE:
+		inc_mm_stat(HANDLE_P2M_REMOTE_AGGREGATE);
+		handle_p2m_remote_aggregate(payload, hdr, buffer);
+		break;
+// compute_pushdown
+    case P2M_C_PUSHDOWN:
+		inc_mm_stat(HANDLE_P2M_REMOTE_AGGREGATE); // todo
+		handle_p2m_c_pushdown(payload, hdr, buffer);
+		break;
+
+    case P2M_C_SYNCMEM:
+        handle_p2m_c_syncmem(msg, buffer);
+        break;
 
 	case P2M_DROP_CACHE:
 		handle_p2m_drop_page_cache(hdr, buffer);
@@ -482,6 +497,17 @@ void __init thpool_init(void)
 	}
 }
 
+/*
+// QZ: init a kernel thread for cRoutor
+void __init c_routor_init(void)
+{
+    pid_t pid;
+
+    pid = kernel_thread(c_routor, NULL, 0);
+    c_routor_task = find_task_by_pid(pid);
+}
+*/
+
 void __init memory_component_init(void)
 {
 #ifndef CONFIG_FIT
@@ -497,6 +523,10 @@ void __init memory_component_init(void)
 	thpool_init();
 
 	init_memory_flush_thread();
+
+    // QZ: put below to kernel init to start early
+    // // QZ: init c_routor
+    // c_routor_init();
 
 #ifdef CONFIG_VMA_MEMORY_UNITTEST
 	mem_vma_unittest();

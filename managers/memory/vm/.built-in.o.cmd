@@ -1,0 +1,1 @@
+cmd_managers/memory/vm/built-in.o :=  ld  -r -o managers/memory/vm/built-in.o managers/memory/vm/mmap.o managers/memory/vm/dcr_mmap.o managers/memory/vm/fault.o managers/memory/vm/pgtable.o managers/memory/vm/uaccess.o managers/memory/vm/gup.o managers/memory/vm/debug.o 

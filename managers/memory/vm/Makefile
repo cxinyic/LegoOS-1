@@ -3,6 +3,7 @@
 #
 
 obj-y := mmap.o
+obj-y += dcr_mmap.o
 obj-y += fault.o
 obj-y += pgtable.o
 obj-y += uaccess.o

@@ -64,19 +64,32 @@ static int procmgmt(void *unused)
 #endif
 
 #if 1
-	init_filename = "/bigdisk/pin";
+/*
+	init_filename = "/usr/local/pgsql/bin/postgres";
 	argv_init[0] = init_filename;
-//	argv_init[1] = "--single";
-//	argv_init[1] = "-E";
-//	argv_init[2] = "-D";
-//	argv_init[3] = "/bigdisk/psql2/data";
-//	argv_init[4] = "-s";
-//	argv_init[5] = "-d";
-//	argv_init[6] = "3";
-	// init_filename = "/usr/local/bin/sqlite3";
-	// argv_init[0] = init_filename;
-	// argv_init[1] = "-init";
-	// argv_init[2] = "/users/yifancai/test.sql";
+	argv_init[1] = "--single";
+	argv_init[2] = "-D";
+	argv_init[3] = "/bigdisk/psql/data";
+	argv_init[4] = "-s";
+*/
+// QZ: below is for MonetDB
+//	init_filename = "/bigdisk/MonetDBDir/bin/mserver5";
+//	argv_init[0] = init_filename;
+//	argv_init[1] = "--daemon=yes";
+//	argv_init[2] = "--dbpath=/bigdisk/TPCH-Test/.farms/monetdb-sf10";
+//	argv_init[3] = "--qz_num_threads=1";
+
+// QZ: MiniPregel
+/*
+	init_filename = "/bigdisk/MiniPregel/thread/minipregel";
+	argv_init[0] = init_filename;
+	argv_init[1] = "/bigdisk/MiniPregel/minipregel.conf";
+	// argv_init[2] = "1";
+//        argv_init[0] = init_filename; 
+*/
+	init_filename = "/bigdisk/dcRoutors/remote_aggregate/agg";
+	argv_init[0] = init_filename;
+	argv_init[1] = "/bigdisk/data/lineitem.tbl";
 #endif
 
 	/*

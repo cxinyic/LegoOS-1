@@ -156,7 +156,9 @@ evict_find_line_random(struct pcache_set *pset) { BUG(); }
 void pset_remove_eviction(struct pcache_set *pset,
 			  struct pcache_meta *pcm, int nr_added);
 int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
-			   enum piggyback_options piggyback);
+			   enum piggyback_options piggyback); // QZ: add address to debug
+// int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm, unsigned long address,
+//			   enum piggyback_options piggyback); // QZ: add address to debug
 void __init alloc_pcache_perset_map(void);
 #else
 static inline int

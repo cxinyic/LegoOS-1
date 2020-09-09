@@ -230,6 +230,9 @@ SYSCALL_DEFINE5(mremap, unsigned long, old_addr, unsigned long, old_len,
 	payload.new_len = new_len;
 	payload.flags = flags;
 	payload.new_addr = new_addr;
+	
+	// pr_info("QZ: mremap(): pid = %d, tgid = %d, old addr:[%lx - %lx], old_len:%ld, new addr:[%lx - %lx], new_len:%#ld, flags:%lx\n",
+	//	current->pid, current->tgid, old_addr, old_addr + old_len, old_len, new_addr, new_addr + new_len, new_len, flags);
 
 	retlen = net_send_reply_timeout(current_memory_home_node(), P2M_MREMAP,
 			&payload, sizeof(payload), &reply, sizeof(reply),
@@ -264,6 +267,8 @@ SYSCALL_DEFINE5(mremap, unsigned long, old_addr, unsigned long, old_len,
 	if (old_len > new_len) {
 		mremap_debug("release: [%#lx - %#lx]",
 			old_addr + new_len, old_addr + old_len);
+		// pr_info("QZ: mremap(): release: [%#lx - %#lx]\n",
+		//	old_addr + new_len, old_addr + old_len);
 
 		release_pgtable(current, old_addr + new_len,
 					 old_addr + old_len);
@@ -276,9 +281,14 @@ SYSCALL_DEFINE5(mremap, unsigned long, old_addr, unsigned long, old_len,
 		mremap_debug("move: [%#lx - %#lx] -> [%#Lx - %#Lx]",
 			old_addr, old_addr + old_len,
 			reply.new_addr, reply.new_addr + old_len);
+		// pr_info("QZ: mremap(): move: [%#lx - %#lx] -> [%#Lx - %#Lx]\n",
+		//	old_addr, old_addr + old_len,
+		//	reply.new_addr, reply.new_addr + old_len);
 
+		// pr_info("QZ: mremap(): before move_page_tables\n");
 		moved_len = move_page_tables(current, old_addr,
 					     reply.new_addr, old_len);
+		// pr_info("QZ: mremap(): after move_page_tables\n");
 		if (unlikely(moved_len < old_len)) {
 			WARN(1, "len: %#lx, moved_len: %#lx", old_len, moved_len);
 			release_pgtable(current, old_addr,
@@ -289,6 +299,7 @@ SYSCALL_DEFINE5(mremap, unsigned long, old_addr, unsigned long, old_len,
 
 out:
 	mremap_debug("new_addr: %lx or (%ld)", ret, (long)ret);
+	// pr_info("QZ: mremap(): finished, new_addr: %lx or ret = (%ld)\n", ret, (long)ret);
 	return ret;
 }
 

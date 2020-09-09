@@ -516,21 +516,29 @@ static void move_ptes(struct mm_struct *mm, pmd_t *old_pmd,
 	spinlock_t *old_ptl, *new_ptl;
 	unsigned long len = old_end - old_addr;
 
+	// pr_info("QZ: %s(): get old pte and lock\n", __func__);
 	old_pte = pte_offset_lock(mm, old_pmd, old_addr, &old_ptl);
+	// pr_info("QZ: %s(): get new pte\n", __func__);
 	new_pte = pte_offset(new_pmd, new_addr);
+	// pr_info("QZ: %s(): get new pte lock\n", __func__);
 	new_ptl = pte_lockptr(mm, new_pmd);
+	// pr_info("QZ: %s(): lock new pte\n", __func__);
 	if (new_ptl != old_ptl)
 		spin_lock(new_ptl);
-
+	// pr_info("QZ: %s(): old ptl = %#lx, new ptl = %#lx, both should be locked!\n", __func__, (unsigned long)old_ptl, (unsigned long)new_ptl);
+	
+	// pr_info("QZ: %s(): entering the loop\n", __func__);
 	for (; old_addr < old_end; old_pte++, old_addr += PAGE_SIZE,
 				   new_pte++, new_addr += PAGE_SIZE) {
 		int ret;
 
 retry:
+		// pr_info("QZ: %s(): trying with old_pte = %#lx, old_addr = %#lx, new_pte = %#lx, new_addr = %#lx\n", __func__, old_pte, old_addr, new_pte, new_addr);
 		if (pte_none(*old_pte))
 			continue;
 
 		if (!pte_present(*old_pte)) {
+			// pr_info("QZ: %s(): old pte is not present\n", __func__);
 #ifdef CONFIG_PCACHE_ZEROFILL
 			/*
 			 * If zerofill is configured, chances are we will
@@ -560,17 +568,21 @@ retry:
 #endif
 		}
 
+		// pr_info("QZ: %s(): before pcache_move_pte\n", __func__);
 		ret = pcache_move_pte(mm, old_pte, new_pte, old_addr, new_addr, old_ptl);
+		// pr_info("QZ: %s(): after pcache_move_pte\n", __func__);
 		switch (ret) {
 		case 0:
 			continue;
 
 		/* pte changed after it released lock */
 		case -EAGAIN:
+			// pr_info("QZ: %s(): -EAGAIN. Retry.\n", __func__);
 			goto retry;
 
 		/* pcache alloc failed */
 		case -ENOMEM:
+			// pr_info("QZ: %s(): -ENOMEM. Retry.\n", __func__);
 			WARN_ON_ONCE(1);
 			goto retry;
 
@@ -578,12 +590,15 @@ retry:
 			BUG();
 		};
 	}
+	// pr_info("QZ: %s(): the loop is finished\n", __func__);
 
 	if (new_ptl != old_ptl)
 		spin_unlock(new_ptl);
 	spin_unlock(old_ptl);
 
+	// pr_info("QZ: %s(): before flush_tlb_mm_range\n", __func__);
 	flush_tlb_mm_range(mm, old_end - len, old_end);
+	// pr_info("QZ: %s(): after flush_tlb_mm_range\n", __func__);
 }
 
 #define LATENCY_LIMIT	(64 * PAGE_SIZE)
@@ -592,7 +607,7 @@ retry:
  * Shift emulated pgtable mapping from
  *	[old_addr, old_addr + len) ---> [new_addr, new_addr + len)
  * The original mapping for old_addr will be cleared. And the
- * TLB will be flushed at last.
+ * TLB will be flushed at last (QZ: eventually, but will trigger warnings on memory node.).
  *
  * RETURN: how much work has been done. Return @len measn fully shifted.
  */
@@ -600,46 +615,61 @@ unsigned long move_page_tables(struct task_struct *tsk,
 			       unsigned long __user old_addr,
 			       unsigned long __user new_addr, unsigned long len)
 {
-	struct mm_struct *mm = tsk->mm;
-	unsigned long extent, next, old_end;
-	pmd_t *old_pmd, *new_pmd;
+        struct mm_struct *mm = tsk->mm;
+        unsigned long extent, next, old_end;
+        pmd_t *old_pmd, *new_pmd;
 
-	pgtable_debug("%s[%u] [%#lx - %#lx] -> [%#lx - %#lx]",
-		tsk->comm, tsk->tgid, old_addr, old_addr + len,
-		new_addr, new_addr + len);
+        pgtable_debug("%s[%u] [%#lx - %#lx] -> [%#lx - %#lx]",
+                tsk->comm, tsk->tgid, old_addr, old_addr + len,
+                new_addr, new_addr + len);
+        // QZ: debug
+        // pr_info("QZ: %s(): %s[%u] [%#lx - %#lx] -> [%#lx - %#lx]\n", __func__,
+        //        tsk->comm, tsk->tgid, old_addr, old_addr + len,
+        //        new_addr, new_addr + len);
 
-	old_end = old_addr + len;
+        old_end = old_addr + len;
 
-	for (; old_addr < old_end; old_addr += extent, new_addr += extent) {
-		next = (old_addr + PMD_SIZE) & PMD_MASK;
+        for (; old_addr < old_end; old_addr += extent, new_addr += extent) {
+                // pr_info("QZ: %s(): in the loop, old_end = %#lx, old_addr = %#lx, new_addr = %#lx\n", __func__, old_end, old_addr, new_addr);
+                next = (old_addr + PMD_SIZE) & PMD_MASK;
 
-		/* even if next overflowed, extent below will be ok */
-		extent = next - old_addr;
-		if (extent > old_end - old_addr)
-			extent = old_end - old_addr;
+                /* even if next overflowed, extent below will be ok */
+                extent = next - old_addr;
+                // pr_info("QZ: %s(): extent test 1: extent = %lu\n", __func__, extent);
+                if (extent > old_end - old_addr)
+                        extent = old_end - old_addr;
+    
+                // pr_info("QZ: %s(): extent test 2: extent = %lu\n", __func__, extent);
 
-		old_pmd = get_old_pmd(mm, old_addr);
-		if (!old_pmd)
-			continue;
+                // pr_info("QZ: %s(): before get_old_pmd\n", __func__);
+                old_pmd = get_old_pmd(mm, old_addr);
+                if (!old_pmd)
+                        continue;
 
-		new_pmd = alloc_new_pmd(mm, new_addr);
-		if (WARN_ON_ONCE(!new_pmd))
-			break;
+                // pr_info("QZ: %s(): before alloc_new_pmd\n", __func__);
+                new_pmd = alloc_new_pmd(mm, new_addr);
+                if (WARN_ON_ONCE(!new_pmd))
+                        break;
 
-		if (WARN_ON_ONCE(!pte_alloc(mm, new_pmd, new_addr)))
-			break;
+                // pr_info("QZ: %s(): before pte_alloc\n", __func__);
+                if (WARN_ON_ONCE(!pte_alloc(mm, new_pmd, new_addr)))
+                        break;
 
-		next = (new_addr + PMD_SIZE) & PMD_MASK;
-		if (extent > next - new_addr)
-			extent = next - new_addr;
-		if (extent > LATENCY_LIMIT)
-			extent = LATENCY_LIMIT;
+                next = (new_addr + PMD_SIZE) & PMD_MASK;
+                if (extent > next - new_addr)
+                        extent = next - new_addr;
+                // pr_info("QZ: %s(): extent test 3: extent = %lu\n", __func__, extent);
+                if (extent > LATENCY_LIMIT)
+                        extent = LATENCY_LIMIT;
+                // pr_info("QZ: %s(): extent test 4: extent = %lu\n", __func__, extent);
 
-		move_ptes(mm, old_pmd, old_addr, old_addr + extent,
-			  new_pmd, new_addr);
-	}
+                // pr_info("QZ: %s(): before move_ptes\n", __func__);
+                move_ptes(mm, old_pmd, old_addr, old_addr + extent,
+                          new_pmd, new_addr);
+                // pr_info("QZ: %s(): after move_ptes\n", __func__);
+        }
 
-	return len + old_addr - old_end;	/* how much done */
+        return len + old_addr - old_end;        /* how much done */
 }
 
 #ifdef CONFIG_PCACHE_ZEROFILL

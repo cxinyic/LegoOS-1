@@ -36,11 +36,6 @@ u64 nr_cachesets __read_mostly;
 
 atomic_long_t nr_used_cachelines;
 
-
-
-u64 nr_spcache_call;
-unsigned long spcache_first_address[100000]={0};
-
 /*
  * Original physical and ioremap'd kernel virtual address
  * These are read frequently to calculate offsets between structures:
@@ -68,8 +63,6 @@ u64 nr_bits_tag;
 
 /* Offset between neighbouring ways within a set */
 u64 pcache_way_cache_stride __read_mostly;
-
-u64 pcache_max_pinned;
 
 static void __init alloc_pcache_set_map(void)
 {
@@ -103,8 +96,6 @@ void __init pcache_early_init(void)
 	nr_cachelines_per_page = PAGE_SIZE / PCACHE_META_SIZE;
 	unit_size = nr_cachelines_per_page * PCACHE_LINE_SIZE;
 	unit_size += PAGE_SIZE;
-	nr_spcache_call=0;
-	
 
 	/*
 	 * nr_cachelines_per_page must already be a power of 2.
@@ -124,8 +115,6 @@ void __init pcache_early_init(void)
 	 */
 	nr_cachelines = nr_units * nr_cachelines_per_page;
 	nr_cachesets = nr_cachelines / PCACHE_ASSOCIATIVITY;
-	// currently we assume that 75% of the cachelines can be used. 
-	pcache_max_pinned = PCACHE_ASSOCIATIVITY-4;
 
 	/* How many 4K pages are used for cache line? */
 	nr_pages_cacheline = nr_cachelines * PCACHE_LINE_NR_PAGES;
@@ -180,7 +169,6 @@ static void __init init_pcache_set_map(void)
 		/* Head of free pcache line */
 		INIT_LIST_HEAD(&pset->free_head);
 		spin_lock_init(&pset->free_lock);
-		atomic_set(&pset->nr_pinned, 0);
 
 		/* Eviction Algorithm Specific */
 #ifdef CONFIG_PCACHE_EVICT_LRU
@@ -211,7 +199,6 @@ static void __init init_pcache_meta_map(void)
 
 	pcache_for_each_way(pcm, nr) {
 		pcm->bits = 0;
-		pcm->pin_flag = 0;
 		INIT_LIST_HEAD(&pcm->free_list);
 		INIT_LIST_HEAD(&pcm->rmap);
 		pcache_mapcount_reset(pcm);
@@ -248,7 +235,8 @@ void __init pcache_post_init(void)
 	 * This may happen if running on QEMU.
 	 * Not sure about physical machine.
 	 */
-	memset((void *)virt_start_cacheline, 0, pcache_registered_size);
+	// QZ: remove this because of BUG: unable to handle kernel paging request at...
+	// memset((void *)virt_start_cacheline, 0, pcache_registered_size);
 
 	pcache_meta_map = (struct pcache_meta *)(virt_start_cacheline + nr_pages_cacheline * PAGE_SIZE);
 

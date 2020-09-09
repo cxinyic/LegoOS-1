@@ -1,0 +1,1 @@
+cmd_arch/x86/entry/built-in.o :=  ld  -r -o arch/x86/entry/built-in.o arch/x86/entry/entry_64.o arch/x86/entry/syscall_64.o arch/x86/entry/common.o arch/x86/entry/vsyscall/built-in.o arch/x86/entry/entry_64_compat.o 

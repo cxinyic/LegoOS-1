@@ -232,23 +232,35 @@ struct pcache_meta *pcache_alloc(unsigned long address,
 	alloc_start = jiffies;
 	timeout = alloc_start + sysctl_pcache_alloc_timeout_sec * HZ;
 
+//	// QZ: debug
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() alloc_start = %lu, timeout = %lu\n", __func__, alloc_start, timeout);
+
 	pset = user_vaddr_to_pcache_set(address);
 	inc_pset_event(pset, PSET_ALLOC);
 
 retry:
 	/* Fastpath try to allocate one directly */
 	PROFILE_START(pcache_alloc_fastpath);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() try alloc pcache with fastpath\n", __func__);
 	pcm = pcache_alloc_fastpath(pset);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() after alloc pcm\n", __func__);
 	PROFILE_LEAVE(pcache_alloc_fastpath);
-	if (likely(pcm)) {
+	if (likely(pcm)) { // QZ: if allocation succeeded, then return the allocaed pcm
 		if (piggyback == DISABLE_PIGGYBACK && PcachePiggyback(pcm))
 			BUG();
 		PROFILE_LEAVE(pcache_alloc);
 		return pcm;
 	}
-
+	// QZ: otherwise, evict a pcache line from this pset, and retry before timeout.
 	PROFILE_START(pcache_alloc_evict);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() before evict pcache line for addr = %#lx\n", __func__, address);
 	ret = pcache_evict_line(pset, address, piggyback);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() after evict pcache line with ret = %d\n", __func__, ret);
 	PROFILE_LEAVE(pcache_alloc_evict);
 	switch (ret) {
 	case PCACHE_EVICT_FAILURE_FIND:
@@ -262,8 +274,10 @@ retry:
 		BUG();
 	};
 
-	if (likely(time_before(jiffies, timeout)))
+	if (likely(time_before(jiffies, timeout))) {
+		// pr_info("QZ: %s() timeout! jiffies = %lu, timeout = %lu\n", __func__, jiffies, timeout);
 		goto retry;
+	}
 
 	/* Then we have a situation */
 	pr_info("# CPU%d PID%d Abort pcache alloc (%ums) addr:%#lx pset:%lu\n",

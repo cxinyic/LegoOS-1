@@ -42,8 +42,14 @@ void *p2m_fork(struct task_struct *p, unsigned long clone_flags)
 	struct p2m_fork_struct payload;
 	struct fork_reply_struct *reply;
 	int retlen;
+	// // QZ: debug
+	// int i;
+	// struct fork_vmainfo *info;
 
 	BUG_ON(!p);
+	
+	// QZ: debug
+	pr_info("QZ: %s(): forking a new process with pid = %u\n", __func__, p->pid);
 
 	reply = kmalloc(sizeof(struct fork_reply_struct), GFP_KERNEL);
 	if (!reply)
@@ -71,6 +77,15 @@ void *p2m_fork(struct task_struct *p, unsigned long clone_flags)
 	}
 
 	fork_reply_dump(reply);
+//	// QZ: debug
+//	pr_info("QZ: %s(): fork is done. VAMs are dumped as below\n", __func__);
+//
+//	info = reply->vmainfos;
+//	pr_info("QZ: %s(): Total VMAs: %d\n", __func__, reply->vma_count);
+//	for (i = 0; i < reply->vma_count; i++)
+//		pr_info("[vma %d] %lx-%lx, flags: %lx\n", i, info[i].vm_start, info[i].vm_end, info[i].vm_flags);
+//	pr_info("QZ: %s(): VMAs dump is done\n", __func__);
+
 	return reply;
 }
 

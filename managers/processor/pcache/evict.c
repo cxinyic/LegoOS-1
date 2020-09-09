@@ -100,10 +100,18 @@ static inline int evict_line(struct pcache_set *pset, struct pcache_meta *pcm,
 			     unsigned long address, enum piggyback_options piggyback)
 {
 #ifdef CONFIG_PCACHE_EVICTION_WRITE_PROTECT
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() use wrprotect to evict.\n", __func__);
 	return evict_line_wrprotect(pset, pcm);
 #elif defined(CONFIG_PCACHE_EVICTION_PERSET_LIST)
 	return evict_line_perset_list(pset, pcm, piggyback);
+	// QZ: debug
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() use perset list to evict.\n", __func__);
+//	return evict_line_perset_list(pset, pcm, address, piggyback); // QZ: add address to debug
 #elif defined(CONFIG_PCACHE_EVICTION_VICTIM)
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() use victim to evict.\n", __func__);
 	return evict_line_victim(pset, pcm, address);
 #endif
 }
@@ -156,9 +164,17 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	 * held within evict_find_line(), it is fine to clear it.
 	 */
 	PROFILE_START(pcache_alloc_evict_do_find);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() before set evicting on pset for addr = %#lx\n", __func__, address);
 	__SetPsetEvicting(pset);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() before find the line to evict.\n", __func__);
 	pcm = evict_find_line(pset);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() find the line to evict.\n", __func__);
 	__ClearPsetEvicting(pset);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() after clear evicting on paset.\n", __func__);
 	PROFILE_LEAVE(pcache_alloc_evict_do_find);
 
 	if (IS_ERR_OR_NULL(pcm)) {
@@ -171,7 +187,11 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 	}
 
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() lock pcm.\n", __func__);
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() reclaim the pcm.\n", __func__);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 
 	/* we locked, it can not be unmapped by others */
@@ -179,7 +199,11 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	BUG_ON(nr_mapped < 1);
 
 	PROFILE_START(pcache_alloc_evict_do_evict);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() before evict_line.\n", __func__);
 	ret = evict_line(pset, pcm, address, piggyback);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() after evict_line.\n", __func__);
 	PROFILE_LEAVE(pcache_alloc_evict_do_evict);
 	if (ret) {
 		/*
@@ -189,9 +213,17 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		 * - unlock
 		 * - dec ref (may lead to free)
 		 */
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() evict failed. Before clear reclaim flag.\n", __func__);
 		ClearPcacheReclaim(pcm);
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() evict failed. Before add to lru list.\n", __func__);
 		add_to_lru_list(pcm, pset);
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() evict failed. Before unlock pcm.\n", __func__);
 		unlock_pcache(pcm);
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() evict failed. Before put_pcache on pcm.\n", __func__);
 		put_pcache(pcm);
 
 		inc_pcache_event(PCACHE_EVICTION_FAILURE_EVICT);
@@ -227,6 +259,8 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			BUG();
 		}
 
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() ref coutn is not right.\n", __func__);
 		ClearPcacheReclaim(pcm);
 		add_to_lru_list(pcm, pset);
 		unlock_pcache(pcm);
@@ -239,11 +273,19 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	 * Succeed: pcm is unmapped, and no other threads
 	 * are using it. Simply free and return it to pset.
 	 */
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() pcm is successfully unmapped. Before clear reclaim.\n", __func__);
 	__ClearPcacheReclaim(pcm);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() pcm is successfully unmapped. Before unlock pcm.\n", __func__);
 	__ClearPcacheLocked(pcm);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() pcm is successfully unmapped. Before put pcm to nolru.\n", __func__);
 	__put_pcache_nolru(pcm);
 
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() exiting....\n", __func__);
 	return PCACHE_EVICT_SUCCEED;
 }

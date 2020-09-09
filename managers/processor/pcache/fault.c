@@ -146,7 +146,6 @@ int common_do_fill_page(struct mm_struct *mm, unsigned long address,
 	 * 2) victim cache
 	 * 3) zerofill
 	 */
-
 	ret = fill_func(address, flags, pcm, arg);
 	if (unlikely(ret)) {
 		ret = VM_FAULT_SIGSEGV;
@@ -535,7 +534,7 @@ unlock_pte:
  * after we acquire the lock. But pte lock can not gurantee us spurious TLB fault:
  * the case where TLB entries have different permission from page table entries.
  */
-int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
+static int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
 				   pte_t *pte, pmd_t *pmd, unsigned long flags)
 {
 	pte_t entry;
@@ -570,7 +569,6 @@ int pcache_handle_pte_fault(struct mm_struct *mm, unsigned long address,
 			 *
 			 * All of them fall-back and merge into this:
 			 */
-
 			return pcache_do_fill_page(mm, address, pte, entry, pmd, flags);
 		}
 		return pcache_do_zerofill_page(mm, address, pte, entry, pmd, flags);
@@ -626,9 +624,6 @@ unlock:
  *
  * Return 0 on success, otherwise return VM_FAULT_XXX flags.
  */
-int print_flag=0;
-int pg_fault_count=1;
-
 int pcache_handle_fault(struct mm_struct *mm,
 			unsigned long address, unsigned long flags)
 {
@@ -647,19 +642,6 @@ int pcache_handle_fault(struct mm_struct *mm,
 	pte = pte_alloc(mm, pmd, address);
 	if (!pte)
 		return VM_FAULT_OOM;
-	
-	int i=0;
-	
-	unsigned long new_address = PAGE_ALIGN(address);
-    
-	for(i;i<nr_spcache_call;i++){
-		if(new_address==spcache_first_address[i]){
-			pg_fault_count+=1;
-			pr_info("pg_fault_count: %d \n", pg_fault_count);
-		}
-	}
-	
-	
 
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));

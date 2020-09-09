@@ -54,7 +54,7 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb);
 
 struct p2m_pcache_miss_msg {
 	struct common_header	header;
-	unsigned int		has_flush_msg;
+		unsigned int		has_flush_msg;
 	__u32			pid;
 	__u32			tgid;
 	__u32			flags;
@@ -304,12 +304,70 @@ int handle_p2m_checkpint(void *, u64, struct common_header *);
 
 void handle_p2m_drop_page_cache(struct common_header *hdr, struct thpool_buffer *tb);
 
+/* 
+ * QZ: dcRoutors operations
+ * */
+struct p2m_remote_aggregate_payload {
+	u32 pid;
+     	u32 tgid;
+     	char __user *addr;
+	size_t n_ele;
+	char __user *res;
+};
+
+void handle_p2m_remote_aggregate(struct p2m_remote_aggregate_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+// QZ: now let's just execute a binary on remote memory,
+//     todo: implement execution based on the function pointer
+struct p2m_c_pushdown_payload {
+	__u32	pid;
+	__u32   tgid;
+	__u32   parent_tgid;
+	__u64   ip;
+	__u64   sp;
+	__u64   arg;
+};
+
+struct p2m_c_pushdown_payload_binary {
+	__u32	pid;
+	__u32	payload_size;
+	char	filename[MAX_FILENAME_LENGTH];
+	__u32	argc;
+	__u32	envc;
+	char	*array;
+};
+ 
+struct p2m_c_pushdown_payload_fix {
+	__u32	pid;
+	char	filename[MAX_FILENAME_LENGTH];
+	__u32	argc;
+	__u32	envc;
+	char	array[512];
+};
+
+void handle_p2m_c_pushdown(struct p2m_c_pushdown_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+// QZ: memory synchronization
+ 
+struct p2m_c_syncmem_m2p_msg {
+ 	struct common_header	header;
+ 	__u32			pid;
+ 	__u32			tgid;
+ 	__u32			flags;
+ 	__u64			missing_vaddr;
+ 	__u32			offset_head;
+ 	__u32			size;
+};
+ 
+void handle_p2m_c_syncmem(struct p2m_c_syncmem_m2p_msg* msg, struct thpool_buffer *b);
+
+
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {
 	char filename[MAX_FILENAME_LENGTH];
 	__u32 storage_node;
 };
-int handle_p2m_lseek(struct p2m_lseek_struct *payload,
+	int handle_p2m_lseek(struct p2m_lseek_struct *payload,
 		     struct common_header *hdr, struct thpool_buffer *tb);
 
 struct p2m_rename_struct {
@@ -318,7 +376,7 @@ struct p2m_rename_struct {
 	__u32 storage_node;
 };
 
-int handle_p2m_rename(struct p2m_rename_struct *payload,
+	int handle_p2m_rename(struct p2m_rename_struct *payload,
 		      struct common_header *hdr, struct thpool_buffer *tb);
 
 struct p2m_stat_struct {

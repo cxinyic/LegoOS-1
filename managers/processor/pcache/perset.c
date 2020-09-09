@@ -213,6 +213,9 @@ DEFINE_PROFILE_POINT(evict_line_perset_flush)
  * Only pcache fault on remote memory can have piggyback enabled.
  * All other callers such as COW, mremap can NOT use this.
  */
+	// QZ: debug
+// int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm, unsigned long address,
+//			   enum piggyback_options piggyback)
 int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 			   enum piggyback_options piggyback)
 {
@@ -242,7 +245,12 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 	}
 
 	PROFILE_START(evict_line_perset_unmap);
-	dirty = pcache_try_to_unmap_reserve_check_dirty(pcm);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() before check dirty for pcm = %#lx, nr_added = %d.\n", __func__, (unsigned long)pcm, nr_added);
+	dirty = pcache_try_to_unmap_reserve_check_dirty(pcm); 
+	// dirty = pcache_try_to_unmap_reserve_check_dirty(pcm, address); // QZ: debug
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() after check dirty = %d.\n", __func__, dirty);
 	PROFILE_LEAVE(evict_line_perset_unmap);
 
 	if (likely(dirty)) {
@@ -255,7 +263,11 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 		}
 
 		PROFILE_START(evict_line_perset_flush);
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() cache line is dirty. Before flush.\n", __func__);
 		pcache_flush_one(pcm);
+//		if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//			pr_info("QZ: %s() After flush.\n", __func__);
 		PROFILE_LEAVE(evict_line_perset_flush);
 	}
 
@@ -265,9 +277,15 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 	 * and remove eviction entries from pset. Concurrent
 	 * pgfault is now safe to go.
 	 */ 
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() Flush finished. Free pcm from rmap....\n", __func__);
 	pcache_free_reserved_rmap(pcm);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() Remove pcm from pset....\n", __func__);
 	pset_remove_eviction(pset, pcm, nr_added);
 	inc_pcache_event_cond(PCACHE_CLFLUSH_CLEAN_SKIPPED, !dirty);
+//	if (address == 0x7fff3cc9b000 || address == 0x7fff3f3fd000)
+//		pr_info("QZ: %s() Exit\n", __func__);
 	return 0;
 }
 

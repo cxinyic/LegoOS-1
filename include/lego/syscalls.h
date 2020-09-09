@@ -253,6 +253,9 @@ asmlinkage long sys_epoll_wait(int epfd, struct epoll_event __user *events,
 				int maxevents, int timeout);
 asmlinkage long sys_poll(struct pollfd __user *ufds, unsigned int nfds,
 			long timeout_msecs);
-asmlinkage long sys_sp_pin(unsigned long addr, unsigned long len, unsigned long try_best_flag);
-asmlinkage long sys_sp_unpin(unsigned long old_addr,unsigned long len);
+asmlinkage long sys_remote_aggregate(char __user *addr, size_t n_ele, char __user *res);
+// asmlinkage long sys_c_pushdown(unsigned long stack_start, unsigned long stack_size, char __user *args, int flags);
+// asmlinkage long sys_c_pushdown(const char __user *filename, const char __user * const * __user argv, const char __user * const * __user envp);
+asmlinkage long sys_c_pushdown(const char __user *ip, const char __user *sp, const char __user *arg);
+asmlinkage long sys_c_syncmem(const char __user *arg, size_t sz, int flags);
 #endif /* _LEGO_SYSCALLS_H_ */

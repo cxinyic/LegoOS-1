@@ -52,6 +52,11 @@
 #define P2M_STAT		((__u32)__NR_stat)
 #define P2M_DROP_CACHE		((__u32)__NR_drop_page_cache)
 
+// QZ: dcRoutors operations
+#define P2M_REMOTE_AGGREGATE	((__u32)__NR_remote_aggregate)
+#define P2M_C_PUSHDOWN		((__u32)__NR_c_pushdown)
+#define P2M_C_SYNCMEM		((__u32)__NR_c_syncmem)
+
 /* Processor to Storage directly */
 #define P2S_OPEN		((__u32)__NR_open)	/* open() goes to storage directly */
 #define P2S_STAT		((__u32)__NR_stat)

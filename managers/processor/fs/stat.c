@@ -174,10 +174,10 @@ static int get_kstat_from_storage(char *filepath, struct kstat *stat, int flag)
 
 free:
 	kfree(msg);
-	if (ret != 0){
-		pr_info("Stat: %s, cwd=%s", filepath, current->fs.cwd);
-		pr_info("ret value = %d, mode = %d\n", ret, stat->mode);
-	}
+	// if (ret != 0){
+	//	pr_info("Stat: %s, cwd=%s", filepath, current->fs.cwd);
+	//	pr_info("ret value = %d, mode = %d\n", ret, stat->mode);
+	// }
 	return ret;
 }
 

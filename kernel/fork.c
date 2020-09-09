@@ -351,12 +351,14 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
 		return NULL;
 	}
 
+#ifdef CONFIG_COMP_PROCESSOR
 	/* Processor: init distributed VMA resource */
 	if (processor_distvm_init(mm, get_memory_home_node(p))) {
 		pgd_free(mm, mm->pgd);
 		kfree(mm);
 		return NULL;
 	}
+#endif
 
 	return mm;
 }

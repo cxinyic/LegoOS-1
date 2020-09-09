@@ -1,0 +1,1 @@
+cmd_arch/x86/kernel/apic/built-in.o :=  ld  -r -o arch/x86/kernel/apic/built-in.o arch/x86/kernel/apic/apic.o arch/x86/kernel/apic/io_apic.o arch/x86/kernel/apic/ipi.o arch/x86/kernel/apic/apic_flat.o arch/x86/kernel/apic/vector.o arch/x86/kernel/apic/msi.o 

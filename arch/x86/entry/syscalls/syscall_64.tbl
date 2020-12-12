@@ -124,7 +124,7 @@
 293	common	pipe2			sys_pipe2
 291	common	epoll_create1		sys_epoll_create1
 309	common	getcpu			sys_getcpu
-
+318 64 mmap_checkpoint sys_mmap_checkpoint
 
 #
 # Lego specific SYSCALL

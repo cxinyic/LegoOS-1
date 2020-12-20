@@ -59,7 +59,6 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 			&payload, sizeof(payload), &reply, sizeof(reply),
 			false, DEF_NET_TIMEOUT);
 
-	mmap_debug("ret_addr:%#Lx", reply.ret_addr);
 
 	if (likely(ret_len == sizeof(reply))) {
 		if (likely(reply.ret == RET_OKAY))
@@ -132,7 +131,6 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 	struct p2m_munmap_reply_struct retbuf;
 	long retlen;
 
-	munmap_debug("release: [%#lx - %#lx]", addr, addr + len);
 
 	if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
 		return -EINVAL;

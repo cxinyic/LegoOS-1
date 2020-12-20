@@ -224,17 +224,17 @@ SYSCALL_DEFINE6(mmap_track, unsigned long, addr, unsigned long, len,
 		put_file(f);
 	
 	if(nr_dp_info == 0 && dp_info_list == NULL){
-		dp_info_list = (dp_vector*)kmalloc(sizeof(dp_vector), GFP_KERNEL);
+		dp_info_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dp_info_list,sizeof(struct dp_info));
 	}
 
 	if(old_dirty_pages == NULL){
-		old_dirty_pages = (dp_vector*)kmalloc(sizeof(dp_vector), GFP_KERNEL);
+		old_dirty_pages = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(old_dirty_pages,sizeof(struct dp_idx));
 	}
 
 	if(new_dirty_pages == NULL){
-		new_dirty_pages = (dp_vector*)kmalloc(sizeof(dp_vector), GFP_KERNEL);
+		new_dirty_pages = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(new_dirty_pages,sizeof(struct dp_idx));
 	}
 
@@ -330,7 +330,7 @@ SYSCALL_DEFINE2(munmap_track, unsigned long, addr, size_t, len)
 
 	if (unlikely(retlen != sizeof(retbuf))) {
 		retbuf.ret = -EIO;
-		goto out;
+		return retbuf.ret;
 	}
 
 	/* Unmap emulated pgtable */
@@ -342,7 +342,7 @@ SYSCALL_DEFINE2(munmap_track, unsigned long, addr, size_t, len)
 	} else
 		pr_err("munmap() fail: %s\n", ret_to_string(retbuf.ret));
 
-out:
+
     int i=0;
 	int position = -1;
 	struct dp_info * tmp;
@@ -361,7 +361,7 @@ out:
 		for(i=0;i<tmp->nr_pages;i++){
 			dp_vector_dispose(tmp->dp_pages+i);
 		}
-		kfree(tmp->dp_vectors);
+		kfree(tmp->dp_pages);
 		dp_vector_delete(dp_info_list,position);
 		nr_dp_info = nr_dp_info-1;
 	}

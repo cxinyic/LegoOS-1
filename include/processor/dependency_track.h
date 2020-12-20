@@ -44,10 +44,19 @@ struct dp_idx{
  */
 
 extern int nr_dp_info;
-extern dp_vector* dp_info_list;
-extern dp_vector* old_dirty_pages;
-extern dp_vector* new_dirty_pages;
+extern struct dp_vector* dp_info_list;
+extern struct dp_vector* old_dirty_pages;
+extern struct dp_vector* new_dirty_pages;
 extern spinlock_t dp_spinlock;
 
+#ifdef CONFIG_DEPENDENCY_TRACK
+
+void dependency_track_init(void);
+
+#else
+
+static inline void dependency_track_init(void) {}
+
+#endif
 
 #endif /* _LEGO_PROCESSOR_DEPENDENCY_TRACK_H */

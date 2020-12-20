@@ -17,27 +17,27 @@ struct dp_vector{
 };
 
 
-static void dp_vector_new(dp_vector* v, int elem_size){
+static void dp_vector_new(struct dp_vector* v, int elem_size){
     v->elem_size = elem_size;
     v->logical_size = 0;
     v->allocated_size = 4;
     v->data = kmalloc(v->elem_size * v->allocated_size, GFP_KERNEL);
 }
 
-static void dp_vector_dispose(dp_vector* v){
+static void dp_vector_dispose(struct dp_vector* v){
     kfree(v->data);
 }
 
-static void* dp_vector_Nth(dp_vector* v, int position){
+static void* dp_vector_Nth(struct dp_vector* v, int position){
     return (char*)v->data + position*v->elem_size;
 }
 
-static void dp_vector_grow(dp_vector* v){
+static void dp_vector_grow(struct dp_vector* v){
     v->data = krealloc(v->data,2*v->allocated_size*v->elem_size,GFP_KERNEL);
     v->allocated_size = 2*v->allocated_size;
 }
 
-static void dp_vector_pushback(dp_vector* v, void* elem_addr){
+static void dp_vector_pushback(struct dp_vector* v, void* elem_addr){
     if(v->logical_size == v->allocated_size){
         dp_vector_grow(v);
     }
@@ -46,26 +46,18 @@ static void dp_vector_pushback(dp_vector* v, void* elem_addr){
     v->logical_size++;
 }
 
-static void dp_vector_delete(dp_vector* v, int position){
+static void dp_vector_delete(struct dp_vector* v, int position){
     void* dest_addr = (char*)v->data+position * v->elem_size;
     int byte_size = (v->logical_size-1-position) * v->elem_size;
     memmove(dest_addr,(char*)dest_addr + v->elemSize, byte_size);
     v->logical_size--;
 }
 
-static int dp_vector_size(dp_vector* v){
+static int dp_vector_size(struct dp_vector* v){
     return v->logical_size;
 }
 
-#ifdef CONFIG_DEPENDENCY_TRACK
 
-void dependency_track_init(void);
-
-#else
-
-static inline void dependency_track_init(void) {}
-
-#endif
 
 
 #endif /* _LEGO_PROCESSOR_DEPENDENCY_VECTPR_H */

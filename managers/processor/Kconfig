@@ -11,7 +11,7 @@ config COMP_PROCESSOR
 
 if COMP_PROCESSOR
 
-config CONFIG_DEPENDENCY_TRACK
+config DEPENDENCY_TRACK
     bool "Enable Dependency Tracking"
 	default n
 	---help---

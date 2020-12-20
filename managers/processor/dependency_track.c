@@ -1,5 +1,7 @@
 #include <processor/dependency_track.h>
-#include <processor/dependency_vector.h>
+#include <processor/pcache.h>
+
+#include <lego/jiffies.h>
 #include <lego/sched.h>
 
 static inline void sleep(unsigned sec)
@@ -24,7 +26,7 @@ static int dependency_track(void *unused){
     struct dp_idx* tmp_dp_idx2;
     struct dp_vector* tmp_dp_vector;
 
-    while(!kthread_should_stop()){
+    while(1){
         spin_lock(&dp_spinlock);
         if(nr_dp_info != 0){
             for(index = 0; index < dp_vector_size(dp_info_list); index++){
@@ -41,7 +43,7 @@ static int dependency_track(void *unused){
                                     curr_dp_info->dirty_page_list[i] = 1;
                                     *pte = pte_mkclean(*pte);
                                     curr_dp_idx.list_idx = index;
-                                    curr_dp_idx.addr_id = i;
+                                    curr_dp_idx.addr_idx = i;
                                     dp_vector_pushback(new_dirty_pages,&curr_dp_idx);
                                     if(*(curr_dp_info->pcm_list+i)==NULL){
                                         *(curr_dp_info->pcm_list+i) = pte_to_pcache_meta(*pte);
@@ -81,7 +83,7 @@ static int dependency_track(void *unused){
         
             tmp_dp_vector = old_dirty_pages;
             old_dirty_pages = new_dirty_pages;
-            new_dirty_pages = tmp_change;
+            new_dirty_pages = tmp_dp_vector;
             while(dp_vector_size(new_dirty_pages)>0){
                 dp_vector_delete(new_dirty_pages,0);
             }

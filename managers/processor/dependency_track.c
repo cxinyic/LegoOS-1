@@ -96,16 +96,15 @@ static int dependency_track(void *unused){
     }
     return 0;
 }
-
+#ifdef CONFIG_DEPENDENCY_TRACK
 void dependency_track_init(void)
 {
-#ifdef CONFIG_DEPENDENCY_TRACK
 	struct task_struct *ret __maybe_unused;
 
 	ret = kthread_run(dependency_track, NULL, "dependency_track");
 	if (IS_ERR(ret))
 		panic("Fail to create dependency_track thread");
 	pr_info("dependency tracking up\n");
-#endif
 }
+#endif
 

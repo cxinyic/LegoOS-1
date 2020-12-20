@@ -11,6 +11,12 @@ config COMP_PROCESSOR
 
 if COMP_PROCESSOR
 
+config CONFIG_DEPENDENCY_TRACK
+    bool "Enable Dependency Tracking"
+	default n
+	---help---
+		Say Y if you want to track the dependency of some pages.
+
 config CHECKPOINT
 	bool "Enable Process Checkpoint"
 	default n

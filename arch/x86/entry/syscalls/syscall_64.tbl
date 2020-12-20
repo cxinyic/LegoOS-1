@@ -123,8 +123,8 @@
 274	64	get_robust_list		sys_get_robust_list
 293	common	pipe2			sys_pipe2
 291	common	epoll_create1		sys_epoll_create1
-309	common	getcpu			sys_getcpu
-318 64 mmap_checkpoint sys_mmap_checkpoint
+309 common  getcpu			sys_getcpu
+318 64  mmap_track sys_mmap_track
 
 #
 # Lego specific SYSCALL

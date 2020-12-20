@@ -21,8 +21,10 @@
 #include <processor/distvm.h>
 #include <processor/vnode.h>
 #include <processor/pcache.h>
+#include <processor/dependency_track.h>
 
 #include <monitor/gpm_handler.h>
+
 
 #include "processor.h"
 
@@ -170,6 +172,9 @@ void __init processor_manager_init(void)
 
 	/* Create checkpointing restore thread */
 	checkpoint_init();
+
+    /* create dependency tracking thread */
+	dependency_track_init();
 }
 
 /*

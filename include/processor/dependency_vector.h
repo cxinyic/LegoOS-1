@@ -33,7 +33,11 @@ static void* dp_vector_Nth(struct dp_vector* v, int position){
 }
 
 static void dp_vector_grow(struct dp_vector* v){
-    v->data = realloc(v->data,2*v->allocated_size*v->elem_size);
+    /* since there is no krealloc, we use kmalloc */
+    void *tmp = kmalloc(2*v->allocated_size*v->elem_size, GFP_KERNEL);
+    memcpy(tmp, v->data, v->logical_size*v->elem_size);
+    kfree(v->data);
+    v->data = tmp;
     v->allocated_size = 2*v->allocated_size;
 }
 

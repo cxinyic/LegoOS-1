@@ -25,7 +25,7 @@ struct dp_info{
     unsigned long nr_pages;
     struct pcache_meta ** pcm_list;
     int * dirty_page_list;
-    dp_vector* dp_pages;
+    struct dp_vector* dp_pages;
 };
 
 /*

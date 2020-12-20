@@ -33,7 +33,7 @@ static void* dp_vector_Nth(struct dp_vector* v, int position){
 }
 
 static void dp_vector_grow(struct dp_vector* v){
-    v->data = krealloc(v->data,2*v->allocated_size*v->elem_size,GFP_KERNEL);
+    v->data = realloc(v->data,2*v->allocated_size*v->elem_size);
     v->allocated_size = 2*v->allocated_size;
 }
 
@@ -49,7 +49,7 @@ static void dp_vector_pushback(struct dp_vector* v, void* elem_addr){
 static void dp_vector_delete(struct dp_vector* v, int position){
     void* dest_addr = (char*)v->data+position * v->elem_size;
     int byte_size = (v->logical_size-1-position) * v->elem_size;
-    memmove(dest_addr,(char*)dest_addr + v->elemSize, byte_size);
+    memmove(dest_addr,(char*)dest_addr + v->elem_size, byte_size);
     v->logical_size--;
 }
 

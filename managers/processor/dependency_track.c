@@ -3,6 +3,7 @@
 
 #include <lego/jiffies.h>
 #include <lego/sched.h>
+#include <lego/kthread.h>
 
 static inline void sleep(unsigned sec)
 {

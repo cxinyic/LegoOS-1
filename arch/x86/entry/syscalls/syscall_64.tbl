@@ -125,6 +125,7 @@
 291	common	epoll_create1		sys_epoll_create1
 309 common  getcpu			sys_getcpu
 318 64  mmap_track sys_mmap_track
+319 64  munmap_track sys_munmap_track
 
 #
 # Lego specific SYSCALL

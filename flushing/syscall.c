@@ -111,6 +111,15 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	curr_dp_info.dp_pages = (struct dp_vector*)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct dp_vector), GFP_KERNEL);
     curr_dp_info.pcm_list = (struct pcache_meta**)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct pcache_meta*), GFP_KERNEL);
     printk("DepTrack:step5\n");
+    if(curr_dp_info.dirty_page_list == NULL){
+        printk("DepTrack: null1\n");
+    }
+    if(curr_dp_info.dp_pages == NULL){
+        printk("DepTrack: null2\n");
+    }
+    if(curr_dp_info.pcm_list == NULL){
+        printk("DepTrack: null3\n");
+    }
 	int i;
 	for(i=0;i<curr_dp_info.nr_pages;i++){
 		*(curr_dp_info.dirty_page_list+i) = 0;

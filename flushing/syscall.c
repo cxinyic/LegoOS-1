@@ -85,21 +85,22 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	if (f)
 		put_file(f);
 	
+    printk("DepTrack:step1\n");
 	if(nr_dp_info == 0 && dp_info_list == NULL){
 		dp_info_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dp_info_list,sizeof(struct dp_info));
 	}
-
+    printk("DepTrack:step2\n");
 	if(old_dirty_pages == NULL){
 		old_dirty_pages = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(old_dirty_pages,sizeof(struct dp_idx));
 	}
-
+    printk("DepTrack:step3\n");
 	if(new_dirty_pages == NULL){
 		new_dirty_pages = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(new_dirty_pages,sizeof(struct dp_idx));
 	}
-
+    printk("DepTrack:step4\n");
 	struct dp_info curr_dp_info;
 	curr_dp_info.user_pid = current->pid;
 	curr_dp_info.user_mm = current->mm;
@@ -109,13 +110,14 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	curr_dp_info.dirty_page_list = (int*)kmalloc_array(curr_dp_info.nr_pages, sizeof(int), GFP_KERNEL);
 	curr_dp_info.dp_pages = (struct dp_vector*)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct dp_vector), GFP_KERNEL);
     curr_dp_info.pcm_list = (struct pcache_meta**)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct pcache_meta*), GFP_KERNEL);
-
+    printk("DepTrack:step5\n");
 	int i;
 	for(i=0;i<curr_dp_info.nr_pages;i++){
 		*(curr_dp_info.dirty_page_list+i) = 0;
 		*(curr_dp_info.pcm_list+i) = NULL;
 		dp_vector_new(curr_dp_info.dp_pages+i, sizeof(struct dp_idx));
 	}
+    printk("DepTrack:step6\n");
 	dp_vector_pushback(dp_info_list,&curr_dp_info);
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");

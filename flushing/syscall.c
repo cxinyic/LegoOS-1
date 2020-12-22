@@ -108,7 +108,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	curr_dp_info.len = len;
 	curr_dp_info.nr_pages = len/PAGE_SIZE;
 	curr_dp_info.dirty_page_list = (int*)kmalloc_array(curr_dp_info.nr_pages, sizeof(int), GFP_KERNEL);
-	curr_dp_info.dp_pages = (struct dp_vector*)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct dp_vector), GFP_KERNEL);
+	curr_dp_info.dp_pages = (struct dp_vector*)kmalloc(curr_dp_info.nr_pages* sizeof(struct dp_vector), GFP_KERNEL);
     curr_dp_info.pcm_list = (struct pcache_meta**)kmalloc_array(curr_dp_info.nr_pages, sizeof(struct pcache_meta*), GFP_KERNEL);
     printk("DepTrack:step5\n");
     if(curr_dp_info.dirty_page_list == NULL){

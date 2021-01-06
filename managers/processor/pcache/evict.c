@@ -137,6 +137,7 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
  *
  * Return 0 on success, otherwise on failures.
  */
+int nr_evict_lines = 0;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
@@ -245,5 +246,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
+	nr_evict_lines +=1;
+	if(nr_evict_lines%1000==0){
+		printk("DepTrack: evict %d lines\n", nr_evict_lines);
+	}
 	return PCACHE_EVICT_SUCCEED;
 }

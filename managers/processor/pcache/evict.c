@@ -20,6 +20,7 @@
 #include <lego/profile.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
+#include <processor/dependency_track.h>
 
 /**
  * evict_find_line
@@ -138,12 +139,16 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
  * Return 0 on success, otherwise on failures.
  */
 int nr_evict_lines = 0;
+int nr_evict_mmaped_lines = 0;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
 	struct pcache_meta *pcm;
 	int nr_mapped;
 	int ret;
+	int index = 0;
+	int i;
+	struct dp_info * curr_dp_info;
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_find)
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_evict)
 
@@ -174,6 +179,19 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+	if (nr_dp_info!=0){
+		spin_lock(&dp_spinlock);
+		for (index = 0; index < dp_vector_size(dp_info_list); index++){
+			curr_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, index);
+            for(i=0;i<curr_dp_info->nr_pages;i++){
+				if(*(curr_dp_info->pcm_list+i) == pcm){
+					nr_evict_mmaped_lines +=1;
+				}
+			}
+		}
+		spin_unlock(&dp_spinlock);
+
+	}
 
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
@@ -249,6 +267,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	nr_evict_lines +=1;
 	if(nr_evict_lines%10000==0){
 		printk("DepTrack: evict %d lines\n", nr_evict_lines);
+	}
+	if(nr_evict_mmaped_lines%1000==0){
+		printk("DepTrack: evict %d mmaped lines\n", nr_evict_mmaped_lines);
 	}
 	return PCACHE_EVICT_SUCCEED;
 }

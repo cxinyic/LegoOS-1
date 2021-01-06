@@ -46,7 +46,7 @@ static int dependency_track(void *unused){
                                     curr_dp_idx.list_idx = index;
                                     curr_dp_idx.addr_idx = i;
                                     dp_vector_pushback(new_dirty_pages,&curr_dp_idx);
-                                    if(*(curr_dp_info->pcm_list+i)==NULL){
+                                    if(*(curr_dp_info->pcm_list+i) == NULL){
                                         *(curr_dp_info->pcm_list+i) = pte_to_pcache_meta(*pte);
                                     }
                                 }

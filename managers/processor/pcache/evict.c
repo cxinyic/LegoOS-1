@@ -139,7 +139,7 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
  * Return 0 on success, otherwise on failures.
  */
 int nr_evict_lines = 0;
-int nr_evict_mmaped_lines = 0;
+int nr_evict_mmaped_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {

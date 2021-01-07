@@ -186,7 +186,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			curr_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, index);
 			printk("DepTrack: step2: index: %d\n", index);
             for(i=0;i<curr_dp_info->nr_pages;i++){
-				printk("DepTrack: step3: i: %d\n", i);
+				
 				if(*(curr_dp_info->pcm_list+i) == pcm){
 					nr_evict_mmaped_lines +=1;
 				}

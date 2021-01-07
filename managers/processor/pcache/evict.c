@@ -184,15 +184,14 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		printk("DepTrack: step1\n");
 		for (index = 0; index < dp_vector_size(dp_info_list); index++){
 			curr_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, index);
-			printk("DepTrack: step2: index: %d\n", index);
             for(i=0;i<curr_dp_info->nr_pages;i++){
 				
 				if(*(curr_dp_info->pcm_list+i) == pcm){
+					printk("DepTrack: find one\n");
 					nr_evict_mmaped_lines +=1;
 				}
 			}
 		}
-		printk("DepTrack: step4\n");
 		spin_unlock(&dp_spinlock);
 
 	}

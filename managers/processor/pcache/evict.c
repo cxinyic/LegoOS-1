@@ -191,7 +191,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
             for(i=0;i<curr_dp_info->nr_pages;i++){
 				
 				if(*(curr_dp_info->pcm_list+i) == pcm){
-					printk("DepTrack: find one\n");
+					// printk("DepTrack: find one\n");
 					nr_flush_lines = 0;
 					for (j=0; j<dp_vector_size(curr_dp_info->dp_pages+i); j++){
 						tmp_dp_idx = dp_vector_Nth(curr_dp_info->dp_pages+i, j);

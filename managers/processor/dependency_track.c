@@ -91,7 +91,7 @@ static int dependency_track(void *unused){
             printk("DepTrack: in this perios, the number of dirty pages are %d\n", dp_vector_size(old_dirty_pages));
         }
         spin_unlock(&dp_spinlock);
-        sleep(1);
+        sleep(0.5);
     
     }
     return 0;

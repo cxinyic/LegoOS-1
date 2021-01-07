@@ -139,7 +139,7 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
  * Return 0 on success, otherwise on failures.
  */
 int nr_evict_lines = 0;
-int nr_evict_mmaped_lines = 1;
+int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
@@ -192,26 +192,25 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				
 				if(*(curr_dp_info->pcm_list+i) == pcm){
 					printk("DepTrack: find one\n");
+					nr_flush_lines = 0;
 					for (j=0; j<dp_vector_size(curr_dp_info->dp_pages+i); j++){
 						tmp_dp_idx = dp_vector_Nth(curr_dp_info->dp_pages+i, j);
 						tmp_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, tmp_dp_idx->list_idx);
 						if (tmp_dp_info->dirty_page_list[tmp_dp_idx->addr_idx] == 1 ){
 							if (*(tmp_dp_info->pcm_list+tmp_dp_idx->addr_idx) !=NULL){
 								pcm_to_flush = *(tmp_dp_info->pcm_list+tmp_dp_idx->addr_idx);
-								printk("DepTrack: flush step1\n");
 								PROFILE_START(evict_line_perset_flush);
 								pcache_flush_one(pcm_to_flush);
-								printk("DepTrack: flush step2\n");
 								PROFILE_LEAVE(evict_line_perset_flush);
-								printk("DepTrack: flush step3\n");
+								nr_flush_lines+=1;
 								tmp_dp_info->dirty_page_list[tmp_dp_idx->addr_idx] = 0;
 
 							}
 						}
 
 					}
+					printk("DepTrack: flush %d lines \n", nr_flush_lines);
 					
-					nr_evict_mmaped_lines +=1;
 				}
 			}
 		}
@@ -294,8 +293,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	if(nr_evict_lines%10000==0){
 		printk("DepTrack: evict %d lines\n", nr_evict_lines);
 	}
-	if(nr_evict_mmaped_lines%1000==0){
-		printk("DepTrack: evict %d mmaped lines\n", nr_evict_mmaped_lines);
-	}
+	
 	return PCACHE_EVICT_SUCCEED;
 }

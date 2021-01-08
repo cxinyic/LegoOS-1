@@ -112,6 +112,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
         pte = rmap->page_table;
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
+                *pte = pte_mkclean(*pte);
+                pcm->prev_dirty = 0;
                 pdi->nr_dirty_pages +=1;
                 if (pdi->first_pcm == NULL){
                     pdi->first_pcm = pcm;
@@ -152,7 +154,7 @@ static int dependency_track(void *unused){
             printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
         }
         spin_unlock(&dp_spinlock);
-        sleep(0.5);
+        sleep(0.1);
 
     }
     

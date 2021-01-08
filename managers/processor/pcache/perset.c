@@ -244,6 +244,9 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 	PROFILE_START(evict_line_perset_unmap);
 	dirty = pcache_try_to_unmap_reserve_check_dirty(pcm);
 	PROFILE_LEAVE(evict_line_perset_unmap);
+	if (pcm->prev_dirty == 1){
+		dirty = true;
+	}
 
 	if (likely(dirty)) {
 		if (likely((nr_added == 1) && (piggyback == ENABLE_PIGGYBACK))) {
@@ -256,6 +259,7 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 
 		PROFILE_START(evict_line_perset_flush);
 		pcache_flush_one(pcm);
+		pcm->prev_dirty = 0;
 		PROFILE_LEAVE(evict_line_perset_flush);
 	}
 

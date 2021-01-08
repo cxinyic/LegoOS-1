@@ -223,6 +223,7 @@ struct pcache_meta {
 #endif
 // #ifdef CONFIG_DEPENDENCY_TRACK
 	struct list_head dependency_list;
+	int prev_dirty;
 // #endif
 } ____cacheline_aligned;
 

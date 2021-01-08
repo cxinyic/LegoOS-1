@@ -183,6 +183,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
 		
@@ -216,7 +217,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 		spin_unlock(&dp_spinlock);
 
-	}
+	}*/
 
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);

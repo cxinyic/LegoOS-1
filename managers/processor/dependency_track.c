@@ -12,7 +12,7 @@ static inline void sleep(unsigned sec)
 }
 
 
-
+/*
 static int dependency_track(void *unused){
     pgd_t *pgd;
     pud_t *pud;
@@ -95,7 +95,70 @@ static int dependency_track(void *unused){
     
     }
     return 0;
+}*/
+
+struct pcache_dependency_info{
+    struct pcache_meta * first_pcm;
+    struct pcache_meta * last_pcm;
+    int nr_dirty_pages;
+
+}; 
+
+statuc int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
+{
+    struct pcache_dependency_info * pdi = arg;
+    pte_t *pte;
+    if (rmap->owner_process->pid == current_pid){
+        pte = rmap->page_table;
+        if (!pte_none(*pte) && pte_present(*pte)) {
+            if (likely(pte_dirty(*pte))) {
+                pdi->nr_dirty_pages +=1;
+                if (pdi->first_pcm == NULL){
+                    pdi->first_pcm = pcm;
+                }
+                if (pdi->last_pcm != NULL){
+                    list_add(pcm->dependency_list,pdi->last_pcm->dependency_list);
+                }
+                pdi->last_pcm = pcm;
+            }
+        }
+    }
+    return PCACHE_RMAP_AGAIN;
 }
+
+
+static int dependency_track(void *unused){
+    struct pcache_meta *pcm;
+    int nr = 0;
+    int count = 0;
+    struct pcache_dependency_info pdi;
+    while (1){
+        spin_lock(&dp_spinlock);
+        if(nr_dp_info != 0){
+            pdi.first_pcm = NULL;
+            pdi.last_pcm = NULL;
+            pdi.nr_dirty_pages = 0;
+
+            struct rmap_walk_control rwc = {
+                .arg = &pdi;
+                .rmap_one = __add_dependency_if_dirty,
+            }; 
+            pcache_for_each_way(pcm, nr) {
+                rmap_walk(pcm, &rwc);
+            }
+            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi_last_pcm){
+                list_add(pdi.first_pcm->dependency_list, pdi.last_pcm->dependency_list);
+            }
+            printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+        }
+        spin_unlock(&dp_spinlock);
+        sleep(0.5);
+
+    }
+    
+    return 0;
+}
+
 #ifdef CONFIG_DEPENDENCY_TRACK
 void dependency_track_init(void)
 {

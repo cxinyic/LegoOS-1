@@ -221,6 +221,9 @@ struct pcache_meta {
 #ifdef CONFIG_PCACHE_EVICT_LRU
 	struct list_head	lru;
 #endif
+// #ifdef CONFIG_DEPENDENCY_TRACK
+	struct list_head dependency_list;
+// #endif
 } ____cacheline_aligned;
 
 enum rmap_caller {

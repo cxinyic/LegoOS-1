@@ -11,6 +11,7 @@ int nr_dp_info =0;
 struct dp_vector* dp_info_list;
 struct dp_vector* old_dirty_pages;
 struct dp_vector* new_dirty_pages;
+pid_t current_pid;
 spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
 
 
@@ -131,7 +132,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");
 	spin_unlock(&dp_spinlock);
-
+	current_pid = current->pid;
 	return ret_addr;
 #else
     return -1;

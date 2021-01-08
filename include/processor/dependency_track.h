@@ -48,6 +48,9 @@ extern struct dp_vector* dp_info_list;
 extern struct dp_vector* old_dirty_pages;
 extern struct dp_vector* new_dirty_pages;
 extern spinlock_t dp_spinlock;
+extern pid_t current_pid;
+
+
 
 #ifdef CONFIG_DEPENDENCY_TRACK
 

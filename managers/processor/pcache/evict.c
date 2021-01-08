@@ -207,7 +207,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 							}
 						}
-
 					}
 					if(nr_flush_lines>0)
 					{printk("DepTrack: flush %d lines \n", nr_flush_lines);}

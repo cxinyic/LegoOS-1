@@ -151,10 +151,11 @@ static int dependency_track(void *unused){
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm){
                 list_add(&(pdi.first_pcm->dependency_list), &(pdi.last_pcm->dependency_list));
             }
-            printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+            if (pdi.nr_dirty_pages>0)
+            {printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
         }
         spin_unlock(&dp_spinlock);
-        sleep(0.1);
+        sleep(0.5);
 
     }
     

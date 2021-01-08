@@ -104,7 +104,7 @@ struct pcache_dependency_info{
 
 }; 
 
-statuc int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
+static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
 {
     struct pcache_dependency_info * pdi = arg;
     pte_t *pte;
@@ -140,13 +140,13 @@ static int dependency_track(void *unused){
             pdi.nr_dirty_pages = 0;
 
             struct rmap_walk_control rwc = {
-                .arg = &pdi;
+                .arg = &pdi,
                 .rmap_one = __add_dependency_if_dirty,
             }; 
             pcache_for_each_way(pcm, nr) {
                 rmap_walk(pcm, &rwc);
             }
-            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi_last_pcm){
+            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm){
                 list_add(pdi.first_pcm->dependency_list, pdi.last_pcm->dependency_list);
             }
             printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);

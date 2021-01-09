@@ -113,7 +113,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
                 *pte = pte_mkclean(*pte);
-                pcm->prev_dirty = 0;
+                pcm->prev_dirty = 1;
                 pdi->nr_dirty_pages +=1;
                 if (pdi->first_pcm == NULL){
                     pdi->first_pcm = pcm;

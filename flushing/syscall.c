@@ -11,7 +11,7 @@ int nr_dp_info =0;
 struct dp_vector* dp_info_list;
 struct dp_vector* old_dirty_pages;
 struct dp_vector* new_dirty_pages;
-pid_t current_pid;
+pid_t current_pid = 0;
 spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
 
 
@@ -86,7 +86,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	if (f)
 		put_file(f);
 	
-    printk("DepTrack:step1\n");
+    /*printk("DepTrack:step1\n");
 	if(nr_dp_info == 0 && dp_info_list == NULL){
 		dp_info_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dp_info_list,sizeof(struct dp_info));
@@ -131,8 +131,10 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	dp_vector_pushback(dp_info_list,&curr_dp_info);
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");
-	spin_unlock(&dp_spinlock);
+	*/
+	nr_dp_info += 1;
 	current_pid = current->pid;
+	spin_unlock(&dp_spinlock);
 	return ret_addr;
 #else
     return -1;
@@ -177,7 +179,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		pr_err("munmap() fail: %s\n", ret_to_string(retbuf.ret));
 
 
-    int i=0;
+    /*int i=0;
 	int position = -1;
 	struct dp_info * tmp;
 	for(i=0;i<nr_dp_info;i++){
@@ -211,7 +213,9 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		new_dirty_pages = NULL;
 		old_dirty_pages = NULL;
 		
-	}
+	}*/
+	nr_dp_info -=1;
+	current_pid = 0;
 	spin_unlock(&dp_spinlock);
 	return retbuf.ret;
 #else

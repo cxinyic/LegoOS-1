@@ -143,6 +143,9 @@ int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
+	if(nr_evict_lines%10000==0){
+		printk("DepTrack: evict %d lines\n", nr_evict_lines);
+	}
 	struct pcache_meta *pcm;
 	int nr_mapped;
 	int ret;
@@ -291,7 +294,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
 	nr_evict_lines +=1;
-	if(nr_evict_lines%10000==0){
+	if(nr_evict_lines%10000==1){
 		printk("DepTrack: evict %d lines\n", nr_evict_lines);
 	}
 	

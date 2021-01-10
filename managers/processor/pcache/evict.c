@@ -196,9 +196,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
-		/*list_for_each_entry(tmp_pcm, pcm->dependency_list, next){
+		list_for_each_entry(tmp_pcm, pcm->dependency_list, next){
 			dp_vector_pushback(dependency_queue,tmp_pcm);
-		}*/
+		}
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step2\n");
 		}

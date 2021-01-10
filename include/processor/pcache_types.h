@@ -15,6 +15,7 @@
 #include <lego/bitops.h>
 #include <lego/spinlock.h>
 
+#include <processor/dependency_vector.h>
 #include <processor/pcache_config.h>
 
 struct pcache_meta;
@@ -222,7 +223,7 @@ struct pcache_meta {
 	struct list_head	lru;
 #endif
 // #ifdef CONFIG_DEPENDENCY_TRACK
-	struct list_head dependency_list;
+	struct dp_vector * dependency_list;
 	int prev_dirty;
 // #endif
 } ____cacheline_aligned;

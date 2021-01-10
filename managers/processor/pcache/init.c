@@ -205,7 +205,6 @@ static void __init init_pcache_meta_map(void)
 		pcache_ref_count_set(pcm, 0);
 		init_pcache_lru(pcm);
 // #ifdef CONFIG_DEPENDENCY_TRACK
-		INIT_LIST_HEAD(&pcm->dependency_list);
 		pcm->prev_dirty = 0;
 // #endif
 	}

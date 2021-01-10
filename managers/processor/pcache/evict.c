@@ -189,7 +189,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
-	if (nr_dp_info!=0){
+	/*if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step1\n");
@@ -198,6 +198,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
 		list_for_each_entry(tmp_pcm, &(pcm->dependency_list), dependency_list){
 			dp_vector_pushback(dependency_queue,tmp_pcm);
+			list_del(tmp_pcm->dependency_list);
 		}
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step2\n");
@@ -216,7 +217,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		spin_unlock(&dp_spinlock);
-	}
+	}*/
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

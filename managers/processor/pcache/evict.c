@@ -203,7 +203,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			printk("DepTrack: flush step2\n");
 		}
 		while (!list_empty(&(pcm->dependency_list))){
-			list_del(list_first_entry(&(pcm->dependency_list), (struct pcache_meta), dependency_list));
+			tmp_pcm = list_first_entry(&(pcm->dependency_list), (struct pcache_meta), dependency_list);
 		}
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step3\n");

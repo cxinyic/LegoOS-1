@@ -15,7 +15,7 @@
 #include <lego/bitops.h>
 #include <lego/spinlock.h>
 
-#include <processor/dependency_vector.h>
+#include <processor/dependency_track.h>
 #include <processor/pcache_config.h>
 
 struct pcache_meta;

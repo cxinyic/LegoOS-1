@@ -61,6 +61,16 @@ static int dp_vector_size(struct dp_vector* v){
     return v->logical_size;
 }
 
+static bool dp_vector_in(struct dp_vector* v, void* elem_addr){
+    int i=0;
+    for(i=0; i<dp_vector_size(v); i++){
+        if (dp_vector_Nth(v,i) == elem_addr){
+            return true;
+        }
+    }
+    return false;
+}
+
 
 
 

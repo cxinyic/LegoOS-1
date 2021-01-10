@@ -156,7 +156,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	struct dp_info * tmp_dp_info;
 	struct dp_idx * tmp_dp_idx;
 	struct pcache_meta * pcm_to_flush;
-	struct dp_vector * pages_to_flush;
+	struct dp_vector * pcms_to_flush;
 	struct dp_vector * dependency_queue;
 	struct pcache_meta *tmp_pcm;
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_find)
@@ -189,35 +189,64 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
-	/*if (nr_dp_info!=0){
+	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step1\n");
 		}
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
-		list_for_each_entry(tmp_pcm, &(pcm->dependency_list), dependency_list){
-			dp_vector_pushback(dependency_queue,tmp_pcm);
-			list_del(tmp_pcm->dependency_list);
+		pcms_to_flush = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
+		dp_vector_new(pcms_to_flush, sizeof(struct pcache_meta* ));
+		for (i=0; i<dp_vector_size(pcm->dependency_list) ; i++){
+			dp_vector_pushback(dependency_queue, dp_vector_Nth(pcm->dependency_list,i));
+		}
+		while (dp_vector_size(pcm->dependency_list)>0){
+			dp_vector_delete(pcm->dependency_list, 0);
 		}
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step2\n");
 		}
-		while (!list_empty(&(pcm->dependency_list))){
-			tmp_pcm = list_first_entry(&(pcm->dependency_list), (struct pcache_meta), dependency_list);
+		while (dp_vector_size(dependency_queue)>0){
+			tmp_pcm = dp_vector_Nth(dependency_queue, 0);
+			if (!dp_vector_in(pcms_to_flush, tmp_pcm)){
+				dp_vector_pushback(pcms_to_flush, tmp_pcm);
+				for (j=0; j<dp_vector_size(tmp_pcm->dependency_list) ; j++){
+					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
+				}
+				while (dp_vector_size(tmp_pcm->dependency_list)>0){
+					dp_vector_delete(tmp_pcm->dependency_list, 0);
+				}
+			}
+			dp_vector_delete(dependency_queue,0);
 		}
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step3\n");
 		}
 
-		dp_vector_dispose(dependency_queue);
-		kfree(dependency_queue);
+		while (dp_vector_size(pcms_to_flush)>0){
+			tmp_pcm = dp_vector_Nth(pcms_to_flush, 0);
+			if (tmp_pcm->prev_dirty == 1 && tmp_pcm!=pcm){
+				PROFILE_START(evict_line_perset_flush);
+				pcache_flush_one(tmp_pcm);
+				PROFILE_LEAVE(evict_line_perset_flush);
+			}
+		}
+		
 		if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step4\n");
 		}
 
+		dp_vector_dispose(dependency_queue);
+		kfree(dependency_queue);
+		dp_vector_dispose(pcms_to_flush);
+		kfree(pcms_to_flush);
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: flush step5\n");
+		}
+
 		spin_unlock(&dp_spinlock);
-	}*/
+	}
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

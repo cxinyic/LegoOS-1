@@ -147,6 +147,7 @@ static int dependency_track(void *unused){
                      pcm->dependency_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
                      dp_vector_new(pcm->dependency_list, sizeof(struct pcache_meta*));
                  }
+                 init_flag = 1;
             }
 
             struct rmap_walk_control rwc = {

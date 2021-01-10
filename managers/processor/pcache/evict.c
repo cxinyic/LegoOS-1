@@ -156,6 +156,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	struct dp_info * tmp_dp_info;
 	struct dp_idx * tmp_dp_idx;
 	struct pcache_meta * pcm_to_flush;
+	struct dp_vector * pages_to_flush;
+	struct dp_vector * dependency_queue;
+	struct pcache_meta *tmp_pcm;
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_find)
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_evict)
 
@@ -186,6 +189,34 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+	if (nr_dp_info!=0){
+		spin_lock(&dp_spinlock);
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: flush step1\n");
+		}
+		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
+		dp_vector_new(dependency_queue, sizeof(struct * pcache_meta));
+		list_for_each_entry(tmp_pcm, pcm->dependency_list, list){
+			dp_vector_pushback(dependency_queue,tmp->pcm);
+		}
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: flush step2\n");
+		}
+		while (!list_empty(&(pcm->dependency_list))){
+			list_del(list_first_entry(&(pcm->dependency_list), (struct pcache_meta*), list));
+		}
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: flush step3\n");
+		}
+
+		dp_vector_dispose(dependency_queue);
+		kfree(dependency_queue);
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: flush step4\n");
+		}
+
+		spin_unlock(&dp_spinlock);
+	}
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

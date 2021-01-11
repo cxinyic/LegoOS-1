@@ -214,6 +214,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				printk("DepTrack: flush step22\n");
 				dp_vector_pushback(pcms_to_flush, tmp_pcm);
 				printk("DepTrack: flush step23\n");
+				if (tmp_pcm->dependency_list == NULL){
+					printk("DepTrack: flush step23-1\n");
+					continue;
+				}
 				for (j=0; j<dp_vector_size(tmp_pcm->dependency_list) ; j++){
 					printk("DepTrack: flush step24\n");
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));

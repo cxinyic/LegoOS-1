@@ -234,7 +234,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 					printk("DepTrack: flush step3-2\n");
 				}
-				if(tmp->pcm == NULL){
+				if(tmp_pcm == NULL){
 					if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 						printk("DepTrack: flush NULL\n");
 					}

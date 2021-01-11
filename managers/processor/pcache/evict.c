@@ -143,7 +143,7 @@ int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
-	if(nr_evict_lines%1000==0){
+	if(nr_evict_lines%1000==0 || nr_evict_lines> 79000){
 		printk("DepTrack: evict %d lines\n", nr_evict_lines);
 	}
 	struct pcache_meta *pcm;
@@ -191,7 +191,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
-		if(nr_evict_lines%1000==0){
+		if(nr_evict_lines%1000==0 || nr_evict_lines> 79000){
 			printk("DepTrack: flush step1\n");
 		}
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -204,7 +204,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		while (dp_vector_size(pcm->dependency_list)>0){
 			dp_vector_delete(pcm->dependency_list, 0);
 		}
-		if(nr_evict_lines%1000==0){
+		if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 			printk("DepTrack: flush step2\n");
 		}
 		while (dp_vector_size(dependency_queue)>0){
@@ -235,7 +235,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			}
 			
 		}
-		if(nr_evict_lines%1000==0){
+		if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 			printk("DepTrack: flush step3\n");
 		}
 
@@ -249,7 +249,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			}
 		}
 		
-		if(nr_evict_lines%1000==0){
+		if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 			printk("DepTrack: flush step4\n");
 		}
 
@@ -257,7 +257,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		kfree(dependency_queue);
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
-		if(nr_evict_lines%1000==0){
+		if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 			printk("DepTrack: flush step5\n");
 		}
 
@@ -302,10 +302,16 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
 	BUG_ON(nr_mapped < 1);
+	if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+			printk("DepTrack: flush step6\n");
+		}
 
 	PROFILE_START(pcache_alloc_evict_do_evict);
 	ret = evict_line(pset, pcm, address, piggyback);
 	PROFILE_LEAVE(pcache_alloc_evict_do_evict);
+	if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+			printk("DepTrack: flush step7\n");
+		}
 	if (ret) {
 		/*
 		 * Revert what algorithm has done:
@@ -322,6 +328,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		inc_pcache_event(PCACHE_EVICTION_FAILURE_EVICT);
 		return PCACHE_EVICT_FAILURE_EVICT;
 	}
+	if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+			printk("DepTrack: flush step8\n");
+		}
 
 	/*
 	 * After a successful eviction, @pcm has no rmap left
@@ -359,7 +368,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		inc_pcache_event(PCACHE_EVICTION_EAGAIN_CONCURRENT);
 		return PCACHE_EVICT_EAGAIN_CONCURRENT;
 	}
-
+if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+			printk("DepTrack: flush step9\n");
+		}
 	/*
 	 * Succeed: pcm is unmapped, and no other threads
 	 * are using it. Simply free and return it to pset.
@@ -371,7 +382,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
 	nr_evict_lines +=1;
-	if(nr_evict_lines%1000==1){
+	if(nr_evict_lines%1000==1|| nr_evict_lines> 79000){
 		printk("DepTrack: evict %d lines\n", nr_evict_lines);
 	}
 	

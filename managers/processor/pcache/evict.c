@@ -209,6 +209,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		// }
 		while (dp_vector_size(dependency_queue)>0){
 			tmp_pcm = dp_vector_Nth(dependency_queue, 0);
+			printk("DepTrack: flush step28\n");
+			dp_vector_delete(dependency_queue,0);
+			
 			printk("DepTrack: flush step21\n");
 			if (!dp_vector_in(pcms_to_flush, tmp_pcm)){
 				printk("DepTrack: flush step22\n");
@@ -218,6 +221,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 					printk("DepTrack: flush step23-1\n");
 					continue;
 				}
+				printk("DepTrack: flush step23-2\n");
 				for (j=0; j<dp_vector_size(tmp_pcm->dependency_list) ; j++){
 					printk("DepTrack: flush step24\n");
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
@@ -229,9 +233,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 					printk("DepTrack: flush step27\n");
 				}
 			}
-			printk("DepTrack: flush step28\n");
-			dp_vector_delete(dependency_queue,0);
-			printk("DepTrack: flush step29\n");
+			
 		}
 		// if(nr_evict_lines%10000==0){
 			printk("DepTrack: flush step3\n");

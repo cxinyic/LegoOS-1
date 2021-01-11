@@ -241,6 +241,8 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 		while (dp_vector_size(pcms_to_flush)>0){
 			tmp_pcm = dp_vector_Nth(pcms_to_flush, 0);
+			printk("DepTrack: flush step3-1\n");
+			dp_vector_delete(pcms_to_flush,0);
 			if (tmp_pcm->prev_dirty == 1 && tmp_pcm!=pcm){
 				PROFILE_START(evict_line_perset_flush);
 				pcache_flush_one(tmp_pcm);

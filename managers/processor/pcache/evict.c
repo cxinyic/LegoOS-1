@@ -234,6 +234,15 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 					printk("DepTrack: flush step3-2\n");
 				}
+				if(tmp->pcm == NULL){
+					if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+						printk("DepTrack: flush NULL\n");
+					}
+					continue;
+				}
+				if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
+					printk("DepTrack: flush step3-2-1\n");
+				}
 				for (j=0; j<dp_vector_size(tmp_pcm->dependency_list) ; j++){
 					if(nr_evict_lines%1000==0|| nr_evict_lines> 79000){
 						printk("DepTrack: flush step24\n");

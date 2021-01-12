@@ -222,7 +222,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				}
 				if (tmp_pcm->dependency_list == NULL){
 					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush NULL1\n");
+						printk("DepTrack: flush NULL1, pcm addr is %lx\n", tmp_pcm);
 					}
 					continue;
 				}

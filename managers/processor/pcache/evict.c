@@ -206,8 +206,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			dp_vector_delete(pcm->dependency_list, 0);
 		}
 		while (dp_vector_size(dependency_queue)>0){
-			tmp_pcm = dp_vector_Nth(dependency_queue, 0);
-			printk("DepTrack: flush  pcm addr is %lx， tmp_pcm addr is %lx\n", pcm, tmp_pcm);
+			tmp_pcm = (struct pcache_meta* )dp_vector_Nth(dependency_queue, 0);
+			if(nr_evict_lines%1000==0){
+				printk("DepTrack: flush  pcm addr is %lx, tmp_pcm addr is %lx\n", pcm, tmp_pcm);
+			}
 			dp_vector_delete(dependency_queue,0);
 			if(nr_evict_lines%1000==0){
 				printk("DepTrack: flush step1\n");

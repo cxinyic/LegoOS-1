@@ -143,8 +143,8 @@ int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
-	if(nr_evict_lines%1000==0 || nr_evict_lines> 35000){
-		printk("DepTrack: evict %d lines\n", nr_evict_lines);
+	if(nr_evict_lines%1000==0){
+		printk("DepTrack: evict %d lines begin\n", nr_evict_lines);
 	}
 	struct pcache_meta *pcm;
 	int nr_mapped;
@@ -192,8 +192,8 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
-		if(nr_evict_lines%1000==0 || nr_evict_lines> 35000){
-			printk("DepTrack: flush step1\n");
+		if(nr_evict_lines%10000==0){
+			printk("DepTrack: enter flushing\n");
 		}
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
@@ -205,78 +205,43 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		while (dp_vector_size(pcm->dependency_list)>0){
 			dp_vector_delete(pcm->dependency_list, 0);
 		}
-		if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step2\n");
-		}
 		while (dp_vector_size(dependency_queue)>0){
 			tmp_pcm = dp_vector_Nth(dependency_queue, 0);
-			// printk("DepTrack: flush step28\n");
 			dp_vector_delete(dependency_queue,0);
-			if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-				printk("DepTrack: flush step28\n");
-			}
-			
-			// printk("DepTrack: flush step21\n");
+			printk("DepTrack: flush step1\n");
+
 			if (!dp_vector_in(pcms_to_flush, tmp_pcm)){
-				// printk("DepTrack: flush step22\n");
-				if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-					printk("DepTrack: flush step22\n");
-				}
+				printk("DepTrack: flush step2\n");
 				dp_vector_pushback(pcms_to_flush, tmp_pcm);
-				if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-					printk("DepTrack: flush step3-0\n");
-				}
+				printk("DepTrack: flush step3\n");
 				if (tmp_pcm->dependency_list == NULL){
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush step3-1\n");
-					}
+					printk("DepTrack: flush NULL1\n");
 					continue;
 				}
-				if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-					printk("DepTrack: flush step3-2\n");
-				}
+				printk("DepTrack: flush step3-1\n");
 				if(tmp_pcm == NULL){
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush NULL\n");
-					}
+					printk("DepTrack: flush NULL2\n");
 					continue;
 				}
-				if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-					printk("DepTrack: flush step3-2-1\n");
-				}
+				printk("DepTrack: flush step3-2\n");
 				size = dp_vector_size(tmp_pcm->dependency_list);
-				if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-					printk("DepTrack: flush step3-2-2, size is %d\n", size);
-				}
+				printk("DepTrack: flush step4, size is %d\n", size);
 				for (j=0; j<size; j++){
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush step24\n");
-					}
+					printk("DepTrack: flush step4-1\n");
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
-					// printk("DepTrack: flush step25\n");
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush step25\n");
-					}
+					printk("DepTrack: flush step4-2\n");
 				}
 				while (dp_vector_size(tmp_pcm->dependency_list)>0){
-					// printk("DepTrack: flush step26\n");
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush step26\n");
-					}
+					printk("DepTrack: flush step5-1\n");
 					dp_vector_delete(tmp_pcm->dependency_list, 0);
-					// printk("DepTrack: flush step27\n");
-					if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-						printk("DepTrack: flush step27\n");
-					}
+					printk("DepTrack: flush step5-2\n");
 				}
 			}
 			
-		}
-		if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step3\n");
 		}
 
 		while (dp_vector_size(pcms_to_flush)>0){
+			printk("DepTrack: flush step6-1\n");
 			tmp_pcm = dp_vector_Nth(pcms_to_flush, 0);
 			dp_vector_delete(pcms_to_flush,0);
 			if (tmp_pcm->prev_dirty == 1 && tmp_pcm!=pcm){
@@ -284,20 +249,16 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				pcache_flush_one(tmp_pcm);
 				PROFILE_LEAVE(evict_line_perset_flush);
 			}
+			printk("DepTrack: flush step6-2\n");
 		}
 		
-		if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step4\n");
-		}
+
 
 		dp_vector_dispose(dependency_queue);
 		kfree(dependency_queue);
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
-		if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step5\n");
-		}
-
+		printk("DepTrack: flush step7\n");
 		spin_unlock(&dp_spinlock);
 	}
 	/*
@@ -339,16 +300,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
 	BUG_ON(nr_mapped < 1);
-	if(nr_evict_lines%1000==0|| nr_evict_lines>35000){
-			printk("DepTrack: flush step6\n");
-		}
-
 	PROFILE_START(pcache_alloc_evict_do_evict);
 	ret = evict_line(pset, pcm, address, piggyback);
 	PROFILE_LEAVE(pcache_alloc_evict_do_evict);
-	if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step7\n");
-		}
+
 	if (ret) {
 		/*
 		 * Revert what algorithm has done:
@@ -365,9 +320,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		inc_pcache_event(PCACHE_EVICTION_FAILURE_EVICT);
 		return PCACHE_EVICT_FAILURE_EVICT;
 	}
-	if(nr_evict_lines%1000==0|| nr_evict_lines>35000){
-			printk("DepTrack: flush step8\n");
-		}
 
 	/*
 	 * After a successful eviction, @pcm has no rmap left
@@ -405,9 +357,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		inc_pcache_event(PCACHE_EVICTION_EAGAIN_CONCURRENT);
 		return PCACHE_EVICT_EAGAIN_CONCURRENT;
 	}
-if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
-			printk("DepTrack: flush step9\n");
-		}
+
 	/*
 	 * Succeed: pcm is unmapped, and no other threads
 	 * are using it. Simply free and return it to pset.
@@ -419,8 +369,8 @@ if(nr_evict_lines%1000==0|| nr_evict_lines> 35000){
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
 	nr_evict_lines +=1;
-	if(nr_evict_lines%1000==1|| nr_evict_lines> 35000){
-		printk("DepTrack: evict %d lines\n", nr_evict_lines);
+	if(nr_evict_lines%10000==1){
+		printk("DepTrack: evict %d lines finished\n", nr_evict_lines);
 	}
 	
 	return PCACHE_EVICT_SUCCEED;

@@ -119,8 +119,10 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     pdi->first_pcm = pcm;
                 }
                 if (pdi->last_pcm != NULL){
-                    // list_add(&(pcm->dependency_list),&(pdi->last_pcm->dependency_list));
-                    dp_vector_pushback(pdi->last_pcm->dependency_list, pcm);
+                    if (!dp_vector_in(pdi->last_pcm->dependency_list, pcm))
+                    {
+                        dp_vector_pushback(pdi->last_pcm->dependency_list, pcm);
+                    }
                 }
                 pdi->last_pcm = pcm;
             }
@@ -158,8 +160,7 @@ static int dependency_track(void *unused){
             pcache_for_each_way(pcm, nr) {
                 rmap_walk(pcm, &rwc);
             }
-            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm){
-                // list_add(&(pdi.first_pcm->dependency_list), &(pdi.last_pcm->dependency_list));
+            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm && ! dp_vector_in(pdi.last_pcm->dependency_list, pdi.first_pcm)){
                 dp_vector_pushback(pdi.last_pcm->dependency_list, pdi.first_pcm);
             }
             if (pdi.nr_dirty_pages>0)

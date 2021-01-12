@@ -146,6 +146,9 @@ static int dependency_track(void *unused){
             pdi.nr_dirty_pages = 0;
             if (init_flag==0){
                  pcache_for_each_way(pcm, nr) {
+                     if (nr%1000==0){
+                         printk("DepTrack: init %d pcm\n", nr);
+                     }
                      pcm->dependency_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
                      dp_vector_new(pcm->dependency_list, sizeof(struct pcache_meta*));
                  }

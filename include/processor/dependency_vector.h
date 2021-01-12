@@ -62,7 +62,6 @@ static int dp_vector_size(struct dp_vector* v){
         printk("DepTrack: v=NULL\n");
         return 0;
     }
-    printk("DepTrack: v is not NULL, %lx\n", v);
     return v->logical_size;
 }
 

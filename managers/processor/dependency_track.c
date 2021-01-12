@@ -122,6 +122,9 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     if (!dp_vector_in(pdi->last_pcm->dependency_list, pcm))
                     {
                         dp_vector_pushback(pdi->last_pcm->dependency_list, pcm);
+                        if (pdi->nr_dirty_pages%100 ==0){
+                            printk("DepTrack: current pcm is %lx, prev pcm is %lx, prev list is %lx", pcm, pdi->last_pcm, pdi->last_pcm->dependency_list);
+                        }
                     }
                 }
                 pdi->last_pcm = pcm;

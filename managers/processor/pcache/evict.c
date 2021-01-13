@@ -143,9 +143,9 @@ int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
-	if(nr_evict_lines%10000==0){
+	/* if(nr_evict_lines%10000==0){
 		printk("DepTrack: evict %d lines begin\n", nr_evict_lines);
-	}
+	} */
 	struct pcache_meta *pcm;
 	int nr_mapped;
 	int ret;
@@ -193,9 +193,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
-		if(nr_evict_lines%1000==0){
-			printk("DepTrack: enter flushing\n");
-		}
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
 		pcms_to_flush = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -206,84 +203,35 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		while (dp_vector_size(pcm->dependency_list)>0){
 			dp_vector_delete(pcm->dependency_list, 0);
 		}
-		size = dp_vector_size(dependency_queue);
+		/*size = dp_vector_size(dependency_queue);
 		if(size>0){
 			printk("DepTrack: dependency queue size is %d\n", size);
-		}
+		}*/
 			
 		while (dp_vector_size(dependency_queue)>0){
 			tmp = (struct pcache_meta **)dp_vector_Nth(dependency_queue, 0);
 			tmp_pcm = *tmp;
-			if(nr_evict_lines%1000==0){
-				printk("DepTrack: flush  pcm addr is %lx, tmp_pcm addr is %lx\n", pcm, tmp_pcm);
-			}
 			dp_vector_delete(dependency_queue,0);
-			if(nr_evict_lines%1000==0){
-				printk("DepTrack: flush step1\n");
-			}
-			
 			if (!dp_vector_in(pcms_to_flush, (void *)tmp)){
-				if(nr_evict_lines%1000==0){
-					printk("DepTrack: flush step2\n");
-				}
 				dp_vector_pushback(pcms_to_flush, (void *)tmp);
-				if(nr_evict_lines%1000==0){
-					printk("DepTrack: flush step3\n");
-				}
 				if (tmp_pcm->dependency_list == NULL){
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush NULL1, pcm addr is %lx\n", tmp_pcm);
-					}
 					continue;
-				}
-				if(nr_evict_lines%1000==0){
-					printk("DepTrack: flush step3-1\n");
 				}
 				if(tmp_pcm == NULL){
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush NULL2\n");
-					}
 					continue;
 				}
-				
-				
-				
 				size = dp_vector_size(tmp_pcm->dependency_list);
-				
-				if(nr_evict_lines%1000==0){
-					printk("DepTrack: flush step4, size is %d\n", size);
-				}
-				
 				for (j=0; j<size; j++){
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush step4-1\n");
-					}
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush step4-2\n");
-					}
 				}
 				while (dp_vector_size(tmp_pcm->dependency_list)>0){
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush step5-1\n");
-					}
 					dp_vector_delete(tmp_pcm->dependency_list, 0);
-					if(nr_evict_lines%1000==0){
-						printk("DepTrack: flush step5-2\n");
-					}
 				}
 			}
 			
-		}
-		size = dp_vector_size(pcms_to_flush);
-		if(size>0){
-			printk("DepTrack: pcms_to_flush size is %d\n", size);
 		}
 
 		while (dp_vector_size(pcms_to_flush)>0){
-			if(nr_evict_lines%1000==0){
-				printk("DepTrack: flush step6-1\n");
-			}
 			tmp = (struct pcache_meta **)dp_vector_Nth(pcms_to_flush, 0);
 			tmp_pcm = *tmp;
 			dp_vector_delete(pcms_to_flush,0);
@@ -291,9 +239,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				PROFILE_START(evict_line_perset_flush);
 				pcache_flush_one(tmp_pcm);
 				PROFILE_LEAVE(evict_line_perset_flush);
-			}
-			if(nr_evict_lines%1000==0){
-				printk("DepTrack: flush step6-2\n");
 			}
 		}
 		
@@ -303,9 +248,6 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		kfree(dependency_queue);
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
-		if(nr_evict_lines%1000==0){
-			printk("DepTrack: flush step7\n");
-		}
 		spin_unlock(&dp_spinlock);
 	}
 	/*
@@ -415,10 +357,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	inc_pset_event(pset, PSET_EVICTION);
 	inc_pcache_event(PCACHE_EVICTION_SUCCEED);
-	nr_evict_lines +=1;
+	/* nr_evict_lines +=1;
 	if(nr_evict_lines%10000==1){
 		printk("DepTrack: evict %d lines finished\n", nr_evict_lines);
-	}
+	} */
 	
 	return PCACHE_EVICT_SUCCEED;
 }

@@ -108,7 +108,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 {
     struct pcache_dependency_info * pdi = arg;
     pte_t *pte;
-    void* elem_addr;
+    struct pcache_meta ** elem_addr;
     struct pcache_meta * tmp_pcm;
     if (rmap->owner_process->pid == current_pid){
         pte = rmap->page_table;
@@ -122,12 +122,13 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                 }
                 if (pdi->last_pcm != NULL){
                     *elem_addr = pcm;
-                    if (!dp_vector_in(pdi->last_pcm->dependency_list, elem_addr))
+                    if (!dp_vector_in(pdi->last_pcm->dependency_list, (void *)elem_addr))
                     {
-                        dp_vector_pushback(pdi->last_pcm->dependency_list, elem_addr);
+                        dp_vector_pushback(pdi->last_pcm->dependency_list, (void *)elem_addr);
                         if (pdi->nr_dirty_pages%100 ==0){
                             printk("DepTrack: current pcm is %lx, prev pcm is %lx, prev list is %lx\n", pcm, pdi->last_pcm, pdi->last_pcm->dependency_list);
-                            tmp_pcm = (struct pcache_meta *)(*dp_vector_Nth(pdi->last_pcm->dependency_list, 0));
+                            elem_addr = (struct pcache_meta **)(dp_vector_Nth(pdi->last_pcm->dependency_list, 0));
+                            tmp_pcm = *elem_addr;
                             printk("DepTrack: first pcm in list is %lx\n", tmp_pcm);
 
                         }
@@ -146,7 +147,7 @@ static int dependency_track(void *unused){
     int nr = 0;
     int count = 0;
     struct pcache_dependency_info pdi;
-    void * elem_addr;
+    struct pcache_meta ** elem_addr;
     
     while (1){
         spin_lock(&dp_spinlock);
@@ -179,8 +180,8 @@ static int dependency_track(void *unused){
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm ){
                 *elem_addr = pdi.first_pcm;
-                if (!dp_vector_in(pdi.last_pcm->dependency_list, elem_addr)){
-                    dp_vector_pushback(pdi.last_pcm->dependency_list, elem_addr);
+                if (!dp_vector_in(pdi.last_pcm->dependency_list, (void *)elem_addr)){
+                    dp_vector_pushback(pdi.last_pcm->dependency_list, (void *)elem_addr);
                 }
             }
             if (pdi.nr_dirty_pages>0)

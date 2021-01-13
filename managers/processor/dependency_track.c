@@ -121,10 +121,10 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     pdi->first_pcm = pcm;
                 }
                 if (pdi->last_pcm != NULL){
-                    *elem_addr = pcm;
-                    if (!dp_vector_in(pdi->last_pcm->dependency_list, (void *)elem_addr))
+                    // *elem_addr = pcm;
+                    if (!dp_vector_in(pdi->last_pcm->dependency_list, &pcm))
                     {
-                        dp_vector_pushback(pdi->last_pcm->dependency_list, (void *)elem_addr);
+                        dp_vector_pushback(pdi->last_pcm->dependency_list, &pcm);
                         if (pdi->nr_dirty_pages%100 ==0){
                             printk("DepTrack: current pcm is %lx, prev pcm is %lx, prev list is %lx\n", pcm, pdi->last_pcm, pdi->last_pcm->dependency_list);
                             elem_addr = (struct pcache_meta **)(dp_vector_Nth(pdi->last_pcm->dependency_list, 0));
@@ -179,9 +179,9 @@ static int dependency_track(void *unused){
             }
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm ){
-                *elem_addr = pdi.first_pcm;
-                if (!dp_vector_in(pdi.last_pcm->dependency_list, (void *)elem_addr)){
-                    dp_vector_pushback(pdi.last_pcm->dependency_list, (void *)elem_addr);
+                // *elem_addr = pdi.first_pcm;
+                if (!dp_vector_in(pdi.last_pcm->dependency_list, &pcm){
+                    dp_vector_pushback(pdi.last_pcm->dependency_list, &pcm);
                 }
             }
             if (pdi.nr_dirty_pages>0)

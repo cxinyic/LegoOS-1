@@ -160,7 +160,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	struct dp_vector * pcms_to_flush;
 	struct dp_vector * dependency_queue;
 	struct pcache_meta *tmp_pcm;
-	void * tmp;
+	struct pcache_meta ** tmp;
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_find)
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_evict)
 

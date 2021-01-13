@@ -180,7 +180,7 @@ static int dependency_track(void *unused){
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm ){
                 // *elem_addr = pdi.first_pcm;
-                if (!dp_vector_in(pdi.last_pcm->dependency_list, &pcm){
+                if (!dp_vector_in(pdi.last_pcm->dependency_list, &pcm)){
                     dp_vector_pushback(pdi.last_pcm->dependency_list, &pcm);
                 }
             }

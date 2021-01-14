@@ -7,13 +7,7 @@
 #include <processor/zerofill.h>
 #include <processor/dependency_track.h>
 
-int nr_dp_info =0;
-struct dp_vector* dp_info_list;
-struct dp_vector* old_dirty_pages;
-struct dp_vector* new_dirty_pages;
-pid_t current_pid = 0;
-spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
-struct pcache_meta * dirty_pcm_last_period = NULL;
+
 
 
 asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
@@ -21,7 +15,6 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
         unsigned long fd, unsigned long off)
 {
 #ifdef CONFIG_COMP_PROCESSOR
-	spin_lock(&dp_spinlock);
 	struct p2m_mmap_struct payload;
 	struct p2m_mmap_reply_struct reply;
 	struct file *f = NULL;
@@ -133,9 +126,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");
 	*/
-	nr_dp_info += 1;
-	current_pid = current->pid;
-	spin_unlock(&dp_spinlock);
+	
 	return ret_addr;
 #else
     return -1;
@@ -144,7 +135,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 {
 #ifdef CONFIG_COMP_PROCESSOR
-	spin_lock(&dp_spinlock);
+	
 	struct p2m_munmap_struct payload;
 	struct p2m_munmap_reply_struct retbuf;
 	long retlen;
@@ -215,9 +206,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		old_dirty_pages = NULL;
 		
 	}*/
-	nr_dp_info -=1;
-	current_pid = 0;
-	spin_unlock(&dp_spinlock);
+	
 	return retbuf.ret;
 #else
     return -1;

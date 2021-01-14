@@ -44,9 +44,6 @@ struct dp_idx{
  */
 
 extern int nr_dp_info;
-extern struct dp_vector* dp_info_list;
-extern struct dp_vector* old_dirty_pages;
-extern struct dp_vector* new_dirty_pages;
 extern spinlock_t dp_spinlock;
 extern pid_t current_pid;
 extern struct pcache_meta * dirty_pcm_last_period;

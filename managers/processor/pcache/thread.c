@@ -21,6 +21,7 @@
 #include <processor/pcache.h>
 #include <processor/pgtable.h>
 #include <processor/processor.h>
+#include <processor/dependency_track.h>
 
 #ifdef CONFIG_DEBUG_FORK
 #define fork_debug(fmt, ...)						\
@@ -79,6 +80,7 @@ void pcache_process_exit(struct task_struct *tsk)
 {
 	/* will also free rmap */
 	release_pgtable(tsk, PAGE_SIZE, TASK_SIZE);
+	current_pid = -1;
 }
 
 /*

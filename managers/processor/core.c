@@ -32,6 +32,11 @@
 #define MAX_INIT_ARGS	CONFIG_INIT_ENV_ARG_LIMIT
 #define MAX_INIT_ENVS	CONFIG_INIT_ENV_ARG_LIMIT
 
+int nr_dp_info = -1;
+pid_t current_pid = 0;
+spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
+struct pcache_meta * dirty_pcm_last_period = NULL;
+
 /* http://c-faq.com/decl/spiral.anderson.html */
 static const char *argv_init[MAX_INIT_ARGS+2];
 const char *envp_init[MAX_INIT_ENVS+2] =
@@ -116,6 +121,7 @@ void __init kick_off_user(void)
 	pid = kernel_thread(procmgmt, NULL, CLONE_GLOBAL_THREAD);
 	if (pid < 0)
 		panic("Fail to run the initial user process.");
+	current_pid = pid;
 }
 
 #ifdef CONFIG_CHECKPOINT

@@ -132,27 +132,23 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
     return PCACHE_RMAP_AGAIN;
 }
 
-int init_flag = 0;
+
 static int dependency_track(void *unused){
     struct pcache_meta *pcm;
     int nr = 0;
     int count = 0;
     struct pcache_dependency_info pdi;
+    if (pin_current_thread()){
+        printk("DepTrack: fail to pin dependency_track thread\n");
+    }
+
     
     while (1){
-        spin_lock(&dp_spinlock);
-        if(nr_dp_info != 0){
+        if(current_pid>0){
+            spin_lock(&dp_spinlock);
             pdi.first_pcm = NULL;
             pdi.last_pcm = NULL;
             pdi.nr_dirty_pages = 0;
-            if (init_flag==0){
-                 /*pcache_for_each_way(pcm, nr) {
-                     pcm->dependency_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
-                     dp_vector_new(pcm->dependency_list, sizeof(struct pcache_meta*));
-                 }*/
-                 init_flag = 1;
-                 nr_dp_info +=1;
-            }
 
             struct rmap_walk_control rwc = {
                 .arg = &pdi,
@@ -185,8 +181,9 @@ static int dependency_track(void *unused){
             
             if (pdi.nr_dirty_pages>0)
             {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
-        }
         spin_unlock(&dp_spinlock);
+        }
+        
         sleep(0.5);
 
     }

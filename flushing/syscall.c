@@ -13,6 +13,7 @@ struct dp_vector* old_dirty_pages;
 struct dp_vector* new_dirty_pages;
 pid_t current_pid = 0;
 spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
+struct pcache_meta * dirty_pcm_last_period = NULL;
 
 
 asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,

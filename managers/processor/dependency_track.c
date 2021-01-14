@@ -162,13 +162,29 @@ static int dependency_track(void *unused){
                 rmap_walk(pcm, &rwc);
             }
             
-            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL && pdi.first_pcm != pdi.last_pcm ){
-                if (!dp_vector_in(pdi.last_pcm->dependency_list, &pcm)){
-                    dp_vector_pushback(pdi.last_pcm->dependency_list, &pcm);
+            if (pdi.first_pcm != NULL && pdi.last_pcm != NULL ){
+                
+                if (pdi.first_pcm != pdi.last_pcm && !dp_vector_in(pdi.last_pcm->dependency_list, &pdi.first_pcm)){
+                    dp_vector_pushback(pdi.last_pcm->dependency_list, &pdi.first_pcm);
                 }
+                if (dirty_pcm_last_period != NULL){
+                    if(pdi.first_pcm != dirty_pcm_last_period){
+                        if (!dp_vector_in(pdi.first_pcm->dependency_list, &dirty_pcm_last_period )){
+                            dp_vector_pushback(pdi.first_pcm->dependency_list, &dirty_pcm_last_period );
+                        }
+                    }
+                    else if (pdi.last_pcm != dirty_pcm_last_period){
+                        if (!dp_vector_in(pdi.last_pcm->dependency_list, &dirty_pcm_last_period )){
+                            dp_vector_pushback(pdi.last_pcm->dependency_list, &dirty_pcm_last_period );
+                        }
+                    }
+                }
+                dirty_pcm_last_period = pdi.last_pcm;
             }
+            
+            
             if (pdi.nr_dirty_pages>0)
-            {printk("DepTrack: in this perios, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+            {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
         }
         spin_unlock(&dp_spinlock);
         sleep(1);

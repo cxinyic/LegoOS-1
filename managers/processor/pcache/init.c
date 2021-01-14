@@ -17,6 +17,7 @@
 
 #include <processor/pcache.h>
 #include <processor/processor.h>
+#include <processor/dependency_track.h>
 
 #include <asm/io.h>
 
@@ -204,6 +205,8 @@ static void __init init_pcache_meta_map(void)
 		pcache_mapcount_reset(pcm);
 		pcache_ref_count_set(pcm, 0);
 		init_pcache_lru(pcm);
+		pcm->dependency_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
+        dp_vector_new(pcm->dependency_list, sizeof(struct pcache_meta*));
 // #ifdef CONFIG_DEPENDENCY_TRACK
 		pcm->prev_dirty = 0;
 // #endif

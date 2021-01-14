@@ -146,10 +146,10 @@ static int dependency_track(void *unused){
             pdi.last_pcm = NULL;
             pdi.nr_dirty_pages = 0;
             if (init_flag==0){
-                 pcache_for_each_way(pcm, nr) {
+                 /*pcache_for_each_way(pcm, nr) {
                      pcm->dependency_list = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
                      dp_vector_new(pcm->dependency_list, sizeof(struct pcache_meta*));
-                 }
+                 }*/
                  init_flag = 1;
                  nr_dp_info +=1;
             }

@@ -191,7 +191,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
-	if (nr_dp_info>1){
+	/*if (nr_dp_info>1){
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
@@ -203,11 +203,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		while (dp_vector_size(pcm->dependency_list)>0){
 			dp_vector_delete(pcm->dependency_list, 0);
 		}
-		/*size = dp_vector_size(dependency_queue);
-		if(size>0){
-			printk("DepTrack: dependency queue size is %d\n", size);
-		}*/
-			
+		
 		while (dp_vector_size(dependency_queue)>0){
 			tmp = (struct pcache_meta **)dp_vector_Nth(dependency_queue, 0);
 			tmp_pcm = *tmp;
@@ -254,7 +250,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}
+	}*/
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

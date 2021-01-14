@@ -3,6 +3,7 @@
 
 #include <lego/types.h>
 #include <processor/dependency_vector.h>
+#include <lego/comp_common.h>
 
 /*
  * dp_info struct: 

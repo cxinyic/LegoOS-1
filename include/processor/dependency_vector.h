@@ -59,7 +59,6 @@ static void dp_vector_delete(struct dp_vector* v, int position){
 
 static int dp_vector_size(struct dp_vector* v){
     if(v==NULL){
-        printk("DepTrack: v=NULL\n");
         return 0;
     }
     return v->logical_size;

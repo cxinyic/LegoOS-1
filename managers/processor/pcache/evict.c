@@ -393,7 +393,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		printk("DepTrack: evict %d lines finished\n", nr_evict_lines);
 	} */
 	if (current_pid >0){
-		printk("DepTrack: begin flushing\n");
+		// printk("DepTrack: begin flushing\n");
 		fdi.pcm_to_evict = pcm;
 		fdi.nr_dirty_pages = 0;
 		struct rmap_walk_control rwc = {

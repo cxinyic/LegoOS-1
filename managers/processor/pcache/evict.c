@@ -154,6 +154,9 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 			*pte = pte_mkclean(*pte);
 			pcache_flush_one(pcm);
 			fdi->nr_dirty_pages += 1;
+			if(fdi->nr_dirty_pages%1000 == 0){
+				printk("DepTrack: flush %d pages\n", fdi->nr_dirty_pages);
+			}
 		}
 	}
 		
@@ -216,6 +219,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 	
 	if (current_pid >0){
+		printk("DepTrack: begin flushing\n");
 		fdi.pcm_to_evict = pcm;
 		fdi.nr_dirty_pages = 0;
 		struct rmap_walk_control rwc = {

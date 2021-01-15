@@ -179,8 +179,8 @@ static int dependency_track(void *unused){
             }
             
             
-            if (pdi.nr_dirty_pages>0)
-            {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+           /* if (pdi.nr_dirty_pages>0)
+            {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}*/
         spin_unlock(&dp_spinlock);
         }
         

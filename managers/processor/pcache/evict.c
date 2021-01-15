@@ -219,7 +219,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 	
 	
-/*
+
 	if (current_pid>0){
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -257,9 +257,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		size = dp_vector_size(pcms_to_flush);
-		if (size>0){
+		/*if (size>0){
 			printk("DepTrack: flush %d pages\n",size);
-		}
+		}*/
 
 		while (dp_vector_size(pcms_to_flush)>0){
 			tmp = (struct pcache_meta **)dp_vector_Nth(pcms_to_flush, 0);
@@ -280,7 +280,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}*/
+	}
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);
@@ -392,7 +392,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	if(nr_evict_lines%10000==1){
 		printk("DepTrack: evict %d lines finished\n", nr_evict_lines);
 	} */
-	if (current_pid >0){
+	/*if (current_pid >0){
 		// printk("DepTrack: begin flushing\n");
 		fdi.pcm_to_evict = pcm;
 		fdi.nr_dirty_pages = 0;
@@ -403,9 +403,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		pcache_for_each_way(tmp_pcm, nr){
 			rmap_walk(tmp_pcm, &rwc);
 		}
-		/*if (fdi.nr_dirty_pages>1)
-		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}*/
-	}
+		if (fdi.nr_dirty_pages>1)
+		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}
+	}*/
 	
 	return PCACHE_EVICT_SUCCEED;
 }

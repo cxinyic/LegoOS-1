@@ -72,13 +72,13 @@ static int procmgmt(void *unused)
 #endif
 
 #if 1
-	init_filename = "/usr/local/pgsql/bin/postgres";
+	init_filename = "/bigdisk/mmap_test";
 	argv_init[0] = init_filename;
-	argv_init[1] = "--single";
+//	argv_init[1] = "--single";
 //	argv_init[1] = "-E";
-	argv_init[2] = "-D";
-	argv_init[3] = "/bigdisk/psql/data";
-	argv_init[4] = "-s";
+//	argv_init[2] = "-D";
+//	argv_init[3] = "/bigdisk/psql/data";
+//	argv_init[4] = "-s";
 //	argv_init[4] = "-d";
 //	argv_init[5] = "3";
 	// init_filename = "/usr/local/bin/sqlite3";
@@ -121,7 +121,7 @@ void __init kick_off_user(void)
 	pid = kernel_thread(procmgmt, NULL, CLONE_GLOBAL_THREAD);
 	if (pid < 0)
 		panic("Fail to run the initial user process.");
-	current_pid = pid;
+	// current_pid = pid;
 }
 
 #ifdef CONFIG_CHECKPOINT

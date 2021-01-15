@@ -126,6 +126,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");
 	*/
+	current_pid = current->pid;
 	
 	return ret_addr;
 #else

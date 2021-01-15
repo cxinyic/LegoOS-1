@@ -138,6 +138,28 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
  *
  * Return 0 on success, otherwise on failures.
  */
+
+struct flush_if_dirty_info{
+	struct pcache_meta * pcm_to_evict;
+	int nr_dirty_pages;
+}
+
+static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
+{
+	struct flush_if_dirty_info * fdi = arg;
+	pte_t *pte;
+	if (pcm!= fdi->pcm_to_evict && rmap->owner_process->pid == current_pid){
+        pte = rmap->page_table;
+		if (likely(pte_dirty(*pte))) {
+            PROFILE_START(evict_line_perset_flush);
+			pcache_flush_one(pcm);
+			PROFILE_LEAVE(evict_line_perset_flush);
+			fdi->nr_dirty_pages += 1;
+		}
+	}
+		
+}
+
 int nr_evict_lines = 0;
 int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
@@ -152,6 +174,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	int index = 0;
 	int i;
 	int j;
+	int nr = 0;
 	int size;
 	struct dp_info * curr_dp_info;
 	struct dp_info * tmp_dp_info;
@@ -161,6 +184,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	struct dp_vector * dependency_queue;
 	struct pcache_meta *tmp_pcm;
 	struct pcache_meta ** tmp;
+	struct flush_if_dirty_info fdi;
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_find)
 	PROFILE_POINT_TIME(pcache_alloc_evict_do_evict)
 
@@ -191,6 +215,20 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+	
+	if (current_pid >0){
+		fdi.pcm_to_evict = pcm;
+		fdi.nr_dirty_pages = 0;
+		struct rmap_walk_control rwc = {
+			.arg = &fdi,
+			.rmap_one = __flush_if_dirty,
+		};
+		pcache_for_each_way(tmp_pcm, nr){
+			rmap_walk(tmp_pcm, &rwc);
+		}
+		printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);
+	}
+/*
 	if (current_pid>0){
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -240,6 +278,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				PROFILE_START(evict_line_perset_flush);
 				pcache_flush_one(tmp_pcm);
 				PROFILE_LEAVE(evict_line_perset_flush);
+				tmp_pcm->prev_dirty = 0;
 			}
 		}
 		
@@ -250,7 +289,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}
+	}*/
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

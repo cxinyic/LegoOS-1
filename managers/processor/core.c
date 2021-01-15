@@ -181,7 +181,7 @@ void __init processor_manager_init(void)
 	checkpoint_init();
 
     /* create dependency tracking thread */
-	dependency_track_init();
+	// dependency_track_init();
 }
 
 /*

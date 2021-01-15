@@ -19,7 +19,6 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	struct p2m_mmap_reply_struct reply;
 	struct file *f = NULL;
 	long ret_len, ret_addr;
-    printk("DepTrack: calling sys_mmap_track now!\n");
 
 	syscall_enter("addr:%#lx,len:%#lx,prot:%#lx,flags:%#lx,fd:%lu,off:%#lx\n",
 		addr, len, prot, flags, fd, off);
@@ -75,7 +74,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 		if (flags & MAP_ANONYMOUS)
 			zerofill_set_range(current, ret_addr, len);
 	}
-    printk("DepTrack: middle calling sys_mmap_track now!\n");
+
 
 	if (f)
 		put_file(f);

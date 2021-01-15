@@ -142,7 +142,7 @@ DEFINE_PROFILE_POINT(pcache_alloc_evict_do_evict)
 struct flush_if_dirty_info{
 	struct pcache_meta * pcm_to_evict;
 	int nr_dirty_pages;
-}
+};
 
 static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
 {

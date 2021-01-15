@@ -72,7 +72,7 @@ static int procmgmt(void *unused)
 #endif
 
 #if 1
-	init_filename = "/bigdisk/mmap_test";
+	init_filename = "/bigdisk/join";
 	argv_init[0] = init_filename;
 //	argv_init[1] = "--single";
 //	argv_init[1] = "-E";
@@ -181,7 +181,7 @@ void __init processor_manager_init(void)
 	checkpoint_init();
 
     /* create dependency tracking thread */
-	// dependency_track_init();
+	dependency_track_init();
 }
 
 /*

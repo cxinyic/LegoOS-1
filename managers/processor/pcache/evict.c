@@ -403,8 +403,8 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		pcache_for_each_way(tmp_pcm, nr){
 			rmap_walk(tmp_pcm, &rwc);
 		}
-		if (fdi.nr_dirty_pages>1)
-		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}
+		/*if (fdi.nr_dirty_pages>1)
+		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}*/
 	}
 	
 	return PCACHE_EVICT_SUCCEED;

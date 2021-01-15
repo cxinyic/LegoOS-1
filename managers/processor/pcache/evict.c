@@ -151,6 +151,7 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 	if (pcm!= fdi->pcm_to_evict && rmap->owner_process->pid == current_pid){
         pte = rmap->page_table;
 		if (likely(pte_dirty(*pte))) {
+			*pte = pte_mkclean(*pte);
             PROFILE_START(evict_line_perset_flush);
 			pcache_flush_one(pcm);
 			PROFILE_LEAVE(evict_line_perset_flush);

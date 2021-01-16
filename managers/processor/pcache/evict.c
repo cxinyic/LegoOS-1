@@ -393,7 +393,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	if(nr_evict_lines%10000==1){
 		printk("DepTrack: evict %d lines finished\n", nr_evict_lines);
 	} */
-	if (current_pid >0){
+	/*if (current_pid >0){
 		// printk("DepTrack: begin flushing\n");
 		fdi.pcm_to_evict = pcm;
 		fdi.nr_dirty_pages = 0;
@@ -406,7 +406,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 		if (fdi.nr_dirty_pages>1)
 		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}
-	}
+	}*/
 	
 	return PCACHE_EVICT_SUCCEED;
 }

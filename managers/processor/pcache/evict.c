@@ -221,7 +221,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 	
 
-	/*if (current_pid>0){
+	if (current_pid>0){
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
@@ -258,7 +258,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		size = dp_vector_size(pcms_to_flush);
-		if (size>0){
+		if (size>1){
 			printk("DepTrack: flush %d pages\n",size);
 		}
 
@@ -281,7 +281,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}*/
+	}
 	/*
 	if (nr_dp_info!=0){
 		spin_lock(&dp_spinlock);

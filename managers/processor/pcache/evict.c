@@ -153,7 +153,7 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 		if (!pte_none(*pte) && pte_present(*pte)) {
 			if (likely(pte_dirty(*pte))) {
 				*pte = pte_mkclean(*pte);
-				pcache_flush_one(pcm);
+				// pcache_flush_one(pcm);
 				fdi->nr_dirty_pages += 1;
 			}
 		}

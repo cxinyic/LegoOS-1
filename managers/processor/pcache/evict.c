@@ -270,7 +270,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				PROFILE_START(evict_line_perset_flush);
 				pcache_flush_one(tmp_pcm);
 				PROFILE_LEAVE(evict_line_perset_flush);
-				tmp_pcm->prev_dirty = 0;
+				// tmp_pcm->prev_dirty = 0;
 			}
 		}
 		

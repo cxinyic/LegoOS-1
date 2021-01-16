@@ -125,7 +125,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	nr_dp_info += 1;
     printk("DepTrack: finished calling sys_mmap_track now!\n");
 	*/
-	current_pid = current->pid;
+	// current_pid = current->pid;
 	
 	return ret_addr;
 #else
@@ -206,7 +206,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		old_dirty_pages = NULL;
 		
 	}*/
-	current_pid = -1;
+	// current_pid = -1;
 	
 	return retbuf.ret;
 #else

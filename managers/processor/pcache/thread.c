@@ -79,7 +79,7 @@ int fork_dup_pcache(struct task_struct *dst_task,
 void pcache_process_exit(struct task_struct *tsk)
 {
 	/* will also free rmap */
-	// current_pid = -1;
+	current_pid = -1;
 	release_pgtable(tsk, PAGE_SIZE, TASK_SIZE);
 	
 }

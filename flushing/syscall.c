@@ -206,6 +206,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		old_dirty_pages = NULL;
 		
 	}*/
+	current_pid = -1;
 	
 	return retbuf.ret;
 #else

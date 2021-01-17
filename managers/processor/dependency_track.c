@@ -1,5 +1,6 @@
 #include <processor/dependency_track.h>
 #include <processor/pcache.h>
+#include <processor/node.h>
 
 
 #include <lego/jiffies.h>
@@ -101,7 +102,7 @@ static int dependency_track(void *unused){
     return 0;
 }*/
 
-static int flush_register_value(){
+static int flush_register_value(void *unused){
     long retval;
     ssize_t retlen;
     ssize_t *retval_ptr;
@@ -126,7 +127,7 @@ static int flush_register_value(){
     hdr->opcode = P2M_FLUSH_REGISTER;
     hdr->src_nid = LEGO_LOCAL_NID;
 
-    payload = msg + sizeo(*hdr);
+    payload = msg + sizeof(*hdr);
     payload->pid = current->pid;
     payload->tgid = current->tgid;
     payload->common_registers = common_registers;
@@ -138,7 +139,7 @@ static int flush_register_value(){
 
     mem_node = current_pgcache_home_node();
 
-    retlen= ibapi_send_reply_imm(memnode, msg, len_msg, retbug, len_retbuf, false);
+    retlen= ibapi_send_reply_imm(mem_node, msg, len_msg, retbuf, len_retbuf, false);
 
     // TODO: change based on the memory side return 
     if(retlen != len_retbuf){

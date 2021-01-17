@@ -17,6 +17,7 @@ void handle_p2m_flush_register(struct p2m_flush_register_payload *payload,
         struct common_header *hdr, struct thpool_buffer *tb) {
     
     struct lego_task_struct *p;
+    unsigned long reply;
 
     p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
     if (unlikely(!p)) {

@@ -130,7 +130,7 @@ static int flush_register_value(void *unused){
     payload = msg + sizeof(*hdr);
     payload->pid = current->pid;
     payload->tgid = current->tgid;
-    payload->common_registers = common_registers;
+    payload->common_registers = current_registers;
     payload->ds = ds_value;
     payload->es = es_value;
     payload->fs = fs_value;

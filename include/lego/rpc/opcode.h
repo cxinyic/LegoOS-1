@@ -52,6 +52,9 @@
 #define P2M_STAT		((__u32)__NR_stat)
 #define P2M_DROP_CACHE		((__u32)__NR_drop_page_cache)
 
+// XY: flush register value p2m
+#define P2M_FLUSH_REGISTER ((__u32)__NR_flush_register)
+
 /* Processor to Storage directly */
 #define P2S_OPEN		((__u32)__NR_open)	/* open() goes to storage directly */
 #define P2S_STAT		((__u32)__NR_stat)

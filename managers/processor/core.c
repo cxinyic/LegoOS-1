@@ -36,6 +36,11 @@ int nr_dp_info = -1;
 pid_t current_pid = 0;
 spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
 struct pcache_meta * dirty_pcm_last_period = NULL;
+struct common_registers;
+unsigned short ds_value = 0;
+unsigned short es_value = 0;
+unsigned short gs_value = 0;
+unsigned short fs_value = 0;
 
 /* http://c-faq.com/decl/spiral.anderson.html */
 static const char *argv_init[MAX_INIT_ARGS+2];

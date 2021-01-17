@@ -22,6 +22,36 @@ struct _task_padding {
 } ____cacheline_aligned;
 #define LEGO_TASK_PADDING(name)	struct _task_padding name;
 
+struct comp_regs{
+	unsigned long r15;
+	unsigned long r14;
+	unsigned long r13;
+	unsigned long r12;
+	unsigned long bp;
+	unsigned long bx;
+	unsigned long r11;
+	unsigned long r10;
+	unsigned long r9;
+	unsigned long r8;
+	unsigned long ax;
+	unsigned long cx;
+	unsigned long dx;
+	unsigned long si;
+	unsigned long di;
+	unsigned long orig_ax;
+	unsigned long ip;
+	unsigned long cs;
+	unsigned long flags;
+	unsigned long sp;
+	unsigned long ss;
+
+	unsigend short ds;
+	unsigned short es;
+	unsigned short fs;
+	unsigned short gs;
+
+};
+
 struct lego_task_struct {
 	unsigned long gpid;
 
@@ -44,6 +74,9 @@ struct lego_task_struct {
 	spinlock_t task_lock;
 
         struct hlist_node link;
+	struct comp_regs regs;  /* the registers value in compute node */
+	unsigned long version_id; /* the version id in flushing */
+	
 } ____cacheline_aligned;
 
 void dump_lego_tasks(void);

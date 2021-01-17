@@ -304,6 +304,22 @@ int handle_p2m_checkpint(void *, u64, struct common_header *);
 
 void handle_p2m_drop_page_cache(struct common_header *hdr, struct thpool_buffer *tb);
 
+/*
+ * XY: flush register value 
+ * */
+struct p2m_flush_register_payload{
+	u32 pid;
+	u32 tgid;
+	struct pt_regs common_registers;
+	u16 gs;
+	u16 fs;
+	u16 es;
+	u16 ds;
+	u32 version_id;
+};
+
+void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {
 	char filename[MAX_FILENAME_LENGTH];
@@ -317,6 +333,9 @@ struct p2m_rename_struct {
 	char newname[MAX_FILENAME_LENGTH];
 	__u32 storage_node;
 };
+
+
+
 
 int handle_p2m_rename(struct p2m_rename_struct *payload,
 		      struct common_header *hdr, struct thpool_buffer *tb);

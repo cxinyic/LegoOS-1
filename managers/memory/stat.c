@@ -21,6 +21,9 @@ static const char *const memory_manager_stat_text[] = {
 	"handle_p2m_mmap",
 	"handle_p2m_munmap",
 	"handle_p2m_brk",
+
+	"handle_p2m_flush_register",
+
 	"handle_m2m_mmap",
 	"handle_m2m_munmap",
 

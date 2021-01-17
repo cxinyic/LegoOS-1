@@ -814,6 +814,7 @@ void handle_m2m_mmap(struct m2m_mmap_struct *payload,
 
 		tsk->pid = pid;
 		tsk->node = prcsr_nid;
+		tsk->version_id = -1;
 		mem_set_memory_home_node(tsk, nid);
 
 		tsk->mm = lego_mm_alloc(tsk, NULL);

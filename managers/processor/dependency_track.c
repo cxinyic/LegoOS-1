@@ -1,9 +1,13 @@
 #include <processor/dependency_track.h>
 #include <processor/pcache.h>
 
+
 #include <lego/jiffies.h>
 #include <lego/sched.h>
 #include <lego/kthread.h>
+#include <lego/comp_common.h>
+#include <lego/fit_ibapi.h>
+
 
 static inline void sleep(unsigned sec)
 {
@@ -96,6 +100,59 @@ static int dependency_track(void *unused){
     }
     return 0;
 }*/
+
+static int flush_register_value(){
+    long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_flush_register_payload *payload;
+    int mem_node;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+
+    hdr = msg;
+    hdr->opcode = P2M_FLUSH_REGISTER;
+    hdr->src_nid = LEGO_LOCAL_NID;
+
+    payload = msg + sizeo(*hdr);
+    payload->pid = current->pid;
+    payload->tgid = current->tgid;
+    payload->common_registers = common_registers;
+    payload->ds = ds_value;
+    payload->es = es_value;
+    payload->fs = fs_value;
+    payload->gs = gs_value;
+    payload->version_id = 0;
+
+    mem_node = current_pgcache_home_node();
+
+    retlen= ibapi_send_reply_imm(memnode, msg, len_msg, retbug, len_retbuf, false);
+
+    // TODO: change based on the memory side return 
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+}
 
 struct pcache_dependency_info{
     struct pcache_meta * first_pcm;

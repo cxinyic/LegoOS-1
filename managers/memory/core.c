@@ -200,6 +200,12 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 		handle_p2m_drop_page_cache(hdr, buffer);
 		break;
 
+/* XY: flush register */
+	case P2M_FLUSH_REGISTER:
+		inc_mm_stat(HANDLE_P2M_FLUSH_REGISTER);
+		handle_p2m_flush_register(payload, hdr, buffer);
+		break;
+
 #ifdef CONFIG_MEM_PAGE_CACHE
 	case P2M_LSEEK:
 		handle_p2m_lseek(payload, hdr, buffer);

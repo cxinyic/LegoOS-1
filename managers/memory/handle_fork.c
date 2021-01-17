@@ -343,6 +343,7 @@ void handle_m2m_fork(struct m2m_fork_struct *payload,
 	child->pid = child_pid;
 	child->node = prcsr_nid;
 	child->parent_pid = parent_pid;
+	child->version_id = -1;
 	mem_set_memory_home_node(child, nid);
 
 	child->mm = lego_mm_alloc(child, NULL);
@@ -636,6 +637,7 @@ void handle_p2m_fork(struct p2m_fork_struct *payload,
 	tsk->pid = tgid;
 	tsk->parent_pid = parent_tgid;
 	tsk->node = nid;
+	tsk->version_id = -1;
 	mem_set_memory_home_node(tsk, LEGO_LOCAL_NID);
 	lego_set_task_comm(tsk, payload->comm);
 

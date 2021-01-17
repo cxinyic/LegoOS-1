@@ -48,6 +48,12 @@ extern int nr_dp_info;
 extern spinlock_t dp_spinlock;
 extern pid_t current_pid;
 extern struct pcache_meta * dirty_pcm_last_period;
+extern struct pt_regs common_registers;
+extern unsigned short ds_value;
+extern unsigned short es_value;
+extern unsigned short gs_value;
+extern unsigned short fs_value;
+
 
 
 

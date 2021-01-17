@@ -310,7 +310,27 @@ void handle_p2m_drop_page_cache(struct common_header *hdr, struct thpool_buffer 
 struct p2m_flush_register_payload{
 	u32 pid;
 	u32 tgid;
-	struct pt_regs common_registers;
+	u32 r15;
+	u32 r14;
+	u32 r13;
+	u32 r12;
+	u32 bp;
+	u32 bx;
+	u32 r11;
+	u32 r10;
+	u32 r9;
+	u32 r8;
+	u32 ax;
+	u32 cx;
+	u32 dx;
+	u32 si;
+	u32 di;
+	u32 orig_ax;
+	u32 ip;
+	u32 cs;
+	u32 flags;
+	u32 sp;
+	u32 ss;
 	u16 gs;
 	u16 fs;
 	u16 es;

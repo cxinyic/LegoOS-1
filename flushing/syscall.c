@@ -126,6 +126,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
     printk("DepTrack: finished calling sys_mmap_track now!\n");
 	*/
 	current_pid = current->pid;
+	current_tgid = current->tgid;
 	
 	return ret_addr;
 #else
@@ -207,6 +208,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 		
 	}*/
 	current_pid = -1;
+	current_tgid = -1;
 	
 	return retbuf.ret;
 #else

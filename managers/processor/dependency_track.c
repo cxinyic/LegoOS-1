@@ -131,8 +131,8 @@ static int flush_register_value(void *unused){
     hdr->src_nid = LEGO_LOCAL_NID;
 
     payload = msg + sizeof(*hdr);
-    payload->pid = current->pid;
-    payload->tgid = current->tgid;
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
     payload->r15 = current_registers->r15;
     payload->r14 = current_registers->r14;
     payload->r13 = current_registers->r13;

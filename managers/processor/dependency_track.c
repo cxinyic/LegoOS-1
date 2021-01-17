@@ -163,8 +163,9 @@ static int flush_register_value(void *unused){
     payload->version_id = 0;
 
     mem_node = current_pgcache_home_node();
+    printk("Flush: memnode is %d\n",mem_node);
 
-    retlen= ibapi_send_reply_imm(mem_node, msg, len_msg, retbuf, len_retbuf, false);
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
 
     // TODO: change based on the memory side return 
     if(retlen != len_retbuf){

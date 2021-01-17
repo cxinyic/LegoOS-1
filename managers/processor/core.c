@@ -126,7 +126,7 @@ void __init kick_off_user(void)
 	pid = kernel_thread(procmgmt, NULL, CLONE_GLOBAL_THREAD);
 	if (pid < 0)
 		panic("Fail to run the initial user process.");
-	current_pid = pid;
+	// current_pid = pid;
 }
 
 #ifdef CONFIG_CHECKPOINT
@@ -186,7 +186,7 @@ void __init processor_manager_init(void)
 	checkpoint_init();
 
     /* create dependency tracking thread */
-	// dependency_track_init();
+	dependency_track_init();
 }
 
 /*

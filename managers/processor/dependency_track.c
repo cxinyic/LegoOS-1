@@ -122,6 +122,7 @@ static int flush_register_value(void *unused){
         kfree(retbuf);
         return -ENOMEM;
     }
+    printk("Flush: step1\n");
 
     hdr = msg;
     hdr->opcode = P2M_FLUSH_REGISTER;
@@ -169,6 +170,7 @@ static int flush_register_value(void *unused){
         retval = -EIO;
         goto out;
     }
+    printk("Flush: step2\n");
 
 out:
     kfree(msg);
@@ -212,6 +214,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
     return PCACHE_RMAP_AGAIN;
 }
 
+
+int flush_flag = 0;
 
 static int dependency_track(void *unused){
     struct pcache_meta *pcm;
@@ -259,8 +263,13 @@ static int dependency_track(void *unused){
             }
             
             
-           // if (pdi.nr_dirty_pages>0)
-            // {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 0){
+               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+               flush_register_value();
+               printk("DepTrack: called flush_register_value successfully\n");
+               flush_flag = 1;
+           }
+       
         spin_unlock(&dp_spinlock);
         }
         

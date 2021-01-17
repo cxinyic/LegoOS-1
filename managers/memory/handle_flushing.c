@@ -18,6 +18,7 @@ void handle_p2m_flush_register(struct p2m_flush_register_payload *payload,
     
     struct lego_task_struct *p;
     unsigned long reply;
+    printk("Flush: memory step1\n");
 
     p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
     if (unlikely(!p)) {
@@ -55,6 +56,7 @@ void handle_p2m_flush_register(struct p2m_flush_register_payload *payload,
 
     lego_task_unlock(p);
     reply = 0;
+    printk("Flush: memory step2\n");
 
 out:
     *(long *)thpool_buffer_tx(tb) = reply;

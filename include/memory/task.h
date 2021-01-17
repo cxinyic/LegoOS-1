@@ -45,7 +45,7 @@ struct comp_regs{
 	unsigned long sp;
 	unsigned long ss;
 
-	unsigend short ds;
+	unsigned short ds;
 	unsigned short es;
 	unsigned short fs;
 	unsigned short gs;

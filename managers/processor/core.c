@@ -36,7 +36,6 @@ int nr_dp_info = -1;
 pid_t current_pid = 0;
 spinlock_t dp_spinlock = __SPIN_LOCK_UNLOCKED(dp_spinlock);
 struct pcache_meta * dirty_pcm_last_period = NULL;
-struct current_registers;
 unsigned short ds_value = 0;
 unsigned short es_value = 0;
 unsigned short gs_value = 0;

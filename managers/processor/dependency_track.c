@@ -112,7 +112,7 @@ static int get_register_value(void *unused){
     u32 len_retbuf, len_msg;
     void *retbuf, *msg;
     struct common_header *hdr;
-    struct p2m_get_register_payload *payload;
+    struct p2m_read_register_payload *payload;
 
     len_retbuf = sizeof(long);
     retbuf = kmalloc(len_retbuf, GFP_KERNEL);

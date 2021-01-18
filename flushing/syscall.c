@@ -127,6 +127,7 @@ asmlinkage long sys_mmap_track(unsigned long addr, unsigned long len,
 	*/
 	current_pid = current->pid;
 	current_tgid = current->tgid;
+	current_tsk = current;
 	
 	return ret_addr;
 #else

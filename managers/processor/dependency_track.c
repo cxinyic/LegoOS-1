@@ -112,7 +112,6 @@ static int flush_register_value(void *unused){
     void *retbuf, *msg;
     struct common_header *hdr;
     struct p2m_flush_register_payload *payload;
-    int mem_node;
 
     len_retbuf = sizeof(long);
     retbuf = kmalloc(len_retbuf, GFP_KERNEL);
@@ -154,6 +153,8 @@ static int flush_register_value(void *unused){
     payload->flags = current_registers->flags;
     payload->sp = current_registers->sp;
     payload->ss = current_registers->ss;
+    payload->fs_base = fs_base_value;
+    payload->gs_base = gs_base_value;
 
 
     payload->ds = ds_value;
@@ -162,8 +163,6 @@ static int flush_register_value(void *unused){
     payload->gs = gs_value;
     payload->version_id = 0;
 
-    mem_node = current_pgcache_home_node();
-    printk("Flush: memnode is %d\n",mem_node);
 
     retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
 

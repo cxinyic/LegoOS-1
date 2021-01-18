@@ -335,6 +335,8 @@ struct p2m_flush_register_payload{
 	u16 fs;
 	u16 es;
 	u16 ds;
+	u32 fs_base;
+	u32 gs_base;
 	u32 version_id;
 };
 

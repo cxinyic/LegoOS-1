@@ -52,6 +52,8 @@ void handle_p2m_flush_register(struct p2m_flush_register_payload *payload,
     p->regs.es = payload->es;
     p->regs.fs = payload->fs;
     p->regs.gs = payload->gs;
+    p->regs.fs_base = payload->fs_base;
+    p->regs.gs_base = payload->gs_base;
     p->version_id = payload->version_id;
 
     lego_task_unlock(p);

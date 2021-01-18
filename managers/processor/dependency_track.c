@@ -224,6 +224,7 @@ static int dependency_track(void *unused){
     int nr = 0;
     int count = 0;
     struct pcache_dependency_info pdi;
+    struct pt_regs *tmp;
     if (pin_current_thread()){
         printk("DepTrack: fail to pin dependency_track thread\n");
     }
@@ -266,6 +267,32 @@ static int dependency_track(void *unused){
                 }
                 dirty_pcm_last_period = pdi.last_pcm;
             }
+
+            tmp = task_pt_regs(current_tsk);
+            current_registers->r15 = tmp->r15;
+            current_registers->r14 = tmp->r14;
+            current_registers->r13 = tmp->r13;
+            current_registers->r12 = tmp->r12;
+            current_registers->bp = tmp->bp;
+            current_registers->bx = tmp->bx;
+            current_registers->r11 = tmp->r11;
+            current_registers->r10 = tmp->r10;
+            current_registers->r9 = tmp->r9;
+            current_registers->r8 = tmp->r8;
+            current_registers->ax = tmp->ax;
+            current_registers->cx = tmp->cx;
+            current_registers->dx = tmp->dx;
+            current_registers->si = tmp->si;
+            current_registers->di = tmp->di;
+            current_registers->orig_ax = tmp->orig_ax;
+            current_registers->ip = tmp->ip;
+            current_registers->cs = tmp->cs;
+            current_registers->flags = tmp->flags;
+            current_registers->sp = tmp->sp;
+            current_registers->ss = tmp->ss;
+
+            //gs fs es ds?
+
             
             
            if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 0){

@@ -210,6 +210,7 @@ asmlinkage long sys_munmap_track(unsigned long addr, size_t len)
 	}*/
 	current_pid = -1;
 	current_tgid = -1;
+	current_tsk = NULL;
 	
 	return retbuf.ret;
 #else

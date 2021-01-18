@@ -105,6 +105,54 @@ static int dependency_track(void *unused){
     return 0;
 }*/
 
+static int get_register_value(void *unused){
+    unsigned long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_get_register_payload *payload;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+    printk("Get:step1\n");
+    hdr = msg;
+    hdr->opcode = P2M_READ_REGISTER;
+    hdr->src_nid = LEGO_LOCAL_NID;
+
+    payload = msg + sizeof(*hdr);
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+    printk("Get: step2\n");
+    retval_ptr = retbuf;
+    retval = *retval_ptr;
+    printk("Get: step3, the value of ip is %d\n",retval);
+
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+
+}
+
 static int flush_register_value(void *unused){
     long retval;
     ssize_t retlen;
@@ -298,8 +346,15 @@ static int dependency_track(void *unused){
             
            if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 0){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+               printk("DepTrack: the ip value is %d\n", current_registers->ip);
                flush_register_value(NULL);
                printk("DepTrack: called flush_register_value successfully\n");
+               flush_flag = 1;
+           }
+           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 1){
+               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+               get_register_value(NULL);
+               printk("DepTrack: called get_register_value successfully\n");
                flush_flag = 1;
            }
        

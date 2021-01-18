@@ -35,6 +35,7 @@
 #define P2M_PCACHE_ZEROFILL	((__u32)0x30000002)
 // XY: flush register value p2m
 #define P2M_FLUSH_REGISTER ((__u32)0x30000003)
+#define P2M_READ_REGISTER ((__u32)0x30000004)
 
 #define P2M_READ		((__u32)__NR_read)
 #define P2M_WRITE		((__u32)__NR_write)

@@ -65,3 +65,27 @@ out:
 	tb_set_tx_size(tb, sizeof(long));
 
 }
+
+
+void handle_p2m_read_register(struct p2m_read_register_payload *payload, 
+        struct common_header *hdr, struct thpool_buffer *tb) {
+    struct lego_task_struct *p;
+    unsigned long reply;
+    printk("Read: memory step1\n");
+
+    p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
+    if (unlikely(!p)) {
+		reply = -ESRCH;
+		goto out;
+	}
+
+    reply = p->regs.ip;
+    printk("Read: memory step2\n");
+
+out:
+    *(long *)thpool_buffer_tx(tb) = reply;
+	tb_set_tx_size(tb, sizeof(long));
+
+
+
+}

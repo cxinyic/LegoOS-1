@@ -340,7 +340,15 @@ struct p2m_flush_register_payload{
 	u32 version_id;
 };
 
+struct p2m_read_register_payload{
+	u32 pid;
+	u32 tgid;
+
+};
+
 void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+void handle_p2m_read_register(struct p2m_read_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {

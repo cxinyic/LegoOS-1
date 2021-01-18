@@ -10,6 +10,7 @@
 #include <lego/fit_ibapi.h>
 
 struct pt_regs * current_registers;
+struct task_struct * current_tsk = NULL;
 
 
 static inline void sleep(unsigned sec)

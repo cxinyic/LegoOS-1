@@ -50,7 +50,7 @@ extern pid_t current_pid;
 extern pid_t current_tgid;
 extern struct pcache_meta * dirty_pcm_last_period;
 extern struct pt_regs * current_registers;
-extern struct tast_struct * current_tsk;
+extern struct task_struct * current_tsk;
 extern unsigned long fs_base_value;
 extern unsigned long gs_base_value;
 extern unsigned short ds_value;

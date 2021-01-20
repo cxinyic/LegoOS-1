@@ -188,7 +188,7 @@ static int get_register_value(void *unused){
     printk("Get: step2\n");
     retval_ptr = retbuf;
     retval = *retval_ptr;
-    printk("Get: step3, the value of ip is %lu\n",retval);
+    printk("Get: step3, the value of ip is %lx\n",retval);
 
 out:
     kfree(msg);
@@ -408,16 +408,21 @@ static int dependency_track(void *unused){
                // printk("DepTrack: called flush_register_value successfully\n");
                flush_flag +=1;
            }
-           /*if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag %2== 1){
+           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 1){
+               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+               printk("DepTrack: the ip value is %lx\n", current_registers->ip);
+               flush_register_value(NULL);
+               printk("DepTrack: called flush_register_value successfully\n");
+               flush_flag +=1;
+           }
+           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                get_register_value(NULL);
                printk("DepTrack: called get_register_value successfully\n");
                flush_flag +=1;
-           }*/
-           if (pdi.nr_dirty_pages>0)
-           {
-               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
            }
+           
+           
        
         spin_unlock(&dp_spinlock);
         }

@@ -427,7 +427,7 @@ static int dependency_track(void *unused){
         spin_unlock(&dp_spinlock);
         }
         
-        sleep(0.2);
+        sleep(0.8);
 
     }
     

@@ -344,19 +344,26 @@ static int dependency_track(void *unused){
 
             
             
-           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag %2== 0){
+           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 0){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
-               printk("DepTrack: the ip value is %lu\n", current_registers->ip);
-               flush_register_value(NULL);
-               printk("DepTrack: called flush_register_value successfully\n");
+               // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
+               //  flush_register_value(NULL);
+               printk("DepTrack: stop the process\n");
+               kill_pid_info(SIGSTOP, (struct siginfo *) 2, current_pid);
+               sleep(5);
+               kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
+
+               
+               // printk("DepTrack: called flush_register_value successfully\n");
                flush_flag +=1;
            }
-           if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag %2== 1){
+           /*if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag %2== 1){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                get_register_value(NULL);
                printk("DepTrack: called get_register_value successfully\n");
                flush_flag +=1;
-           }
+           }*/
+           printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
        
         spin_unlock(&dp_spinlock);
         }

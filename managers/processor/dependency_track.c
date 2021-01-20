@@ -137,8 +137,8 @@ int deptrack_checkpoint_thread(struct task_struct *p){
     current_registers->flags = src->flags;
     current_registers->sp = src->sp;
     current_registers->ss = src->ss;
-    current_registers->fs_base = p->thread.fsbase;
-    current_registers->gs_base = p->thread.gsbase;
+    fs_base_value = p->thread.fsbase;
+    gs_base_value = p->thread.gsbase;
 
     preempt_enable_no_resched();
 

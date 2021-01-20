@@ -349,9 +349,9 @@ static int dependency_track(void *unused){
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
                printk("DepTrack: stop the process\n");
-               kill_pid_info(SIGSTOP, (struct siginfo *) 2, current_pid);
-               sleep(5);
                kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
+               sleep(5);
+               // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
 
                
                // printk("DepTrack: called flush_register_value successfully\n");

@@ -1,6 +1,7 @@
 #include <processor/dependency_track.h>
 #include <processor/pcache.h>
 #include <processor/node.h>
+#include <processor/processor.h>
 
 
 #include <lego/jiffies.h>
@@ -8,6 +9,7 @@
 #include <lego/kthread.h>
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
+
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;
@@ -104,6 +106,49 @@ static int dependency_track(void *unused){
     }
     return 0;
 }*/
+
+int deptrack_checkpoint_thread(struct task_struct *p){
+    printk("DepTrack: deptrack_checkpoint_thread is called here\n");
+    if (p!=current_tsk){
+        return 0;
+    }
+    preempt_disable();
+
+    struct pt_regs *src = task_pt_regs(p);
+
+    current_registers->r15 = src->r15;
+    current_registers->r14 = src->r14;
+    current_registers->r13 = src->r13;
+    current_registers->r12 = src->r12;
+    current_registers->bp = src->bp;
+    current_registers->bx = src->bx;
+    current_registers->r11 = src->r11;
+    current_registers->r10 = src->r10;
+    current_registers->r9 = src->r9;
+    current_registers->r8 = src->r8;
+    current_registers->ax = src->ax;
+    current_registers->cx = src->cx;
+    current_registers->dx = src->dx;
+    current_registers->si = src->si;
+    current_registers->di = src->di;
+    current_registers->orig_ax = src->orig_ax;
+    current_registers->ip = src->ip;
+    current_registers->cs = src->cs;
+    current_registers->flags = src->flags;
+    current_registers->sp = src->sp;
+    current_registers->ss = src->ss;
+    current_registers->fs_base = p->thread.fsbase;
+    current_registers->gs_base = p->thread.gsbase;
+
+    preempt_enable_no_resched();
+
+
+
+    clear_tsk_thread_flag(p, TIF_NEED_CHECKPOINT);
+    printk("DepTrack: finished this call\n");
+    return 0;
+
+}
 
 static int get_register_value(void *unused){
     unsigned long retval;
@@ -274,6 +319,7 @@ static int dependency_track(void *unused){
     int count = 0;
     struct pcache_dependency_info pdi;
     struct pt_regs *tmp;
+    unsigned long flags;
     if (pin_current_thread()){
         printk("DepTrack: fail to pin dependency_track thread\n");
     }
@@ -317,7 +363,7 @@ static int dependency_track(void *unused){
                 dirty_pcm_last_period = pdi.last_pcm;
             }
 
-            tmp = task_pt_regs(current_tsk);
+            /*tmp = task_pt_regs(current_tsk);
             current_registers->r15 = tmp->r15;
             current_registers->r14 = tmp->r14;
             current_registers->r13 = tmp->r13;
@@ -338,7 +384,7 @@ static int dependency_track(void *unused){
             current_registers->cs = tmp->cs;
             current_registers->flags = tmp->flags;
             current_registers->sp = tmp->sp;
-            current_registers->ss = tmp->ss;
+            current_registers->ss = tmp->ss;*/
 
             //gs fs es ds?
 
@@ -348,9 +394,14 @@ static int dependency_track(void *unused){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
-               printk("DepTrack: stop the process\n");
-               kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
-               sleep(5);
+               printk("DepTrack: checkpoint the process\n");
+               spin_lock_irqsave(&tasklist_lock, flags);
+               set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
+               if (!wake_up_state(current_tsk, TASK_ALL))
+			        kick_process(current_tsk);
+                spin_unlock_irqrestore(&tasklist_lock, flags);
+                printk("DepTrack: finished the checkpoint\n");
+               
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
 
                
@@ -363,7 +414,10 @@ static int dependency_track(void *unused){
                printk("DepTrack: called get_register_value successfully\n");
                flush_flag +=1;
            }*/
-           printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+           if (pdi.nr_dirty_pages>0)
+           {
+               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+           }
        
         spin_unlock(&dp_spinlock);
         }

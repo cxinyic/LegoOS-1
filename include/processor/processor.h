@@ -37,6 +37,7 @@ void pcache_thread_exit(struct task_struct *tsk);
 #ifdef CONFIG_CHECKPOINT
 int checkpoint_thread(struct task_struct *);
 #else
+int deptrack_checkpoint_thread(struct task_struct *);
 static inline int checkpoint_thread(struct task_struct *tsk) { return 0; }
 #endif
 

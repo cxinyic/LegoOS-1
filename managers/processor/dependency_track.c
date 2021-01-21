@@ -11,6 +11,8 @@
 #include <lego/fit_ibapi.h>
 #include <lego/checkpoint.h>
 
+static LIST_HEAD(pss_list);
+static DEFINE_SPINLOCK(pss_lock);
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;
@@ -260,7 +262,7 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
     deptrack_enqueue_pss(pss);
     return 0;
 free_files:
-    kfree(ps->files);
+    kfree(pss->files);
 out:
     kfree(ss_tasks);
     kfree(pss);

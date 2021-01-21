@@ -152,7 +152,7 @@ static void deptrack_save_thread_regs(struct task_struct *p, struct ss_task_stru
 
 int deptrack_save_files(struct task_struct *p, struct process_snapshot *ps)
 {
-    struct file_struct *file = p->files;
+    struct file_struct *files = p->files;
     struct ss_files *ss_files;
     unsigned int fd, nr_files;
     int i = 0;

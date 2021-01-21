@@ -9,6 +9,7 @@
 #include <lego/kthread.h>
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
+#include <lego/checkpoint.h>
 
 
 struct pt_regs * current_registers;
@@ -107,7 +108,195 @@ static int dependency_track(void *unused){
     return 0;
 }*/
 
+static void deptrack_save_thread_regs(struct task_struct *p, struct ss_task_struct *ss)
+{
+    struct pt_regs *src = task_pt_regs(p);
+	struct ss_thread_gregs *dst = &(ss->user_regs.gregs);
+
+#define COPY_REG(reg)	do { dst->reg = src->reg; } while (0)
+	COPY_REG(r15);
+	COPY_REG(r14);
+	COPY_REG(r13);
+	COPY_REG(r12);
+	COPY_REG(bp);
+	COPY_REG(bx);
+	COPY_REG(r11);
+	COPY_REG(r10);
+	COPY_REG(r9);
+	COPY_REG(r8);
+	COPY_REG(ax);
+	COPY_REG(cx);
+	COPY_REG(dx);
+	COPY_REG(si);
+	COPY_REG(di);
+	COPY_REG(orig_ax);
+	COPY_REG(ip);
+	COPY_REG(cs);
+	COPY_REG(flags);
+	COPY_REG(sp);
+	COPY_REG(ss);
+#undef COPY_REG
+
+	dst->fs_base	= p->thread.fsbase;
+	dst->gs_base	= p->thread.gsbase;
+
+    // correct? not sure
+    savesegment(ds, dst->ds);
+    savesegment(es, dst->es);
+    savesegment(fs, dst->fs);
+    savesegment(gs, dst->gs);
+
+}
+
+int deptrack_save_files(struct task_struct *p, struct process_snapshot *ps)
+{
+    struct file_struct *file = p->files;
+    struct ss_files *ss_files;
+    unsigned int fd, nr_files;
+    int i = 0;
+
+    nr_files = bitmap_weight(files->fd_bitmap, NR_OPEN_DEFAULT);
+    if (nr_files == 0) {
+		ps->files = NULL;
+		ps->nr_files = 0;
+		return 0;
+	}
+    ss_files = kmalloc(sizeof(*ss_files) * nr_files, GFP_KERNEL);
+	if (unlikely(!ss_files))
+		return -ENOMEM;
+    for_each_set_bit(fd, files->fd_bitmap, NR_OPEN_DEFAULT) {
+		struct ss_files *ss_file = &ss_files[i];
+		struct file *file = files->fd_array[fd];
+
+		BUG_ON(!file);
+
+		ss_file->fd		= fd;
+		ss_file->f_mode		= file->f_mode;
+		ss_file->f_flags	= file->f_flags;
+		ss_file->f_pos		= file->f_pos;
+		memcpy(ss_file->f_name, file->f_name, FILENAME_LEN_DEFAULT);
+
+		i++;
+	}
+	BUG_ON(i != nr_files);
+
+	ps->files = ss_files;
+	ps->nr_files = nr_files;
+
+	return 0;
+
+}
+
+int deptrack_save_signals(struct task_struct *p, struct process_snapshot *ps)
+{
+    struct k_sigaction *k_action = p->sighand->action;
+	struct sigaction *src, *dst;
+	int i;
+
+	BUG_ON(p != p->group_leader);
+
+	for (i = 0; i < _NSIG; i++) {
+		src = &k_action[i].sa;
+		dst = &ps->action[i];
+		memcpy(dst, src, sizeof(*dst));
+	}
+
+	memcpy(&ps->blocked, &p->blocked, sizeof(sigset_t));
+
+	return 0;
+}
+void deptrack_enqueue_pss(struct process_snapshot *pss)
+{
+	BUG_ON(!pss);
+	spin_lock(&pss_lock);
+	list_add_tail(&pss->list, &pss_list);
+	spin_unlock(&pss_lock);
+}
+
+static int __deptrack_do_checkpoint_process(struct task_struct *leader)
+{
+    struct task_struct *t;
+    struct process_snapshot *pss;
+    struct ss_task_struct *ss_tasks, *ss_task;
+    int ret = 0, i = 0;
+    printk("DepTrack: __deptrack_do_checkpoint_process called\n");
+
+    pss = kmalloc(sizeof(*pss), GFP_KERNEL);
+    if (!pss)
+        return -ENOMEM;
+    pss->nr_tasks = leader->signal->nr_threads;
+    ss_tasks = kmalloc(sizeof(*ss_tasks) * pss->nr_tasks, GFP_KERNEL);
+	if (!ss_tasks) {
+		kfree(pss);
+		return -ENOMEM;
+	}
+    pss->tasks = ss_tasks;
+    memcpy(pss->comm, leader->comm, TASK_COMM_LEN);
+
+    ret = deptrack_save_files(leader, pss);
+    if (ret)
+        goto out;
+    printk("DepTrack: __deptrack_do_checkpoint_process step1\n");
+    
+    ret =deptrack_save_signals(leader, pss);
+    if (ret)
+		goto free_files;
+    printk("DepTrack: __deptrack_do_checkpoint_process step2\n");
+    
+
+    for_each_thread(leader, t){
+        ss_task = &ss_tasks[i++];
+		ss_task->pid = t->pid;
+		ss_task->set_child_tid = t->set_child_tid;
+		ss_task->clear_child_tid = t->clear_child_tid;
+		ss_task->sas_ss_sp = t->sas_ss_sp;
+		ss_task->sas_ss_size = t->sas_ss_size;
+		ss_task->sas_ss_flags = t->sas_ss_flags;
+
+		deptrack_save_thread_regs(t, ss_task);
+    }
+    printk("DepTrack: __deptrack_do_checkpoint_process step3\n");
+
+    deptrack_enqueue_pss(pss);
+    return 0;
+free_files:
+    kfree(ps->files);
+out:
+    kfree(ss_tasks);
+    kfree(pss);
+    return ret;
+
+}
+
+static int deptrack_do_checkpoint_process(struct task_struct *leader)
+{
+    int ret;
+    preempt_disable();
+    ret = __deptrack_do_checkpoint_process(leader);
+    preempt_enable_no_resched();
+    return ret;
+}
+
+
 int deptrack_checkpoint_thread(struct task_struct *p){
+    printk("DepTrack: deptrack_checkpoint_thread is called here\n");
+    struct task_struct *leader;
+    long saved_state =p->state;
+
+    leader = p->group_leader;
+    if (p != leader){
+        set_current_state(TASK_CHECKPOINTING);
+        schedule();
+        set_current_state(saved_state);
+    }else{
+        deptrack_do_checkpoint_process(p);
+
+    }
+
+}
+
+
+/*int deptrack_checkpoint_thread(struct task_struct *p){
     printk("DepTrack: deptrack_checkpoint_thread is called here\n");
     if (p!=current_tsk){
         return 0;
@@ -148,7 +337,7 @@ int deptrack_checkpoint_thread(struct task_struct *p){
     printk("DepTrack: finished this call\n");
     return 0;
 
-}
+}*/
 
 static int get_register_value(void *unused){
     unsigned long retval;
@@ -388,7 +577,7 @@ static int dependency_track(void *unused){
 
             //gs fs es ds?
 
-            if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){
+            /*if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                get_register_value(NULL);
                printk("DepTrack: called get_register_value successfully\n");
@@ -402,7 +591,7 @@ static int dependency_track(void *unused){
                printk("DepTrack: called flush_register_value successfully\n");
                flush_flag +=1;
                
-           }
+           }*/
             
            if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 0){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);

@@ -371,6 +371,9 @@ static int deptrack_restore_sys_open(struct ss_files *ss_f)
     printk("Restore: open7\n");
 
 	BUG_ON(!f->f_op->open);
+    if (f->f_op == NULL){
+        printk("Restore: open NULL\n");
+    }
 	ret = f->f_op->open(f);
 	if (ret)
 		free_fd(current->files, fd);

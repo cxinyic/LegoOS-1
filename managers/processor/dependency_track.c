@@ -17,6 +17,7 @@ static LIST_HEAD(pss_list);
 static DEFINE_SPINLOCK(pss_lock);
 static LIST_HEAD(restorer_work_list);
 static DEFINE_SPINLOCK(restorer_work_lock);
+struct restorer_work_info current_info;
 
 struct restorer_work_info {
 	struct process_snapshot	*pss;
@@ -272,9 +273,9 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
     printk("DepTrack: __deptrack_do_checkpoint_process step3\n");
 
     deptrack_enqueue_pss(pss);
-    struct restorer_work_info info;
-    info.pss = pss;
-    list_add_tail(&info.list, &restorer_work_list);
+    
+    current_info.pss = pss;
+    
     return 0;
 free_files:
     kfree(pss->files);
@@ -521,7 +522,7 @@ static void deptrack_create_restorer(struct restorer_work_info *info)
 int deptrack_restore_worker_thread(void* unused)
 {
     printk("Restore: begin\n");
-    if(!list_empty(&restorer_work_list)){
+    /*if(!list_empty(&restorer_work_list)){
         struct restorer_work_info *info;
             printk("Restore: begin1\n");
 			info = list_entry(restorer_work_list.next,
@@ -534,7 +535,16 @@ int deptrack_restore_worker_thread(void* unused)
             }
             deptrack_create_restorer(info);
             printk("Restore: begin3\n");
+    }*/
+    struct restorer_work_info *info;
+    *info = current_info;
+    if (info == NULL){
+        printk("Restore: NULL\n");
     }
+    deptrack_create_restorer(info);
+    printk("Restore: begin1\n");
+
+
 }
 
 

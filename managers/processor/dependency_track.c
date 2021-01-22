@@ -503,7 +503,8 @@ static void deptrack_restore_thread_group(struct restorer_work_info *info)
 	deptrack_restore_thread_state(current, ss_task);
 
 	if (nr_threads == 1)
-		goto done;
+    {    printk("Restore: only one thread\n");
+		goto done;}
     // TODO: other threads
 done:
     info->result = current;
@@ -863,6 +864,7 @@ static int dependency_track(void *unused){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                  deptrack_restore_worker_thread(NULL);
                  flush_flag+=1;
+                 current_pid = -1;
              }
             if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);

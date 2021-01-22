@@ -376,13 +376,17 @@ static int deptrack_restore_files(struct process_snapshot *pss)
 {
     printk("Restore: step3\n");
     unsigned int nr_files = pss->nr_files;
+    printk("Restore: step31\n");
 	struct files_struct *files = current->files;
+    printk("Restore: step32\n");
 	int fd, ret;
 	struct file *f;
 	struct ss_files *ss_f;
+    printk("Restore: step33\n");
 
     for (fd = 0; fd < nr_files; fd++) {
 		ss_f = &pss->files[fd];
+    printk("Restore: step34\n");
     if (fd < 3 && test_bit(fd, files->fd_bitmap)) {
 			f = files->fd_array[fd];
 			BUG_ON(!f);
@@ -395,8 +399,9 @@ static int deptrack_restore_files(struct process_snapshot *pss)
 			}
 			continue;
 		}
-
+printk("Restore: step35\n");
 		ret = deptrack_restore_sys_open(ss_f);
+        printk("Restore: step36\n");
 		if (ret)
 			goto out;
 	}

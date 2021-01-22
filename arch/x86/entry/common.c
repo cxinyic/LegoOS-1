@@ -40,7 +40,9 @@ static void exit_to_usermode_loop(struct pt_regs *regs, u32 cached_flags)
 // #ifdef CONFIG_CHECKPOINT
 		if (cached_flags & _TIF_NEED_CHECKPOINT)
 			// checkpoint_thread(current);
+#ifdef CONFIG_COMP_PROCESSOR
 			deptrack_checkpoint_thread(current);
+#endif
 // #endif
 
 		if (cached_flags & _TIF_NEED_RESCHED)

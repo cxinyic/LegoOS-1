@@ -540,6 +540,7 @@ static void deptrack_create_restorer(struct restorer_work_info *info)
 		WARN_ON_ONCE(1);
 		info->result = ERR_PTR(pid);
 	}
+    printk("Restore: pid is %d\n", pid);
 }
 
 int deptrack_restore_worker_thread(void* unused)

@@ -527,10 +527,13 @@ int deptrack_restore_worker_thread(void* unused)
 			info = list_entry(restorer_work_list.next,
 					struct restorer_work_info, list);
             printk("Restore: begin2\n");
-			list_del_init(&info->list);
-            printk("Restore: begin3\n");
+			// list_del_init(&info->list);
+            // printk("Restore: begin3\n");
+            if (info == NULL){
+                printk("Restore: NULL\n");
+            }
             deptrack_create_restorer(info);
-            printk("Restore: begin4\n");
+            printk("Restore: begin3\n");
     }
 }
 

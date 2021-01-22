@@ -11,6 +11,7 @@
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
 #include <lego/checkpoint.h>
+#include <asm/prctl.h>
 
 static LIST_HEAD(pss_list);
 static DEFINE_SPINLOCK(pss_lock);
@@ -353,8 +354,7 @@ static int deptrack_restore_sys_open(struct ss_files *ss_f)
 		ret = proc_file_open(f, f_name);
 	else if (unlikely(sys_file(f_name)))
 		ret = sys_file_open(f, f_name);
-	else
-		ret = normal_file_open(f, f_name);
+
 
 	if (ret) {
 		free_fd(current->files, fd);
@@ -476,7 +476,7 @@ static void deptrack_restore_thread_group(struct restorer_work_info *info)
 	int i;
 
 	ss_task = &ss_tasks[0];
-	restore_thread_state(current, ss_task);
+	deptrack_restore_thread_state(current, ss_task);
 
 	if (nr_threads == 1)
 		goto done;
@@ -508,7 +508,7 @@ err:
 
 static void deptrack_create_restorer(struct restorer_work_info *info)
 {
-    in pid;
+    int pid;
     printk("Restore: step 1\n");
     pid = do_fork(SIGCHLD, (unsigned long)deptrack_restorer_for_group_leader,
 			(unsigned long)info, NULL, NULL, 0);
@@ -518,7 +518,7 @@ static void deptrack_create_restorer(struct restorer_work_info *info)
 	}
 }
 
-int deptrack_restore_worker_thread()
+int deptrack_restore_worker_thread(void* unused)
 {
     printk("Restore: begin\n");
     if(!list_empty(&restorer_work_list)){

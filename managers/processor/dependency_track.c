@@ -280,6 +280,22 @@ static int deptrack_do_checkpoint_process(struct task_struct *leader)
 }
 
 
+static void deptrack_wake_up_thread_group(struct task_struct *leader)
+{
+    struct task_struct *t;
+	unsigned long flags;
+
+	spin_lock_irqsave(&tasklist_lock, flags);
+	for_each_thread(leader, t) {
+		if (leader == t)
+			continue;
+		if (!wake_up_state(t, TASK_CHECKPOINTING))
+			WARN(1, "Fail to wake: %d-%d-state:%ld\n",
+				t->pid, t->tgid, t->state);
+	}
+	spin_unlock_irqrestore(&tasklist_lock, flags);
+}
+
 int deptrack_checkpoint_thread(struct task_struct *p){
     printk("DepTrack: deptrack_checkpoint_thread is called here\n");
     struct task_struct *leader;
@@ -293,7 +309,12 @@ int deptrack_checkpoint_thread(struct task_struct *p){
     }else{
         deptrack_do_checkpoint_process(p);
 
+        deptrack_wake_up_thread_group(p);
+
     }
+    
+    clear_tsk_thread_flag(p, TIF_NEED_CHECKPOINT);
+    return 0;
 
 }
 

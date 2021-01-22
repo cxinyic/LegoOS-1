@@ -361,6 +361,13 @@ static int deptrack_restore_sys_open(struct ss_files *ss_f)
 		ret = proc_file_open(f, f_name);
 	else if (unlikely(sys_file(f_name)))
 		ret = sys_file_open(f, f_name);
+    else if (unlikely(dev_file(f_name)))
+		ret = dev_file_open(f, f_name);
+	else if (unlikely(socket_file(f_name)))
+		ret = socket_file_open(f);
+    else{
+        ret = default_file_open(f, f_name);
+    }
     printk("Restore: open6\n");
 
 

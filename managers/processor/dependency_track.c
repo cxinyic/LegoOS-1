@@ -336,31 +336,39 @@ int deptrack_checkpoint_thread(struct task_struct *p){
 
 static int deptrack_restore_sys_open(struct ss_files *ss_f)
 {
+    printk("Restore: open1\n");
 	struct file *f;
 	int fd, ret;
 	char *f_name = ss_f->f_name;
+    printk("Restore: open2\n");
 
 	fd = alloc_fd(current->files, f_name);
+    printk("Restore: open3\n");
 	if (unlikely(fd != ss_f->fd)) {
 		pr_err("Unmactched fd: %d:%s\n",
 			ss_f->fd, ss_f->f_name);
 		return -EBADF;
 	}
+    printk("Restore: open4\n");
 
 	f = fdget(fd);
+    printk("Restore: open5\n");
 	f->f_flags = ss_f->f_flags;
 	f->f_mode = ss_f->f_mode;
+    printk("Restore: open6\n");
 
 	if (unlikely(proc_file(f_name)))
 		ret = proc_file_open(f, f_name);
 	else if (unlikely(sys_file(f_name)))
 		ret = sys_file_open(f, f_name);
+    printk("Restore: open6\n");
 
 
 	if (ret) {
 		free_fd(current->files, fd);
 		goto put;
 	}
+    printk("Restore: open7\n");
 
 	BUG_ON(!f->f_op->open);
 	ret = f->f_op->open(f);
@@ -383,6 +391,7 @@ static int deptrack_restore_files(struct process_snapshot *pss)
 	struct file *f;
 	struct ss_files *ss_f;
     printk("Restore: step33\n");
+    printk("Restore: there are %d open files\n", nr_files);
 
     for (fd = 0; fd < nr_files; fd++) {
 		ss_f = &pss->files[fd];

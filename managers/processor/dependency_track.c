@@ -820,7 +820,7 @@ static int dependency_track(void *unused){
             }
             if (flush_flag == 3){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
-                 deptrack_restore_worker_thread();
+                 deptrack_restore_worker_thread(NULL);
                  flush_flag+=1;
              }
             if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){

@@ -2,6 +2,7 @@
 #include <processor/pcache.h>
 #include <processor/node.h>
 #include <processor/processor.h>
+#include <processor/fs.h>
 
 
 #include <lego/jiffies.h>
@@ -13,6 +14,16 @@
 
 static LIST_HEAD(pss_list);
 static DEFINE_SPINLOCK(pss_lock);
+static LIST_HEAD(restorer_work_list);
+static DEFINE_SPINLOCK(restorer_work_lock);
+
+struct restorer_work_info {
+	struct process_snapshot	*pss;
+	struct task_struct	*result;
+	struct completion	*done;
+
+	struct list_head	list;
+};
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;
@@ -260,6 +271,9 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
     printk("DepTrack: __deptrack_do_checkpoint_process step3\n");
 
     deptrack_enqueue_pss(pss);
+    struct restorer_work_info info;
+    info.pss = pss;
+    list_add_tail(&info.list, &restorer_work_list);
     return 0;
 free_files:
     kfree(pss->files);
@@ -316,6 +330,205 @@ int deptrack_checkpoint_thread(struct task_struct *p){
     clear_tsk_thread_flag(p, TIF_NEED_CHECKPOINT);
     return 0;
 
+}
+
+static int deptrack_restore_sys_open(struct ss_files *ss_f)
+{
+	struct file *f;
+	int fd, ret;
+	char *f_name = ss_f->f_name;
+
+	fd = alloc_fd(current->files, f_name);
+	if (unlikely(fd != ss_f->fd)) {
+		pr_err("Unmactched fd: %d:%s\n",
+			ss_f->fd, ss_f->f_name);
+		return -EBADF;
+	}
+
+	f = fdget(fd);
+	f->f_flags = ss_f->f_flags;
+	f->f_mode = ss_f->f_mode;
+
+	if (unlikely(proc_file(f_name)))
+		ret = proc_file_open(f, f_name);
+	else if (unlikely(sys_file(f_name)))
+		ret = sys_file_open(f, f_name);
+	else
+		ret = normal_file_open(f, f_name);
+
+	if (ret) {
+		free_fd(current->files, fd);
+		goto put;
+	}
+
+	BUG_ON(!f->f_op->open);
+	ret = f->f_op->open(f);
+	if (ret)
+		free_fd(current->files, fd);
+
+put:
+	put_file(f);
+	return ret;
+}
+
+static int deptrack_restore_files(struct process_snapshot *pss)
+{
+    printk("Restore: step3\n");
+    unsigned int nr_files = pss->nr_files;
+	struct files_struct *files = current->files;
+	int fd, ret;
+	struct file *f;
+	struct ss_files *ss_f;
+
+    for (fd = 0; fd < nr_files; fd++) {
+		ss_f = &pss->files[fd];
+    if (fd < 3 && test_bit(fd, files->fd_bitmap)) {
+			f = files->fd_array[fd];
+			BUG_ON(!f);
+
+			if (strncmp(ss_f->f_name, f->f_name,
+				FILENAME_LEN_DEFAULT)) {
+				WARN(1, "Pacth needed here!");
+				ret = -EBADF;
+				goto out;
+			}
+			continue;
+		}
+
+		ret = deptrack_restore_sys_open(ss_f);
+		if (ret)
+			goto out;
+	}
+
+out:
+	return ret;
+}
+
+
+static void deptrack_restore_signals(struct process_snapshot *pss)
+{
+     printk("Restore: step4\n");
+	struct k_sigaction *k_action = current->sighand->action;
+	struct sigaction *src, *dst;
+	int i;
+
+	for (i = 0; i < _NSIG; i++) {
+		src = &pss->action[i];
+		dst = &k_action[i].sa;
+		memcpy(dst, src, sizeof(*dst));
+	}
+
+	memcpy(&current->blocked, &pss->blocked, sizeof(sigset_t));
+}
+
+static void deptrack_restore_thread_state(struct task_struct *p,
+				 struct ss_task_struct *ss_task)
+{
+	struct pt_regs *dst = task_pt_regs(p);
+	struct ss_thread_gregs *src = &(ss_task->user_regs.gregs);
+
+	p->set_child_tid = ss_task->set_child_tid;
+	p->clear_child_tid = ss_task->clear_child_tid;
+	p->sas_ss_sp = ss_task->sas_ss_sp;
+	p->sas_ss_size = ss_task->sas_ss_size;
+	p->sas_ss_flags = ss_task->sas_ss_flags;
+
+#define RESTORE_REG(reg)	do { dst->reg = src->reg; } while (0)
+	RESTORE_REG(r15);
+	RESTORE_REG(r14);
+	RESTORE_REG(r13);
+	RESTORE_REG(r12);
+	RESTORE_REG(bp);
+	RESTORE_REG(bx);
+	RESTORE_REG(r11);
+	RESTORE_REG(r10);
+	RESTORE_REG(r9);
+	RESTORE_REG(r8);
+	RESTORE_REG(ax);
+	RESTORE_REG(cx);
+	RESTORE_REG(dx);
+	RESTORE_REG(si);
+	RESTORE_REG(di);
+	RESTORE_REG(orig_ax);
+	RESTORE_REG(ip);
+	RESTORE_REG(cs);
+	RESTORE_REG(flags);
+	RESTORE_REG(sp);
+	RESTORE_REG(ss);
+#undef RESTORE_REG
+
+	if (src->fs_base)
+		do_arch_prctl(p, ARCH_SET_FS, src->fs_base);
+	if (src->gs_base)
+		do_arch_prctl(p, ARCH_SET_GS, src->gs_base);
+}
+
+
+static void deptrack_restore_thread_group(struct restorer_work_info *info)
+{
+     printk("Restore: step5\n");
+    struct process_snapshot *pss = info->pss;
+	struct ss_task_struct *ss_task, *ss_tasks = pss->tasks;
+	struct task_struct *t;
+	struct wait_info *wait;
+	unsigned long clone_flags;
+	int nr_threads = pss->nr_tasks;
+	int i;
+
+	ss_task = &ss_tasks[0];
+	restore_thread_state(current, ss_task);
+
+	if (nr_threads == 1)
+		goto done;
+    // TODO: other threads
+done:
+    info->result = current;
+}
+
+static int deptrack_restorer_for_group_leader(void *_info)
+{
+    printk("Restore: step2\n");
+    struct restorer_work_info *info = _info;
+	struct process_snapshot *pss = info->pss;
+    memcpy(current->comm, pss->comm, TASK_COMM_LEN);
+    deptrack_restore_files(pss);
+    deptrack_restore_signals(pss);
+
+    deptrack_restore_thread_group(info);
+	if (IS_ERR(info->result))
+		goto err;
+     printk("Restore: finished\n");
+    return 0;
+
+err:
+    do_exit(-1);
+    BUG();
+    return 0;
+}
+
+static void deptrack_create_restorer(struct restorer_work_info *info)
+{
+    in pid;
+    printk("Restore: step 1\n");
+    pid = do_fork(SIGCHLD, (unsigned long)deptrack_restorer_for_group_leader,
+			(unsigned long)info, NULL, NULL, 0);
+	if (pid < 0) {
+		WARN_ON_ONCE(1);
+		info->result = ERR_PTR(pid);
+	}
+}
+
+int deptrack_restore_worker_thread()
+{
+    printk("Restore: begin\n");
+    if(!list_empty(&restorer_work_list)){
+        struct restorer_work_info *info;
+
+			info = list_entry(restorer_work_list.next,
+					struct restorer_work_info, list);
+			list_del_init(&info->list);
+            deptrack_create_restorer(info);
+    }
 }
 
 
@@ -600,8 +813,15 @@ static int dependency_track(void *unused){
 
             //gs fs es ds?
 
-             if (flush_flag > 2){
+            if (flush_flag == 4){
+                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+                flush_flag+=1;
+                current_pid = -1;
+            }
+            if (flush_flag == 3){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+                 deptrack_restore_worker_thread();
+                 flush_flag+=1;
              }
             if (pdi.nr_dirty_pages>0 && pdi.nr_dirty_pages< 100 && flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);

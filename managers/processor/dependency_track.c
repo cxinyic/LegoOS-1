@@ -537,7 +537,7 @@ int deptrack_restore_worker_thread(void* unused)
             printk("Restore: begin3\n");
     }*/
     struct restorer_work_info *info;
-    info = kmalloc(sizeof(restorer_work_info), GFP_KERNEL);
+    info = kmalloc(sizeof(struct restorer_work_info), GFP_KERNEL);
     *info = current_info;
     if (info == NULL){
         printk("Restore: NULL\n");

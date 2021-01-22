@@ -723,6 +723,9 @@ dotraplinkage void do_page_fault(struct pt_regs *regs, long error_code)
 		 * If for any reason at all we couldn't handle the fault,
 		 * make sure we exit gracefully rather than endlessly redo the fault.
 		 */
+		if (current->pid == 25){
+				printk("page fault: here\n");
+		}
 		mm_fault_error(regs, error_code, address, fault);
 		return;
 	}

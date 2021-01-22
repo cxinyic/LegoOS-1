@@ -327,6 +327,9 @@ static int
 __pcache_do_zerofill_page(unsigned long address, unsigned long flags,
 			  struct pcache_meta *pcm, void *unused)
 {
+	if (current->pid == 25){
+		printk("__pcache_do_zerofill_page: address is %lx\n", address);
+	}
 	void *pcache_kva;
 	PROFILE_POINT_TIME(__pcache_fill_zerofill)
 

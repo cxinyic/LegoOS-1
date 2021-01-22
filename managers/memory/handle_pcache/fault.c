@@ -265,6 +265,7 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 
 	p = find_lego_task_by_pid(src_nid, tgid);
 	if (unlikely(!p)) {
+		printk("cannot find pid\n");
 		pr_info("%s(): src_nid: %d tgid: %d\n", __func__, src_nid, tgid);
 		pcache_miss_error(RET_ESRCH, p, vaddr, tb);
 		return;

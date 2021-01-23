@@ -513,9 +513,10 @@ done:
 static int deptrack_restorer_for_group_leader(void *_info)
 {
     printk("Restore: step2\n");
-    struct restorer_work_info *info = _info;
+    return 0;
+    /*struct restorer_work_info *info = _info;
 	struct process_snapshot *pss = info->pss;
-    memcpy(current->comm, pss->comm, TASK_COMM_LEN);
+    // memcpy(current->comm, pss->comm, TASK_COMM_LEN);
     // deptrack_restore_files(pss);
     // deptrack_restore_signals(pss);
     current->pm_data.home_node = 1;
@@ -529,7 +530,7 @@ static int deptrack_restorer_for_group_leader(void *_info)
 err:
     do_exit(-1);
     BUG();
-    return 0;
+    return 0;*/
 }
 
 static void deptrack_create_restorer(struct restorer_work_info *info)

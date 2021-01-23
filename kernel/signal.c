@@ -1235,6 +1235,7 @@ relock:
 	 * the CLD_ si_code into SIGNAL_CLD_MASK bits.
 	 */
 	if (unlikely(signal->flags & SIGNAL_CLD_MASK)) {
+		printk("Deptrack: get signal step1\n");
 		int why;
 
 		if (signal->flags & SIGNAL_CLD_CONTINUED)
@@ -1274,7 +1275,8 @@ relock:
 
 		if (unlikely(current->jobctl & JOBCTL_STOP_PENDING) &&
 		    do_signal_stop(0))
-			goto relock;
+			{printk("Deptrack: get signal step3\n");
+			goto relock;}
 
 		if (unlikely(current->jobctl & JOBCTL_TRAP_MASK)) {
 			do_jobctl_trap();
@@ -1358,6 +1360,7 @@ relock:
 			}
 
 			if (likely(do_signal_stop(ksig->info.si_signo))) {
+				printk("Deptrack: get signal step2\n");
 				/* It released the siglock.  */
 				goto relock;
 			}

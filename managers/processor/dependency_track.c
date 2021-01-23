@@ -864,6 +864,8 @@ static int dependency_track(void *unused){
             if (flush_flag == 3){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                  // deptrack_restore_worker_thread(NULL);
+                 sleep(3);
+                 printk("DepTrack: sleep 3 seconds\n");
                  kill_pid_info(SIGCONT, (struct siginfo *) 1, current_pid);
                  if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);

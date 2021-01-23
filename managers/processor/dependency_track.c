@@ -520,7 +520,7 @@ static int deptrack_restorer_for_group_leader(void *_info)
     deptrack_restore_signals(pss);
     current->pm_data.home_node = 1;
 
-    deptrack_restore_thread_group(info);
+    // deptrack_restore_thread_group(info);
 	if (IS_ERR(info->result))
 		goto err;
      printk("Restore: finished\n");
@@ -863,13 +863,13 @@ static int dependency_track(void *unused){
             }
             if (flush_flag == 3){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
-                 // deptrack_restore_worker_thread(NULL);
-                 sleep(3);
-                 printk("DepTrack: sleep 3 seconds\n");
+                 deptrack_restore_worker_thread(NULL);
+                 
+                /*
                  kill_pid_info(SIGCONT, (struct siginfo *) 1, current_pid);
                  if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);
-                  printk("DepTrack: continue the process\n");
+                  printk("DepTrack: continue the process\n");*/
                  flush_flag+=1;
                  current_pid = -1;
              }
@@ -891,13 +891,13 @@ static int dependency_track(void *unused){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
-               /*printk("DepTrack: checkpoint the process\n");
+               printk("DepTrack: checkpoint the process\n");
                spin_lock_irqsave(&tasklist_lock, flags);
                set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
                if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);
                 spin_unlock_irqrestore(&tasklist_lock, flags);
-                printk("DepTrack: finished the checkpoint\n");*/
+                printk("DepTrack: finished the checkpoint\n");
                 flush_flag +=1;
                
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);

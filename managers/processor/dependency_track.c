@@ -863,14 +863,16 @@ static int dependency_track(void *unused){
             }
             if (flush_flag == 3){
                  printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
-                 deptrack_restore_worker_thread(NULL);
+                 // deptrack_restore_worker_thread(NULL);
+                 kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
+                  printk("DepTrack: continue the process\n");
                  flush_flag+=1;
                  current_pid = -1;
              }
             if (flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                flush_flag +=1;
-               kill_pid_info(SIGTERM, (struct siginfo *) 2, current_pid);
+               kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
                printk("DepTrack: kill the process\n");
 
                

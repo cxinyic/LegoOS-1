@@ -450,6 +450,7 @@ static void complete_signal(int sig, struct task_struct *p, int group)
 static int
 send_signal(int sig, struct siginfo *info, struct task_struct *t, int group)
 {
+	printk("Deptrack: send signal: %d\n", sig);
 	struct sigpending *pending;
 	struct sigqueue *q;
 	int override_rlimit;
@@ -920,6 +921,7 @@ static bool task_participate_group_stop(struct task_struct *task)
 static bool do_signal_stop(int signr)
 	__releases(&current->sighand->siglock)
 {
+	printk("Deptrack: do signal stop\n");
 	struct signal_struct *sig = current->signal;
 
 	if (!(current->jobctl & JOBCTL_STOP_PENDING)) {
@@ -1220,6 +1222,7 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
  */
 int get_signal(struct ksignal *ksig)
 {
+	printk("Deptrack: get signal\n");
 	struct sighand_struct *sighand = current->sighand;
 	struct signal_struct *signal = current->signal;
 	int signr;
@@ -1236,12 +1239,10 @@ relock:
 
 		if (signal->flags & SIGNAL_CLD_CONTINUED)
 		{
-			printk("Deptrack: catch continue signal\n");
 			why = CLD_CONTINUED;
 		}
 		else
 		{
-			printk("Deptrack: catch stop signal\n");
 			why = CLD_STOPPED;
 		}
 

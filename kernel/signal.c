@@ -1235,9 +1235,15 @@ relock:
 		int why;
 
 		if (signal->flags & SIGNAL_CLD_CONTINUED)
+		{
+			printk("Deptrack: catch continue signal\n");
 			why = CLD_CONTINUED;
+		}
 		else
+		{
+			printk("Deptrack: catch stop signal\n");
 			why = CLD_STOPPED;
+		}
 
 		signal->flags &= ~SIGNAL_CLD_MASK;
 

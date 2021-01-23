@@ -516,8 +516,8 @@ static int deptrack_restorer_for_group_leader(void *_info)
     struct restorer_work_info *info = _info;
 	struct process_snapshot *pss = info->pss;
     memcpy(current->comm, pss->comm, TASK_COMM_LEN);
-    deptrack_restore_files(pss);
-    deptrack_restore_signals(pss);
+    // deptrack_restore_files(pss);
+    // deptrack_restore_signals(pss);
     current->pm_data.home_node = 1;
 
     // deptrack_restore_thread_group(info);

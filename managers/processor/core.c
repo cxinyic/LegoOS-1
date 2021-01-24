@@ -136,6 +136,7 @@ void __init checkpoint_init(void);
 #else
 static inline void checkpoint_init(void) { }
 #endif
+void __init deptrack_checkpoint_init(void);
 
 #ifdef CONFIG_GPM_HANDLER
 static inline void init_gpm_handler(void)
@@ -185,8 +186,8 @@ void __init processor_manager_init(void)
 	gpm_handler_init();
 
 	/* Create checkpointing restore thread */
-	checkpoint_init();
-
+	// checkpoint_init();
+	deptrack_checkpoint_init();
     /* create dependency tracking thread */
 	dependency_track_init();
 }

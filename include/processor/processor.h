@@ -41,6 +41,7 @@ int checkpoint_thread(struct task_struct *);
 static inline int checkpoint_thread(struct task_struct *tsk) { return 0; }
 #endif
 int deptrack_checkpoint_thread(struct task_struct *);
+int deptrack_restore_worker_thread(void *);
 
 int do_execve(const char *filename,
 	      const char * const *argv,

@@ -713,9 +713,7 @@ dotraplinkage void do_page_fault(struct pt_regs *regs, long error_code)
 	 * for further VM handling:
 	 */
 	PROFILE_START(pcache_handle_fault);
-	if (current->pid == 25){
-		printk("page fault: step1: address is %lx\n", address);
-	}
+	
 	fault = pcache_handle_fault(current->mm, address, flags);
 	PROFILE_LEAVE(pcache_handle_fault);
 	if (unlikely(fault & VM_FAULT_ERROR)) {
@@ -723,9 +721,7 @@ dotraplinkage void do_page_fault(struct pt_regs *regs, long error_code)
 		 * If for any reason at all we couldn't handle the fault,
 		 * make sure we exit gracefully rather than endlessly redo the fault.
 		 */
-		if (current->pid == 25){
-				printk("page fault: here\n");
-		}
+		
 		mm_fault_error(regs, error_code, address, fault);
 		return;
 	}

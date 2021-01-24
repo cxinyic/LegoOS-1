@@ -259,9 +259,6 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 	tgid   = msg->tgid;
 	flags  = msg->flags;
 	vaddr  = msg->missing_vaddr;
-	if (tgid == 25){
-		tgid = 24;
-	}
 
 	handle_pcache_debug("I nid:%u pid:%u tgid:%u flags:%x vaddr:%#Lx",
 		src_nid, msg->pid, tgid, flags, vaddr);

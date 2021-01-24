@@ -517,7 +517,7 @@ int deptrack_restore_worker_thread(void* unused)
 		if (list_empty(&restorer_work_list))
 			schedule();
 		__set_current_state(TASK_RUNNING);*/
-        sleep(1);
+        sleep(0.2);
         printk("Restore: wake up\n");
         spin_lock(&restorer_work_lock);
 		while (!list_empty(&restorer_work_list)) {

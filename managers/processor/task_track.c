@@ -562,7 +562,7 @@ int deptrack_restore_worker_thread(void* unused)
 
 }
 
-void __init deptrack_checkpoint_init(void)
+void  deptrack_checkpoint_init(void)
 {
     restorer_worker = kthread_run(deptrack_restore_worker_thread, NULL, "task_restore");
 	if (IS_ERR(restorer_worker))

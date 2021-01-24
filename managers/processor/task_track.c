@@ -514,7 +514,8 @@ int deptrack_restore_worker_thread(void* unused)
 			schedule();
 		__set_current_state(TASK_RUNNING);*/
         sleep(1);
-        spin_lock(&restorer_work_lock);
+        printk("Restore: wake up\n");
+        /*spin_lock(&restorer_work_lock);
 		while (!list_empty(&restorer_work_list)) {
 			struct restorer_work_info *info;
 
@@ -522,17 +523,14 @@ int deptrack_restore_worker_thread(void* unused)
 					struct restorer_work_info, list);
 			list_del_init(&info->list);
 
-			/*
-			 * Release the lock so others can attach work.
-			 * The real work may take some time.
-			 */
+			
 			spin_unlock(&restorer_work_lock);
 
 			deptrack_create_restorer(info);
 
 			spin_lock(&restorer_work_lock);
 		}
-		spin_unlock(&restorer_work_lock);
+		spin_unlock(&restorer_work_lock);*/
     }
     return 0;
     /*if(!list_empty(&restorer_work_list)){

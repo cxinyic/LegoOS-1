@@ -157,6 +157,7 @@ struct process_snapshot *deptrack_dequeue_pss(void)
 
 struct task_struct *restore_process_snapshot(struct process_snapshot *pss)
 {
+    printk("DepTrack: restore process snapshot\n");
 	DEFINE_COMPLETION(done);
 	struct restorer_work_info info;
 	struct task_struct *result;

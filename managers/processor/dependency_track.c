@@ -231,7 +231,13 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 }
 
 
+static int toy_func(void* unused){
+    printk("Hi: I am a toy func\n");
+    return 0;
+}
+
 int flush_flag = 0;
+
 
 static int dependency_track(void *unused){
     struct pcache_meta *pcm;
@@ -335,25 +341,35 @@ static int dependency_track(void *unused){
                
            }*/
             
-           /*if (pdi.nr_dirty_pages>0 && flush_flag == 0){
+           if (pdi.nr_dirty_pages>0 && flush_flag == 0){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
-               printk("DepTrack: checkpoint the process\n");
+               /*printk("DepTrack: checkpoint the process\n");
                spin_lock_irqsave(&tasklist_lock, flags);
                set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
                if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);
                 spin_unlock_irqrestore(&tasklist_lock, flags);
-                printk("DepTrack: finished the checkpoint\n");
+                printk("DepTrack: finished the checkpoint\n");*/
+
                 flush_flag +=1;
+                int pid;
+                pid = do_fork(SIGCHILD, (unsigned long)toy_func, 0, NULL, NULL, 0);
+                if(pid<0){
+                    printk("DepTrack: fork fails\n");
+                }
+                else{
+                    printk("DepTrack: fork succeeds\n");
+                }
+
                
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
 
                
                // printk("DepTrack: called flush_register_value successfully\n");
                
-           }*/
+           }
            printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
 
 

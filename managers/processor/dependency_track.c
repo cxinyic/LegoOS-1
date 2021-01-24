@@ -355,7 +355,7 @@ static int dependency_track(void *unused){
 
                 flush_flag +=1;
                 int pid;
-                pid = do_fork(SIGCHILD, (unsigned long)toy_func, 0, NULL, NULL, 0);
+                pid = do_fork(SIGCHLD, (unsigned long)toy_func, 0, NULL, NULL, 0);
                 if(pid<0){
                     printk("DepTrack: fork fails\n");
                 }

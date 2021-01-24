@@ -505,9 +505,12 @@ static void deptrack_create_restorer(struct restorer_work_info *info)
 
 int deptrack_restore_worker_thread(void* unused)
 {
-    set_cpus_allowed_ptr(current, cpu_possible_mask);
+    // set_cpus_allowed_ptr(current, cpu_possible_mask);
+    if (pin_current_thread()){
+        printk("TaskTrack: fail to pin task_track thread\n");
+    }
     printk("Restore: begin\n");
-    for(;;)
+    while (1)
     {
         /*set_current_state(TASK_UNINTERRUPTIBLE);
 		if (list_empty(&restorer_work_list))

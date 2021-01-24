@@ -518,7 +518,7 @@ int deptrack_restore_worker_thread(void* unused)
 		__set_current_state(TASK_RUNNING);*/
         sleep(1);
         printk("Restore: wake up\n");
-        /*spin_lock(&restorer_work_lock);
+        spin_lock(&restorer_work_lock);
 		while (!list_empty(&restorer_work_list)) {
 			struct restorer_work_info *info;
 
@@ -533,7 +533,7 @@ int deptrack_restore_worker_thread(void* unused)
 
 			spin_lock(&restorer_work_lock);
 		}
-		spin_unlock(&restorer_work_lock);*/
+		spin_unlock(&restorer_work_lock);
     }
     return 0;
     /*if(!list_empty(&restorer_work_list)){

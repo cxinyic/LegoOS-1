@@ -28,6 +28,12 @@ struct restorer_work_info {
 	struct list_head	list;
 };
 
+static inline void sleep(unsigned sec)
+{
+    __set_current_state(TASK_INTERRUPTIBLE);
+    schedule_timeout(sec * HZ);
+}
+
 static void deptrack_save_thread_regs(struct task_struct *p, struct ss_task_struct *ss)
 {
     struct pt_regs *src = task_pt_regs(p);
@@ -503,10 +509,11 @@ int deptrack_restore_worker_thread(void* unused)
     printk("Restore: begin\n");
     for(;;)
     {
-        set_current_state(TASK_UNINTERRUPTIBLE);
+        /*set_current_state(TASK_UNINTERRUPTIBLE);
 		if (list_empty(&restorer_work_list))
 			schedule();
-		__set_current_state(TASK_RUNNING);
+		__set_current_state(TASK_RUNNING);*/
+        sleep(1);
         spin_lock(&restorer_work_lock);
 		while (!list_empty(&restorer_work_list)) {
 			struct restorer_work_info *info;

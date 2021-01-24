@@ -460,6 +460,7 @@ done:
 
 static int deptrack_restorer_for_group_leader(void *_info)
 {
+    struct restorer_work_info *info = _info;
     printk("Restore: step2\n");
     complete(info->done);
     return 0;

@@ -247,7 +247,7 @@ static int deptrack_do_checkpoint_process(struct task_struct *leader)
     ret = __deptrack_do_checkpoint_process(leader);
     preempt_enable_no_resched();
 
-    //restore_process_snapshot(deptrack_dequeue_pss());
+    restore_process_snapshot(deptrack_dequeue_pss());
     return ret;
 }
 

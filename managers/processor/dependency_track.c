@@ -13,19 +13,7 @@
 #include <lego/checkpoint.h>
 #include <asm/prctl.h>
 
-static LIST_HEAD(pss_list);
-static DEFINE_SPINLOCK(pss_lock);
-static LIST_HEAD(restorer_work_list);
-static DEFINE_SPINLOCK(restorer_work_lock);
-struct restorer_work_info current_info;
 
-struct restorer_work_info {
-	struct process_snapshot	*pss;
-	struct task_struct	*result;
-	struct completion	*done;
-
-	struct list_head	list;
-};
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;

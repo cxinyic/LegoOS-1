@@ -348,13 +348,15 @@ static int dependency_track(void *unused){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
-               /*printk("DepTrack: checkpoint the process\n");
+               printk("DepTrack: checkpoint the process\n");
                spin_lock_irqsave(&tasklist_lock, flags);
                set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
                if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);
                 spin_unlock_irqrestore(&tasklist_lock, flags);
-                printk("DepTrack: finished the checkpoint\n");*/
+                printk("DepTrack: finished the checkpoint\n");
+                kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+                printk("DepTrack: kill the process\n");
 
                 flush_flag +=1;
                 /*int pid;

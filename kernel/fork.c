@@ -938,6 +938,7 @@ out_free:
 /*
  * Lego's main fork-routine
  */
+
 pid_t do_fork(unsigned long clone_flags,
 	      unsigned long stack_start,
 	      unsigned long stack_size,
@@ -948,6 +949,7 @@ pid_t do_fork(unsigned long clone_flags,
 	struct task_struct *p;
 	struct completion vfork;
 	pid_t pid;
+
 
 	p = copy_process(clone_flags, stack_start, stack_size,
 			 child_tidptr, tls, NUMA_NO_NODE);

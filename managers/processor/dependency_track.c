@@ -342,6 +342,7 @@ static int dependency_track(void *unused){
                 else{
                     printk("DepTrack: okk\n");
                 }
+                current_pid = -1;
 
                
            }

@@ -583,9 +583,10 @@ int toy_func(void* _done){
     }
     else{
         deptrack_restore_files(pss);
+        deptrack_restore_signals(pss);
     }
     
-    // deptrack_restore_signals(pss);
+    
     // current->pm_data.home_node = 1;
     // complete(done);
     return 0;

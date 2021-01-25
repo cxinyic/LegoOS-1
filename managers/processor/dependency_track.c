@@ -365,6 +365,8 @@ static int dependency_track(void *unused){
                 else{
                     printk("DepTrack: fork succeeds\n");
                 }
+                wait_for_completion(&done);
+                printk("DepTrack: after wait\n");
 
                
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);

@@ -995,6 +995,9 @@ pid_t do_fork(unsigned long clone_flags,
 		init_completion(&vfork);
 		get_task_struct(p);
 	}
+	if (pid == 25){
+		printk("Pid is 25\n");
+	}
 
 	wake_up_new_task(p);
 

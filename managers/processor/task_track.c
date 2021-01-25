@@ -575,6 +575,11 @@ int toy_func(void* _done){
     // struct completion * done = _done;
     printk("Hi: I am a toy func\n");
     memcpy(current->comm, "TOY", TASK_COMM_LEN);
+    struct restorer_work_info *info;
+    info = list_entry(restorer_work_list.next,
+					struct restorer_work_info, list);
+    printk("toy func step1\n");
+    struct process_snapshot *pss = info->pss;
     deptrack_restore_files(pss);
     // deptrack_restore_signals(pss);
     // current->pm_data.home_node = 1;

@@ -232,9 +232,9 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 
 
 static int toy_func(void* _done){
-    struct completion * done = _done;
+    // struct completion * done = _done;
     printk("Hi: I am a toy func\n");
-    complete(done);
+    // complete(done);
     return 0;
 }
 
@@ -356,7 +356,7 @@ static int dependency_track(void *unused){
                 printk("DepTrack: finished the checkpoint\n");*/
 
                 flush_flag +=1;
-                int pid;
+                /*int pid;
                 DEFINE_COMPLETION(done);
                 pid = do_fork(SIGCHLD, (unsigned long)toy_func, (unsigned long)&done, NULL, NULL, 0);
                 if(pid<0){
@@ -366,7 +366,15 @@ static int dependency_track(void *unused){
                     printk("DepTrack: fork succeeds\n");
                 }
                 wait_for_completion(&done);
-                printk("DepTrack: after wait\n");
+                printk("DepTrack: after wait\n");*/
+                struct task_struct *ret1 __maybe_unused;
+
+	            ret1 = kthread_run(toy_func, NULL, "toy_func");
+                if (IS_ERR(ret1))
+		                panic("Fail to create toy func thread!");
+                else{
+                    printk("DepTrack: okk\n");
+                }
 
                
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);

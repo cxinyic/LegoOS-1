@@ -45,6 +45,7 @@ void complete(struct completion *x)
 		x->done++;
 	__wake_up_locked(&x->wait, TASK_NORMAL, 1);
 	spin_unlock_irqrestore(&x->wait.lock, flags);
+	printk("DepTrack: complete1\n");
 }
 
 /**

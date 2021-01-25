@@ -37,6 +37,7 @@
  */
 void complete(struct completion *x)
 {
+	printk("DepTrack: complete\n");
 	unsigned long flags;
 
 	spin_lock_irqsave(&x->wait.lock, flags);

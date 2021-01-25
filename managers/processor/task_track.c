@@ -403,6 +403,7 @@ static void deptrack_restore_signals(struct process_snapshot *pss)
 static void deptrack_restore_thread_state(struct task_struct *p,
 				 struct ss_task_struct *ss_task)
 {
+    printk("Restore: thread state\n");
 	struct pt_regs *dst = task_pt_regs(p);
 	struct ss_thread_gregs *src = &(ss_task->user_regs.gregs);
 
@@ -440,6 +441,7 @@ static void deptrack_restore_thread_state(struct task_struct *p,
 		do_arch_prctl(p, ARCH_SET_FS, src->fs_base);
 	if (src->gs_base)
 		do_arch_prctl(p, ARCH_SET_GS, src->gs_base);
+    printk("Restore: finish thread state\n");
 }
 
 
@@ -584,6 +586,8 @@ int toy_func(void* _done){
     else{
         deptrack_restore_files(pss);
         deptrack_restore_signals(pss);
+        current->pm_data.home_node = 1;
+        deptrack_restore_thread_state(pss);
     }
     
     

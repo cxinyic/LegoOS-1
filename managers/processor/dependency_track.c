@@ -234,6 +234,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 static int toy_func(void* _done){
     // struct completion * done = _done;
     printk("Hi: I am a toy func\n");
+    memcpy(current->comm, "TOY", TASK_COMM_LEN);
     // complete(done);
     return 0;
 }

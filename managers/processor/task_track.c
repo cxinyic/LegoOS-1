@@ -587,7 +587,7 @@ int toy_func(void* _done){
         deptrack_restore_files(pss);
         deptrack_restore_signals(pss);
         current->pm_data.home_node = 1;
-        deptrack_restore_thread_state(pss);
+        deptrack_restore_thread_state(current, pss);
     }
     
     

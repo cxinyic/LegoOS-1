@@ -231,13 +231,6 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 }
 
 
-static int toy_func(void* _done){
-    // struct completion * done = _done;
-    printk("Hi: I am a toy func\n");
-    memcpy(current->comm, "TOY", TASK_COMM_LEN);
-    // complete(done);
-    return 0;
-}
 
 int flush_flag = 0;
 
@@ -337,12 +330,21 @@ static int dependency_track(void *unused){
                printk("DepTrack: kill the process\n");
 
                
-           }
+           }*/
            if (flush_flag == 1){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                flush_flag +=1;
+               struct task_struct *ret1 __maybe_unused;
+
+	            ret1 = kthread_run(toy_func, NULL, "toy_func");
+                if (IS_ERR(ret1))
+		                panic("Fail to create toy func thread!");
+                else{
+                    printk("DepTrack: okk\n");
+                }
+
                
-           }*/
+           }
             
            if (pdi.nr_dirty_pages>0 && flush_flag == 0){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
@@ -370,15 +372,7 @@ static int dependency_track(void *unused){
                 }
                 wait_for_completion(&done);
                 printk("DepTrack: after wait\n");*/
-                struct task_struct *ret1 __maybe_unused;
-
-	            ret1 = kthread_run(toy_func, NULL, "toy_func");
-                if (IS_ERR(ret1))
-		                panic("Fail to create toy func thread!");
-                else{
-                    printk("DepTrack: okk\n");
-                }
-
+                
                
                // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
 

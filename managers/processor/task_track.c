@@ -570,3 +570,11 @@ void  deptrack_checkpoint_init(void)
 		panic("Fail to create task restore thread!");
 
 }
+
+int toy_func(void* _done){
+    // struct completion * done = _done;
+    printk("Hi: I am a toy func\n");
+    memcpy(current->comm, "TOY", TASK_COMM_LEN);
+    // complete(done);
+    return 0;
+}

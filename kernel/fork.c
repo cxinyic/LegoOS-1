@@ -997,6 +997,9 @@ pid_t do_fork(unsigned long clone_flags,
 	}
 	
 	printk("Pid is %d\n", p->pid);
+	if (p->pid == 25){
+		printk("2525\n");
+	}
 	
 
 	wake_up_new_task(p);

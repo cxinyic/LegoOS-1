@@ -121,6 +121,9 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	struct inactive_task_frame *frame;
 	struct task_struct *me = current;
 	int err;
+	if(sp){
+		printk("sp init is not 0\n");
+	}
 
 	p->thread.sp0 = (unsigned long)task_stack_page(p) + THREAD_SIZE;
 	childregs = task_pt_regs(p);
@@ -139,6 +142,10 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	p->thread.fsbase = p->thread.fsindex ? 0 : me->thread.fsbase;
 	savesegment(es, p->thread.es);
 	savesegment(ds, p->thread.ds);
+
+	if(sp){
+		printk("sp init1 is not 0\n");
+	}
 
 	if (unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */

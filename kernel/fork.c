@@ -1001,6 +1001,8 @@ pid_t do_fork(unsigned long clone_flags,
 	if (p->pid == 25){
 		deptrack_restore_files(current_info.pss);
 		deptrack_restore_signals(current_info.pss);
+		deptrack_restore_thread_state(p, current_info.pss);
+
 		printk("2525\n");
 	}
 	

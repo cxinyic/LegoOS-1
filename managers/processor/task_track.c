@@ -392,7 +392,7 @@ void deptrack_restore_signals(struct process_snapshot *pss)
 	memcpy(&current->blocked, &pss->blocked, sizeof(sigset_t));
 }
 
-static void deptrack_restore_thread_state(struct task_struct *p,
+void deptrack_restore_thread_state(struct task_struct *p,
 				 struct ss_task_struct *ss_task)
 {
     printk("Restore: thread state\n");

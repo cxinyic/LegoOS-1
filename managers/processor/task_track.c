@@ -376,8 +376,7 @@ printk("Restore: step35\n");
 out:
 	return ret;
 }
-
-static void deptrack_restore_signals(struct process_snapshot *pss)
+void deptrack_restore_signals(struct process_snapshot *pss)
 {
      printk("Restore: step4\n");
 	struct k_sigaction *k_action = current->sighand->action;

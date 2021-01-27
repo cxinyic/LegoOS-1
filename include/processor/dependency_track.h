@@ -69,6 +69,7 @@ extern unsigned short fs_value;
 extern struct restorer_work_info current_info;
 
 int deptrack_restore_files(struct process_snapshot *pss);
+void deptrack_restore_signals(struct process_snapshot *pss);
 
 
 

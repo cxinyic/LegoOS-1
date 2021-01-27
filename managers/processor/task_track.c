@@ -56,6 +56,9 @@ static void deptrack_save_thread_regs(struct task_struct *p, struct ss_task_stru
 	COPY_REG(ss);
 #undef COPY_REG
 
+printk("DepTrack: checkpoint sp is %lx\n", dst->sp);
+printk("DepTrack: checkpoint ip is %lx\n", dst->ip);
+
 	dst->fs_base	= p->thread.fsbase;
 	dst->gs_base	= p->thread.gsbase;
 

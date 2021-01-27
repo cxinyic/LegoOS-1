@@ -112,6 +112,10 @@ SYSCALL_DEFINE2(arch_prctl, int, code, unsigned long, addr)
 int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		unsigned long arg, struct task_struct *p, unsigned long tls)
 {
+	printk("clone flags is %lx\n", clone_flags);
+	printk("sp is %lx\n", sp);
+	printk("arg is %lx\n", arg);
+	printk("tls is %lx\n", tls);
 	struct pt_regs *childregs;
 	struct fork_frame *fork_frame;
 	struct inactive_task_frame *frame;
@@ -148,7 +152,6 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 
 	childregs->ax = 0;
 	if (sp)
-		printk("Restore: sp1 is %lx\n", sp);
 		childregs->sp = sp;
 
 	/*

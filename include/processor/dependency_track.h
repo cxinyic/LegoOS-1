@@ -4,6 +4,7 @@
 #include <lego/types.h>
 #include <processor/dependency_vector.h>
 #include <lego/comp_common.h>
+#include <lego/checkpoint.h>
 
 /*
  * dp_info struct: 
@@ -39,6 +40,14 @@ struct dp_idx{
     int addr_idx;
 }; 
 
+struct restorer_work_info {
+	struct process_snapshot	*pss;
+	struct task_struct	*result;
+	struct completion	*done;
+
+	struct list_head	list;
+};
+
 /*
  * nr_dp_info: number of dp_info
  * dp_info_list: store those dp_info
@@ -57,6 +66,9 @@ extern unsigned short ds_value;
 extern unsigned short es_value;
 extern unsigned short gs_value;
 extern unsigned short fs_value;
+extern struct restorer_work_info current_info;
+
+int deptrack_restore_files(struct process_snapshot *pss);
 
 
 

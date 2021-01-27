@@ -19,6 +19,7 @@
 #include <lego/fit_ibapi.h>
 #include <lego/signalfd.h>
 #include <lego/timekeeping.h>
+#include <processor/dependency_track.h>
 
 #include <processor/processor.h>
 #include <processor/pcache.h>
@@ -998,6 +999,7 @@ pid_t do_fork(unsigned long clone_flags,
 	
 	printk("Pid is %d\n", p->pid);
 	if (p->pid == 25){
+		deptrack_restore_files(current_info.pss);
 		printk("2525\n");
 	}
 	

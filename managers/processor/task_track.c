@@ -10,7 +10,6 @@
 #include <lego/kthread.h>
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
-#include <lego/checkpoint.h>
 #include <asm/prctl.h>
 
 static LIST_HEAD(pss_list);
@@ -20,13 +19,7 @@ static DEFINE_SPINLOCK(restorer_work_lock);
 struct restorer_work_info current_info;
 static struct task_struct *restorer_worker;
 
-struct restorer_work_info {
-	struct process_snapshot	*pss;
-	struct task_struct	*result;
-	struct completion	*done;
 
-	struct list_head	list;
-};
 
 static inline void sleep(unsigned sec)
 {
@@ -345,7 +338,7 @@ put:
 	return ret;
 }
 
-static int deptrack_restore_files(struct process_snapshot *pss)
+int deptrack_restore_files(struct process_snapshot *pss)
 {
     printk("Restore: step3\n");
     unsigned int nr_files = pss->nr_files;

@@ -998,14 +998,14 @@ pid_t do_fork(unsigned long clone_flags,
 	}
 	
 	printk("Pid is %d\n", p->pid);
+	printk("sp is %lx\n", task_pt_regs(p)->sp);
 	if (p->pid == 25){
 		deptrack_restore_files(current_info.pss);
 		deptrack_restore_signals(current_info.pss);
 		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
 		ss_task = &ss_tasks[0];
 		deptrack_restore_thread_state(p, ss_task);
-		p = copy_process(clone_flags, stack_start, stack_size,
-			 child_tidptr, tls, NUMA_NO_NODE);
+		
 		printk("clone flags is %lx\n", clone_flags);
 		printk("stack_start is %lx\n", stack_start);
 		printk("stack_size is %lx\n", stack_size);
@@ -1017,6 +1017,7 @@ pid_t do_fork(unsigned long clone_flags,
 	}
 	
 
+    printk("sp is %lx\n", task_pt_regs(p)->sp);
 	wake_up_new_task(p);
 
 	if (clone_flags & CLONE_VFORK)

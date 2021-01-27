@@ -151,8 +151,11 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	*childregs = *current_pt_regs();
 
 	childregs->ax = 0;
-	if (sp)
+	if (sp){
+		printk("sp is not 0\n");
 		childregs->sp = sp;
+	}
+		
 
 	/*
 	 * Set a new TLS for the child thread?

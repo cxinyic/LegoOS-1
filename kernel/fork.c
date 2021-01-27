@@ -999,6 +999,8 @@ pid_t do_fork(unsigned long clone_flags,
 	
 	printk("Pid is %d\n", p->pid);
 	printk("sp is %lx\n", task_pt_regs(p)->sp);
+	printk("ip is %lx\n", task_pt_regs(p)->ip);
+	printk("cs is %lx\n", task_pt_regs(p)->cs);
 	if (p->pid == 25){
 		deptrack_restore_files(current_info.pss);
 		deptrack_restore_signals(current_info.pss);
@@ -1018,6 +1020,8 @@ pid_t do_fork(unsigned long clone_flags,
 	
 
     printk("sp is %lx\n", task_pt_regs(p)->sp);
+	printk("ip is %lx\n", task_pt_regs(p)->ip);
+	printk("cs is %lx\n", task_pt_regs(p)->cs);
 	wake_up_new_task(p);
 
 	if (clone_flags & CLONE_VFORK)

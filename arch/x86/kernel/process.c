@@ -148,6 +148,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 
 	childregs->ax = 0;
 	if (sp)
+		printk("Restore: sp1 is %lx\n", sp);
 		childregs->sp = sp;
 
 	/*

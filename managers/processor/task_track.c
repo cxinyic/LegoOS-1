@@ -428,6 +428,7 @@ void deptrack_restore_thread_state(struct task_struct *p,
 	RESTORE_REG(sp);
 	RESTORE_REG(ss);
 #undef RESTORE_REG
+printk("Restore: sp2 is %lx\n", dst->sp);
 
 	if (src->fs_base)
 		do_arch_prctl(p, ARCH_SET_FS, src->fs_base);

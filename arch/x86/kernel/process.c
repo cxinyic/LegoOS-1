@@ -122,11 +122,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 
 	p->thread.sp0 = (unsigned long)task_stack_page(p) + THREAD_SIZE;
 	childregs = task_pt_regs(p);
-	printk("childregs sp is %lx\n",childregs->sp);
-	printk("childregs ip is %lx\n",childregs->ip);
-	printk("childregs cs is %lx\n",childregs->cs);
 	
-
 	fork_frame = container_of(childregs, struct fork_frame, regs);
 	frame = &fork_frame->frame;
 	frame->bp = 0;
@@ -134,7 +130,6 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	frame->ret_addr = (unsigned long)ret_from_fork;
 	/* __switch_to_asm will switch to this sp */
 	p->thread.sp = (unsigned long)fork_frame;
-	printk("child thread sp is %lx\n",p->thread.sp );
 	p->thread.io_bitmap_ptr = NULL;
 
 	savesegment(gs, p->thread.gsindex);
@@ -157,6 +152,11 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	}
 	frame->bx = 0;
 	*childregs = *current_pt_regs();
+	printk("childregs sp is %lx\n",childregs->sp);
+	printk("childregs ip is %lx\n",childregs->ip);
+	printk("childregs cs is %lx\n",childregs->cs);
+		printk("child thread sp is %lx\n",p->thread.sp );
+	
 
 	childregs->ax = 0;
 	if (sp){

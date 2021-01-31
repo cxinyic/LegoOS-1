@@ -139,12 +139,10 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	savesegment(es, p->thread.es);
 	savesegment(ds, p->thread.ds);
 
-	if(sp){
-		printk("sp init1 is not 0\n");
-	}
 
 	if (unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */
+		printk("fork a kernel thread\n");
 		memset(childregs, 0, sizeof(struct pt_regs));
 		frame->bx = sp;		/* function */
 		frame->r12 = arg;

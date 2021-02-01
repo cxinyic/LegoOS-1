@@ -792,8 +792,10 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_sighand;
 	if(pid==25){
 		printk("Pid is 25\n");
+#ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);
+#endif
 
 	}
 

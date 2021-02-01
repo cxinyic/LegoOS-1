@@ -1034,6 +1034,7 @@ pid_t do_fork(unsigned long clone_flags,
     printk("sp is %lx\n", task_pt_regs(p)->sp);
 	printk("ip is %lx\n", task_pt_regs(p)->ip);
 	printk("cs is %lx\n", task_pt_regs(p)->cs);*/
+	p->pm_data.home_node = 1;
 	wake_up_new_task(p);
 
 	if (clone_flags & CLONE_VFORK)

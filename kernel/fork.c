@@ -767,7 +767,11 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	
 	p->pid = pid;
 	if(pid == 25){
+		printk("pid is 25\n");
 		p->fs = current_tsk->fs;
+	}
+	else{
+		printk("pid is not 25\n");
 	}
 	if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;

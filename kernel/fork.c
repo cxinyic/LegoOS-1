@@ -430,6 +430,7 @@ static int copy_mm(unsigned long clone_flags, struct task_struct *tsk)
 	}
 
 	mm = dup_mm_struct(tsk);
+
 	if (!mm)
 		return -ENOMEM;
 
@@ -729,12 +730,26 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		return ERR_PTR(-EINVAL);
 
 	/* Duplicate task_struct and create new stack */
-	p = dup_task_struct(current, node);
+	if (!(clone_flags & CLONE_IDLE_THREAD)) {
+		pid = alloc_pid(p);
+		if (!pid)
+			goto out_cleanup_thread;
+	}
+	if(pid == 25){
+		clone_flags |= CLONE_GLOBAL_THREAD;
+	}
+	if (pid == 25){
+		p = dup_task_struct(current_tsk, node);
+	}
+	else{
+		p = dup_task_struct(current, node);
+	}
 	if (!p)
 		return ERR_PTR(-ENOMEM);
 
 	/* rt_mutex and PI stuff */
 	spin_lock_init(&p->pi_lock);
+
 
 	p->flags &= ~(PF_SUPERPRIV | PF_WQ_WORKER | PF_IDLE);
 	p->flags |= PF_FORKNOEXEC;
@@ -751,24 +766,58 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	p->start_time = ktime_get_ns();
 	p->real_start_time = ktime_get_boot_ns();
 	p->pagefault_disabled = 0;
-	p->fs = current->fs;
-
-	if (!(clone_flags & CLONE_IDLE_THREAD)) {
-		pid = alloc_pid(p);
-		if (!pid)
-			goto out_cleanup_thread;
+	if(pid == 25){
+		p->fs = current_tsk->fs;
 	}
+	else{
+		p->fs = current->fs;
+	}
+
+	
 	p->pid = pid;
 
 	/*
 	 * Now do the dirty work.
 	 */
+	if (pid == 25){
+		strcpy(p->fs.cwd, current_tsk->fs.cwd);
+		strcpy(p->fs.root, current_tsk->fs.root);
+		memcpy((void*)(&p->fs.lock), (void*)(&current_tsk->fs.lock), sizeof(p->fs.lock));
+		p->fs.umask = current_tsk->fs.umask;
+		p->fs.users = current_tsk->fs.users;
+		retval = 0;
 
-	retval = copy_fs(p);
+	}
+	else{
+		retval = copy_fs(p);
+	}
 	if (retval < 0)
 		goto out_free;
 
-	retval = copy_creds(p, clone_flags);
+	if (pid == 25){
+		struct cred *new;
+		struct cred *old = current_tsk->cred;
+
+		if (clone_flags & CLONE_THREAD) {
+			p->real_cred = get_cred(p->cred);
+			p->cred = get_cred(p->cred);
+		}
+		
+
+		new = kmalloc(sizeof(*new), GFP_KERNEL);
+
+		*new = *old;
+		atomic_set(&new->usage, 0);
+
+		p->real_cred = get_cred(p->cred);
+		p->cred = get_cred(p->cred);
+		retval = 0;
+
+	}
+	else{
+		retval = copy_creds(p, clone_flags);
+	}
+	
 	if (retval < 0)
 		goto out_free;
 
@@ -777,36 +826,101 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_creds;
 
-	
+	if(pid == 25){
+		struct files_struct *oldf, *newf;
 
-	retval = copy_files(clone_flags, p);
+		oldf = current_tsk->files;
+		newf = dup_fd(oldf);
+		p->files = newf;
+		retval = 0;
+	}
+	else{
+		retval = copy_files(clone_flags, p);
+	}
 	if (retval)
 		goto out_cleanup_sched;
-
-	retval = copy_sighand(clone_flags, p);
+	
+	if(pid == 25){
+		struct sighand_struct *sig;
+		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
+		memcpy(sig->action, current_tsk->sighand->action, sizeof(sig->action));
+		spin_lock_init(&sig->siglock);
+		atomic_set(&sig->count, 1);
+		init_waitqueue_head(&sig->signalfd_wqh);	
+		p->sighand = sig;
+	}
+	else{
+		retval = copy_sighand(clone_flags, p);
+	}
 	if (retval)
 		goto out_cleanup_files;
+	
+	if(pid == 25){
+		struct signal_struct *sig;
+		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
+		p->signal = sig;
 
-	retval = copy_signal(clone_flags, p);
+		sig->nr_threads = 1;
+		atomic_set(&sig->live, 1);
+		atomic_set(&sig->sigcnt, 1);
+
+		sig->thread_head = (struct list_head)LIST_HEAD_INIT(p->thread_node);
+		tsk->thread_node = (struct list_head)LIST_HEAD_INIT(sig->thread_head);
+
+		init_waitqueue_head(&sig->wait_chldexit);
+		sig->curr_target = p;
+		init_sigpending(&sig->shared_pending);
+		INIT_LIST_HEAD(&sig->posix_timers);
+		spin_lock_init(&sig->stats_lock);
+		init_timer(&sig->real_timer);
+		sig->real_timer.function = it_real_fn;
+
+		task_lock(current_tsk->group_leader);
+		memcpy(sig->rlim, current_tsk->signal->rlim, sizeof sig->rlim);
+		task_unlock(current_tsk->group_leader);
+	}
+	else{
+		retval = copy_signal(clone_flags, p);
+	}
+
 	if (retval)
 		goto out_cleanup_sighand;
-	if(pid==25){
+	/*if(pid==25){
 		printk("Pid is 25\n");
 #ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);
 #endif
 
-	}
+	}*/
 
 	/*
 	 * copy_mm may use the memory home node of p
 	 * to setup a new dist_vma. So initialzie
 	 * the processor_data first.
 	 */
-	fork_processor_data(p, current, clone_flags);
-
-	retval = copy_mm(clone_flags, p);
+	if(pid == 25){
+		fork_processor_data(p, current_tsk, clone_flags);
+	}
+	else{
+		fork_processor_data(p, current, clone_flags);
+	}
+	
+	if(pid == 25){
+		struct mm_struct *mm, *oldmm;
+		p->mm = p->active_mm = NULL;
+		p->nvcsw = p->nivcsw = 0;
+		oldmm = current_tsk->mm;	
+		mm = kmalloc(sizeof(*mm), GFP_KERNEL);
+		memcpy(mm, oldmm, sizeof(*mm));
+		processor_fork_dup_distvm(p, mm, oldmm);
+		p->mm = mm;
+		p->active_mm = mm;
+		retval = 0;
+	}
+	else{
+		retval = copy_mm(clone_flags, p);
+	}
 	if (retval)
 		goto out_cleanup_signal;
 
@@ -995,7 +1109,13 @@ pid_t do_fork(unsigned long clone_flags,
 		 * we got VMA info from remote memory.
 		 * Walk through page table entries.
 		 */
-		ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
+		if(p->pid == 25){
+			ret = fork_dup_pcache(p, p->mm, current_tsk->mm, vmainfo);
+			printk("pid 25 ret is %d\n", ret);
+		}
+		else{
+			ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
+		}
 		if (ret) {
 			WARN_ON_ONCE(1);
 			return ret;

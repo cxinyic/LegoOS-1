@@ -262,9 +262,7 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 
 	handle_pcache_debug("I nid:%u pid:%u tgid:%u flags:%x vaddr:%#Lx",
 		src_nid, msg->pid, tgid, flags, vaddr);
-	if(tgid==25){
-		tgid=24;
-	}
+	
 	p = find_lego_task_by_pid(src_nid, tgid);
 	if (unlikely(!p)) {
 		pr_info("%s(): src_nid: %d tgid: %d\n", __func__, src_nid, tgid);

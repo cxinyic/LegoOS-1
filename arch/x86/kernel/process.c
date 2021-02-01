@@ -155,7 +155,12 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		return 0;
 	}
 	frame->bx = 0;
-	*childregs = *current_pt_regs();
+	if(p->pid == 25){
+		*childregs = *task_pt_regs(current_tsk);
+	}
+	else{
+		*childregs = *current_pt_regs();
+	}
 	if(p->pid==25){
 		printk("pid 25 restore registers\n");
 #ifdef CONFIG_COMP_PROCESSOR

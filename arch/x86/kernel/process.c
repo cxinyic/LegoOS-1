@@ -25,6 +25,8 @@
 #include <asm/switch_to.h>
 #include <asm/fpu/internal.h>
 
+#include <processor/dependency_track.h>
+
 __visible DEFINE_PER_CPU(unsigned long, rsp_scratch);
 
 /*

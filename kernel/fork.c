@@ -977,6 +977,9 @@ pid_t do_fork(unsigned long clone_flags,
 	 * might get invalid after that point, if the thread exits quickly.
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
+    if (p->pid == 25){
+		clone_flags |= CLONE_GLOBAL_THREAD;
+	}
 	if (clone_flags & CLONE_GLOBAL_THREAD) {
 		void *vmainfo;
 		int ret;

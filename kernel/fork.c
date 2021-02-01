@@ -1077,6 +1077,7 @@ pid_t do_fork(unsigned long clone_flags,
 	struct task_struct *p;
 	struct completion vfork;
 	pid_t pid;
+	printk("do_fork here\n");
 
 
 	p = copy_process(clone_flags, stack_start, stack_size,

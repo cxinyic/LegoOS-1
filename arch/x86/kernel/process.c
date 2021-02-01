@@ -146,12 +146,9 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 
 	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */
-		printk("fork a kernel thread\n");
 		memset(childregs, 0, sizeof(struct pt_regs));
 		frame->bx = sp;		/* function */
 		frame->r12 = arg;
-		printk("frame bx is %lx\n", frame->bx);
-		printk("frame r12 is %lx\n", frame->r12);
 		return 0;
 	}
 	frame->bx = 0;

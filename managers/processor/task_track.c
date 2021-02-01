@@ -370,7 +370,7 @@ int deptrack_restore_files(struct task_struct *p, struct process_snapshot *pss)
 			continue;
 		}
 printk("Restore: step35\n");
-		ret = deptrack_restore_sys_open(ss_f);
+		ret = deptrack_restore_sys_open(p, ss_f);
         printk("Restore: step36\n");
 		if (ret)
 			goto out;

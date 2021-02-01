@@ -773,7 +773,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	}
 	if(pid == 25){
-		arch_dup_task_struct(p, current_tsk)
+		arch_dup_task_struct(p, current_tsk);
 	}
 
 

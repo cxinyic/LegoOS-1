@@ -138,6 +138,8 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	p->thread.fsbase = p->thread.fsindex ? 0 : me->thread.fsbase;
 	savesegment(es, p->thread.es);
 	savesegment(ds, p->thread.ds);
+	
+	printk("p->flags is %lx\n", p->flags);
 
 
 	if (unlikely(p->flags & PF_KTHREAD)) {

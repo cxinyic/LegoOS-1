@@ -139,7 +139,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	savesegment(es, p->thread.es);
 	savesegment(ds, p->thread.ds);
 	
-	printk("p->flags is %lx\n", p->flags);
+	printk("p->flags is %d\n", p->flags);
 
 
 	if (unlikely(p->flags & PF_KTHREAD)) {

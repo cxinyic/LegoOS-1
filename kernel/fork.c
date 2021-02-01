@@ -776,9 +776,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	}
-	if(pid == 25){
+	/*if(pid == 25){
 		arch_dup_task_struct(p, current_tsk);
-	}
+	}*/
 
 
 	/*
@@ -891,7 +891,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_sighand;
 	/*if(pid==25){
-		printk("Pid is 25\n");
+
 #ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);

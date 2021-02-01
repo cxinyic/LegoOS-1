@@ -142,7 +142,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	printk("p->flags is %d\n", p->flags);
 
 
-	if (unlikely(p->flags & PF_KTHREAD)) {
+	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */
 		printk("fork a kernel thread\n");
 		memset(childregs, 0, sizeof(struct pt_regs));
@@ -154,14 +154,22 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	}
 	frame->bx = 0;
 	*childregs = *current_pt_regs();
+	if(p->pid==25){
+		printk("pid 25 restore registers\n");
+		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
+		ss_task = &ss_tasks[0];
+		deptrack_restore_thread_state(p, ss_task);
+
+	}
+	
 	printk("childregs sp is %lx\n",childregs->sp);
 	printk("childregs ip is %lx\n",childregs->ip);
 	printk("childregs cs is %lx\n",childregs->cs);
-		printk("child thread sp is %lx\n",p->thread.sp );
+	printk("child thread sp is %lx\n",p->thread.sp );
 	
 
 	childregs->ax = 0;
-	if (sp){
+	if (p->pid!=25 && sp){
 		childregs->sp = sp;
 	}
 		

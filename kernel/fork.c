@@ -758,6 +758,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		if (!pid)
 			goto out_cleanup_thread;
 	}
+	p->pid = pid;
 
 	/*
 	 * Now do the dirty work.
@@ -831,7 +832,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		sas_ss_reset(p);
 
 	/* ok, now we should be set up.. */
-	p->pid = pid;
+	
 	if (clone_flags & CLONE_THREAD) {
 		p->exit_signal = -1;
 		p->group_leader = current->group_leader;

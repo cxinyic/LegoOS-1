@@ -730,20 +730,11 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		return ERR_PTR(-EINVAL);
 
 	/* Duplicate task_struct and create new stack */
-	if (!(clone_flags & CLONE_IDLE_THREAD)) {
-		pid = alloc_pid(p);
-		if (!pid)
-			goto out_cleanup_thread;
-	}
-	if(pid == 25){
-		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
-	if (pid == 25){
-		p = dup_task_struct(current_tsk, node);
-	}
-	else{
-		p = dup_task_struct(current, node);
-	}
+	
+	
+	
+	p = dup_task_struct(current, node);
+	
 	if (!p)
 		return ERR_PTR(-ENOMEM);
 
@@ -766,15 +757,25 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	p->start_time = ktime_get_ns();
 	p->real_start_time = ktime_get_boot_ns();
 	p->pagefault_disabled = 0;
+	p->fs = current->fs;
+	
+	if (!(clone_flags & CLONE_IDLE_THREAD)) {
+		pid = alloc_pid(p);
+		if (!pid)
+			goto out_cleanup_thread;
+	}
+	
+	p->pid = pid;
 	if(pid == 25){
 		p->fs = current_tsk->fs;
 	}
-	else{
-		p->fs = current->fs;
+	if(pid == 25){
+		clone_flags |= CLONE_GLOBAL_THREAD;
+	}
+	if(pid == 25){
+		arch_dup_task_struct(p, current_tsk)
 	}
 
-	
-	p->pid = pid;
 
 	/*
 	 * Now do the dirty work.

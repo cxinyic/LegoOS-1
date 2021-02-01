@@ -865,7 +865,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		atomic_set(&sig->sigcnt, 1);
 
 		sig->thread_head = (struct list_head)LIST_HEAD_INIT(p->thread_node);
-		tsk->thread_node = (struct list_head)LIST_HEAD_INIT(sig->thread_head);
+		p->thread_node = (struct list_head)LIST_HEAD_INIT(sig->thread_head);
 
 		init_waitqueue_head(&sig->wait_chldexit);
 		sig->curr_target = p;

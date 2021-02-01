@@ -753,6 +753,12 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	p->pagefault_disabled = 0;
 	p->fs = current->fs;
 
+	if (!(clone_flags & CLONE_IDLE_THREAD)) {
+		pid = alloc_pid(p);
+		if (!pid)
+			goto out_cleanup_thread;
+	}
+
 	/*
 	 * Now do the dirty work.
 	 */
@@ -770,6 +776,8 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_creds;
 
+	
+
 	retval = copy_files(clone_flags, p);
 	if (retval)
 		goto out_cleanup_sched;
@@ -781,6 +789,12 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	retval = copy_signal(clone_flags, p);
 	if (retval)
 		goto out_cleanup_sighand;
+	if(pid==25){
+		printk("Pid is 25\n");
+		deptrack_restore_files(p, current_info.pss);
+		deptrack_restore_signals(p, current_info.pss);
+
+	}
 
 	/*
 	 * copy_mm may use the memory home node of p
@@ -798,11 +812,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_mm;
 
 	/* clone idle thread, whose pid is 0 */
-	if (!(clone_flags & CLONE_IDLE_THREAD)) {
-		pid = alloc_pid(p);
-		if (!pid)
-			goto out_cleanup_thread;
-	}
+	
 
 	p->set_child_tid = (clone_flags & CLONE_CHILD_SETTID) ? child_tidptr : NULL;
 	/*

@@ -286,7 +286,7 @@ int deptrack_checkpoint_thread(struct task_struct *p){
 
 }
 
-static int deptrack_restore_sys_open(struct ss_files *ss_f)
+static int deptrack_restore_sys_open(struct task_struct *p, struct ss_files *ss_f)
 {
     printk("Restore: open1\n");
 	struct file *f;
@@ -322,7 +322,7 @@ static int deptrack_restore_sys_open(struct ss_files *ss_f)
 
 
 	if (ret) {
-		free_fd(current->files, fd);
+		free_fd(p->files, fd);
 		goto put;
 	}
     printk("Restore: open7\n");
@@ -334,19 +334,19 @@ static int deptrack_restore_sys_open(struct ss_files *ss_f)
     
 	ret = f->f_op->open(f);
 	if (ret)
-		free_fd(current->files, fd);
+		free_fd(p->files, fd);
 
 put:
 	put_file(f);
 	return ret;
 }
 
-int deptrack_restore_files(struct process_snapshot *pss)
+int deptrack_restore_files(struct task_struct *p, struct process_snapshot *pss)
 {
     printk("Restore: step3\n");
     unsigned int nr_files = pss->nr_files;
     printk("Restore: step31\n");
-	struct files_struct *files = current->files;
+	struct files_struct *files = p->files;
     printk("Restore: step32\n");
 	int fd, ret;
 	struct file *f;
@@ -379,10 +379,10 @@ printk("Restore: step35\n");
 out:
 	return ret;
 }
-void deptrack_restore_signals(struct process_snapshot *pss)
+void deptrack_restore_signals(struct task_struct *p,struct process_snapshot *pss)
 {
-     printk("Restore: step4\n");
-	struct k_sigaction *k_action = current->sighand->action;
+    printk("Restore: step4\n");
+	struct k_sigaction *k_action = p->sighand->action;
 	struct sigaction *src, *dst;
 	int i;
 
@@ -392,7 +392,7 @@ void deptrack_restore_signals(struct process_snapshot *pss)
 		memcpy(dst, src, sizeof(*dst));
 	}
 
-	memcpy(&current->blocked, &pss->blocked, sizeof(sigset_t));
+	memcpy(&p->blocked, &pss->blocked, sizeof(sigset_t));
 }
 
 void deptrack_restore_thread_state(struct task_struct *p,

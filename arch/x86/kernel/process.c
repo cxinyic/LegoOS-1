@@ -163,7 +163,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 #ifdef CONFIG_COMP_PROCESSOR
 		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
 		ss_task = &ss_tasks[0];
-		// deptrack_restore_thread_state(p, ss_task);
+		deptrack_restore_thread_state(p, ss_task);
 #endif
 
 	}

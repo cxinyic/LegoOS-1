@@ -430,9 +430,14 @@ int pcache_add_rmap(struct pcache_meta *pcm, pte_t *page_table,
 
 	/* No duplication */
 	list_for_each_entry(pos, &pcm->rmap, next) {
-		BUG_ON(pos->page_table == page_table);
+		/*BUG_ON(pos->page_table == page_table);
 		BUG_ON(pos->owner_mm == owner_mm);
-		BUG_ON(pos->owner_process == owner_process);
+		BUG_ON(pos->owner_process == owner_process);*/
+		if (pos->page_table == page_table || pos->owner_mm == owner_mm
+			|| pos->owner_process == owner_process){
+				ret = 0;
+				goto out;
+		}
 	}
 
 add:

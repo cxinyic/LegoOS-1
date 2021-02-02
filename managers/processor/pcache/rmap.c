@@ -882,6 +882,7 @@ int pcache_zap_pte(struct mm_struct *mm, unsigned long address,
 
 	pcm = pte_to_pcache_meta(ptent);
 	if (unlikely(!pcm)) {
+		printk("pcache_zap_pte fail1\n");
 		pr_info("pte: %p ptent: %#lx address: %#lx\n",
 			pte, (unsigned long)ptent.pte, address);
 		dump_pte(pte, "corrupted");
@@ -933,6 +934,7 @@ int pcache_zap_pte(struct mm_struct *mm, unsigned long address,
 	 * 2) will not be selected as condidate cos we locked pcache.
 	 */
 	if (unlikely(!zpc.zapped)) {
+		printk("pcache_zap_pte fail2\n");
 		pr_info("pte: %p ptent: %#lx address: %#lx\n",
 			pte, (unsigned long)ptent.pte, address);
 		dump_pte(pte, "corrupted");

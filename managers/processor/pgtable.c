@@ -462,6 +462,10 @@ int pcache_copy_page_range(struct mm_struct *dst, struct mm_struct *src,
 	dst_pgd = pgd_offset(dst, addr);
 	src_pgd = pgd_offset(src, addr);
 	if(dst_task->pid == 25){
+		printk("pid 25 dst_mm is %lx\n", dst);
+		printk("pid 25 src_mm is %lx\n", src);
+	}
+	if(dst_task->pid == 25){
 		printk("pid 25 dst_pgd is %lx\n", dst_pgd);
 		printk("pid 25 src_pgd is %lx\n", src_pgd);
 	}

@@ -918,6 +918,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		oldmm = current_tsk->mm;	
 		mm = kmalloc(sizeof(*mm), GFP_KERNEL);
 		memcpy(mm, oldmm, sizeof(*mm));
+		mm_init(mm, p);
 		processor_fork_dup_distvm(p, mm, oldmm);
 		p->mm = mm;
 		p->active_mm = mm;

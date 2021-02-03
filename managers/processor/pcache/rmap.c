@@ -430,14 +430,14 @@ int pcache_add_rmap(struct pcache_meta *pcm, pte_t *page_table,
 
 	/* No duplication */
 	list_for_each_entry(pos, &pcm->rmap, next) {
-		/*BUG_ON(pos->page_table == page_table);
+		BUG_ON(pos->page_table == page_table);
 		BUG_ON(pos->owner_mm == owner_mm);
-		BUG_ON(pos->owner_process == owner_process);*/
-		if (pos->page_table == page_table || pos->owner_mm == owner_mm
+		BUG_ON(pos->owner_process == owner_process);
+		/*if (pos->page_table == page_table || pos->owner_mm == owner_mm
 			|| pos->owner_process == owner_process){
 				ret = 0;
 				goto out;
-		}
+		}*/
 	}
 
 add:
@@ -882,7 +882,6 @@ int pcache_zap_pte(struct mm_struct *mm, unsigned long address,
 
 	pcm = pte_to_pcache_meta(ptent);
 	if (unlikely(!pcm)) {
-		printk("pcache_zap_pte fail1\n");
 		pr_info("pte: %p ptent: %#lx address: %#lx\n",
 			pte, (unsigned long)ptent.pte, address);
 		dump_pte(pte, "corrupted");
@@ -934,11 +933,10 @@ int pcache_zap_pte(struct mm_struct *mm, unsigned long address,
 	 * 2) will not be selected as condidate cos we locked pcache.
 	 */
 	if (unlikely(!zpc.zapped)) {
-		/*printk("pcache_zap_pte fail2\n");
 		pr_info("pte: %p ptent: %#lx address: %#lx\n",
 			pte, (unsigned long)ptent.pte, address);
 		dump_pte(pte, "corrupted");
-		WARN_ON_ONCE(1);*/
+		WARN_ON_ONCE(1);
 		return 0;
 	}
 

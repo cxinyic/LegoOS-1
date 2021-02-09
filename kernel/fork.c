@@ -832,12 +832,13 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_creds;
 
 	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
-
 		oldf = current_tsk->files;
 		newf = dup_fd(oldf);
 		p->files = newf;
 		retval = 0;
+#endif
 	}
 	else{
 		retval = copy_files(clone_flags, p);
@@ -846,6 +847,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_sched;
 	
 	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		struct sighand_struct *sig;
 		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
 		memcpy(sig->action, current_tsk->sighand->action, sizeof(sig->action));
@@ -853,6 +855,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		atomic_set(&sig->count, 1);
 		init_waitqueue_head(&sig->signalfd_wqh);	
 		p->sighand = sig;
+#endif
 	}
 	else{
 		retval = copy_sighand(clone_flags, p);
@@ -861,6 +864,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_files;
 	
 	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		struct signal_struct *sig;
 		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
 		p->signal = sig;
@@ -883,6 +887,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		task_lock(current_tsk->group_leader);
 		memcpy(sig->rlim, current_tsk->signal->rlim, sizeof sig->rlim);
 		task_unlock(current_tsk->group_leader);
+#endif
 	}
 	else{
 		retval = copy_signal(clone_flags, p);
@@ -905,13 +910,16 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	 * the processor_data first.
 	 */
 	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		fork_processor_data(p, current_tsk, clone_flags);
+#endif
 	}
 	else{
 		fork_processor_data(p, current, clone_flags);
 	}
 	
 	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
 		struct mm_struct *mm, *oldmm;
 		p->mm = p->active_mm = NULL;
 		p->nvcsw = p->nivcsw = 0;
@@ -923,6 +931,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		p->mm = mm;
 		p->active_mm = mm;
 		retval = 0;
+#endif
 	}
 	else{
 		retval = copy_mm(clone_flags, p);

@@ -909,14 +909,14 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	 * to setup a new dist_vma. So initialzie
 	 * the processor_data first.
 	 */
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		fork_processor_data(p, current_tsk, clone_flags);
 #endif
 	}
-	else{
+	else{*/
 		fork_processor_data(p, current, clone_flags);
-	}
+	// }
 	
 	if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR

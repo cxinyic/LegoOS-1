@@ -1126,13 +1126,13 @@ pid_t do_fork(unsigned long clone_flags,
 		 * we got VMA info from remote memory.
 		 * Walk through page table entries.
 		 */
-		if(p->pid == 25){
+		/*if(p->pid == 25){
 			ret = fork_dup_pcache(p, p->mm, current_tsk->mm, vmainfo);
 			printk("pid 25 ret is %d\n", ret);
 		}
-		else{
+		else{*/
 			ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
-		}
+		// }
 		if (ret) {
 			WARN_ON_ONCE(1);
 			return ret;

@@ -160,7 +160,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	else{*/
 		*childregs = *current_pt_regs();
 	// }
-	/*if(p->pid==25){
+	if(p->pid==25){
 		printk("pid 25 restore registers\n");
 #ifdef CONFIG_COMP_PROCESSOR
 		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
@@ -168,7 +168,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		deptrack_restore_thread_state(p, ss_task);
 #endif
 
-	}*/
+	}
 	
 	printk("childregs sp is %lx\n",childregs->sp);
 	printk("childregs ip is %lx\n",childregs->ip);

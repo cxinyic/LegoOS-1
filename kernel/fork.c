@@ -831,7 +831,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_creds;
 
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
@@ -840,13 +840,13 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 #endif
 	}
-	else{
+	else{*/
 		retval = copy_files(clone_flags, p);
-	}
+	// }
 	if (retval)
 		goto out_cleanup_sched;
 	
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct sighand_struct *sig;
 		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
@@ -857,13 +857,13 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		p->sighand = sig;
 #endif
 	}
-	else{
+	else{*/
 		retval = copy_sighand(clone_flags, p);
-	}
+	// }
 	if (retval)
 		goto out_cleanup_files;
 	
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct signal_struct *sig;
 		sig = kzalloc(sizeof(*sig), GFP_KERNEL);
@@ -889,9 +889,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		task_unlock(current_tsk->group_leader);
 #endif
 	}
-	else{
+	else{*/
 		retval = copy_signal(clone_flags, p);
-	}
+	// }
 
 	if (retval)
 		goto out_cleanup_sighand;

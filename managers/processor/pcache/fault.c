@@ -405,6 +405,9 @@ static int pcache_do_wp_page(struct mm_struct *mm, unsigned long address,
 			     pte_t *page_table, pmd_t *pmd, spinlock_t *ptl,
 			     pte_t orig_pte) __releases(ptl)
 {
+	if (current->tgid == 25){
+		printk("pid 25 pcache_do_wp_page is %lx\n", address);
+	}
 	struct pcache_meta *old_pcm;
 	int ret;
 

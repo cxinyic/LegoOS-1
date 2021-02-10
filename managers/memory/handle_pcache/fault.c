@@ -264,6 +264,10 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 		printk("pid 25 miss addr: %lx\n", vaddr);
 	}
 
+	if (tgid == 24){
+		printk("pid 24 miss addr: %lx\n", vaddr);
+	}
+
 	handle_pcache_debug("I nid:%u pid:%u tgid:%u flags:%x vaddr:%#Lx",
 		src_nid, msg->pid, tgid, flags, vaddr);
 	

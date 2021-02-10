@@ -95,7 +95,10 @@ void submit_zerofill_notify_work(struct task_struct *p,
 static void do_zerofill_work(struct zerofill_work *zw)
 {
 	if (current->pid == 25){
-		printk("do_zerofill_work here\n");
+		printk("pid 25 do_zerofill_work here\n");
+	}
+	if (current->pid == 24){
+		printk("pid 24 do_zerofill_work here\n");
 	}
 	struct p2m_zerofill_msg msg;
 	int dst_nid, reply;

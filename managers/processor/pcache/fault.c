@@ -283,6 +283,12 @@ fallback:
 		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
 	}
 
+	if (current->tgid == 24){
+		printk("pid 24 __pcache_do_fill_page addr is %lx\n", address);
+	}
+
+
+
 	if (unlikely(len < (int)PCACHE_LINE_SIZE)) {
 		if (likely(len == sizeof(int))) {
 			/* remote reported error */
@@ -407,6 +413,9 @@ static int pcache_do_wp_page(struct mm_struct *mm, unsigned long address,
 {
 	if (current->tgid == 25){
 		printk("pid 25 pcache_do_wp_page is %lx\n", address);
+	}
+	if (current->tgid == 24){
+		printk("pid 24 pcache_do_wp_page is %lx\n", address);
 	}
 	struct pcache_meta *old_pcm;
 	int ret;
@@ -658,6 +667,9 @@ int pcache_handle_fault(struct mm_struct *mm,
 
 	if (current->tgid == 25){
 		printk("pid 25 pcache_handle_fault addr is %lx\n", address);
+	}
+	if (current->tgid == 24){
+		printk("pid 24 pcache_handle_fault addr is %lx\n", address);
 	}
 	return pcache_handle_pte_fault(mm, address, pte, pmd, flags);
 }

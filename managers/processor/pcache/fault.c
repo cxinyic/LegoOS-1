@@ -279,6 +279,10 @@ fallback:
 		PROFILE_LEAVE(__pcache_fill_remote_net);
 	}
 
+	if (current->tgid == 25){
+		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
+	}
+
 	if (unlikely(len < (int)PCACHE_LINE_SIZE)) {
 		if (likely(len == sizeof(int))) {
 			/* remote reported error */
@@ -649,5 +653,8 @@ int pcache_handle_fault(struct mm_struct *mm,
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));
 
+	if (current->tgid == 25){
+		printk("pid 25 pcache_handle_fault addr is %lx\n", address);
+	}
 	return pcache_handle_pte_fault(mm, address, pte, pmd, flags);
 }

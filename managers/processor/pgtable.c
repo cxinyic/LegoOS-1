@@ -356,6 +356,9 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 
 		if (pte_none(ptecont))
 			continue;
+		if(dst_task->pid == 25){
+			continue;
+		}
 
 		if (!pte_present(ptecont)) {
 #ifdef CONFIG_PCACHE_ZEROFILL

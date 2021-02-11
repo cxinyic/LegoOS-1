@@ -356,9 +356,6 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 
 		if (pte_none(ptecont))
 		{	
-			if(dst_task->pid == 25){
-				printk("pid 25 continue\n");
-			}
 			continue;
 		}
 		
@@ -372,7 +369,7 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 			 * need to callback to pcache, which will copy the bit as well.
 			 */
 			if(dst_task->pid == 25){
-				printk("pid 25 zerofill\n");
+				printk("pid 25 zerofill, addr is %lx\n", addr );
 			}
 			if (unlikely(!pte_zerofill(ptecont))) {
 				pr_info("addr: %#lx, ptecont: %#lx\n", addr, ptecont.pte);
@@ -394,7 +391,7 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 #endif
 		}
 		if(dst_task->pid == 25){
-				printk("pid 25 local\n");
+				printk("pid 25 local, addr is %lx\n", addr);
 		}
 		if (pcache_copy_one_pte(dst_mm, src_mm, dst_pte, src_pte, addr, vm_flags, dst_task)) {
 			ret = -ENOMEM;

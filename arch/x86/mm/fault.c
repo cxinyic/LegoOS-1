@@ -626,9 +626,6 @@ dotraplinkage void do_page_fault(struct pt_regs *regs, long error_code)
 	if(current->pid == 25){
 		printk("pid 25 page fault address is %lx\n", address);
 	}
-	if(current->pid == 24){
-		printk("pid 24 page fault address is %lx\n", address);
-	}
 
 #if 0
 	pr_info("%s %d ip: %#lx(%pS) fault addr: %#lx error_code:%#lx\n",

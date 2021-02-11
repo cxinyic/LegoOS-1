@@ -283,9 +283,7 @@ fallback:
 		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
 	}
 
-	if (current->tgid == 24){
-		printk("pid 24 __pcache_do_fill_page addr is %lx\n", address);
-	}
+	
 
 
 

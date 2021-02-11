@@ -211,7 +211,6 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
         pte = rmap->page_table;
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
-                printk("pid 24 dirty address is %lx\n", rmap->address);
                 *pte = pte_mkclean(*pte);
                 pcm->prev_dirty = 1;
                 pdi->nr_dirty_pages +=1;
@@ -225,6 +224,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     }
                 }
                 pdi->last_pcm = pcm;
+				pcache_flush_one(pcm);
+				printk("flush one pcm,addr is %lx\n", rmap->address);
             }
         }
     }

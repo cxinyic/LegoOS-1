@@ -329,18 +329,12 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 	int ret;
 
 	dst_pte = pte_alloc(dst_mm, dst_pmd, addr);
-	if(dst_task->pid == 25){
-		printk("pid 25 dst_pte is %lx\n", dst_pte);
-	}
 	if (!dst_pte)
 		return -ENOMEM;
 	dst_ptl = pte_lockptr(dst_mm, dst_pmd);
 	spin_lock(dst_ptl);
 
 	src_pte = pte_offset(src_pmd, addr);
-	if(dst_task->pid == 25){
-		printk("pid 25 src_pte is %lx\n", src_pte);
-	}
 	src_ptl = pte_lockptr(src_mm, src_pmd);
 
 	/* Will this have potential deadlock issue? */
@@ -368,9 +362,7 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 			 * only deal with non-present PTE here. Present ones
 			 * need to callback to pcache, which will copy the bit as well.
 			 */
-			if(dst_task->pid == 25){
-				printk("pid 25 zerofill, addr is %lx\n", addr );
-			}
+			
 			if (unlikely(!pte_zerofill(ptecont))) {
 				pr_info("addr: %#lx, ptecont: %#lx\n", addr, ptecont.pte);
 				dump_pte(src_pte, "corrupted");
@@ -390,9 +382,7 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 			continue;
 #endif
 		}
-		if(dst_task->pid == 25){
-				printk("pid 25 local, addr is %lx\n", addr);
-		}
+
 		if (pcache_copy_one_pte(dst_mm, src_mm, dst_pte, src_pte, addr, vm_flags, dst_task)) {
 			ret = -ENOMEM;
 			break;
@@ -469,14 +459,7 @@ int pcache_copy_page_range(struct mm_struct *dst, struct mm_struct *src,
 	ret = 0;
 	dst_pgd = pgd_offset(dst, addr);
 	src_pgd = pgd_offset(src, addr);
-	if(dst_task->pid == 25){
-		printk("pid 25 dst_mm is %lx\n", dst);
-		printk("pid 25 src_mm is %lx\n", src);
-	}
-	if(dst_task->pid == 25){
-		printk("pid 25 dst_pgd is %lx\n", dst_pgd);
-		printk("pid 25 src_pgd is %lx\n", src_pgd);
-	}
+	
 	do {
 		next = pgd_addr_end(addr, end);
 		if (pgd_none_or_clear_bad(src_pgd))

@@ -355,10 +355,13 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 		pte_t ptecont = *src_pte;
 
 		if (pte_none(ptecont))
-			continue;
-		if(dst_task->pid == 25){
+		{	
+			if(dst_task->pid == 25){
+				printk("pid 25 continue\n");
+			}
 			continue;
 		}
+		
 
 		if (!pte_present(ptecont)) {
 #ifdef CONFIG_PCACHE_ZEROFILL
@@ -368,6 +371,9 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 			 * only deal with non-present PTE here. Present ones
 			 * need to callback to pcache, which will copy the bit as well.
 			 */
+			if(dst_task->pid == 25){
+				printk("pid 25 zerofill\n");
+			}
 			if (unlikely(!pte_zerofill(ptecont))) {
 				pr_info("addr: %#lx, ptecont: %#lx\n", addr, ptecont.pte);
 				dump_pte(src_pte, "corrupted");
@@ -387,7 +393,9 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 			continue;
 #endif
 		}
-
+		if(dst_task->pid == 25){
+				printk("pid 25 local\n");
+		}
 		if (pcache_copy_one_pte(dst_mm, src_mm, dst_pte, src_pte, addr, vm_flags, dst_task)) {
 			ret = -ENOMEM;
 			break;

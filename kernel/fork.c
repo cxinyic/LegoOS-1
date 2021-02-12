@@ -784,7 +784,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	/*
 	 * Now do the dirty work.
 	 */
-	/*if (pid == 25){
+	if (pid == 25){
 		strcpy(p->fs.cwd, current_tsk->fs.cwd);
 		strcpy(p->fs.root, current_tsk->fs.root);
 		memcpy((void*)(&p->fs.lock), (void*)(&current_tsk->fs.lock), sizeof(p->fs.lock));
@@ -793,9 +793,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 
 	}
-	else{*/
+	else{
 		retval = copy_fs(p);
-	// }
+	}
 	if (retval < 0)
 		goto out_free;
 
@@ -831,7 +831,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_creds;
 
-	/*if(pid == 25){
+	if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
@@ -840,9 +840,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 #endif
 	}
-	else{*/
+	else{
 		retval = copy_files(clone_flags, p);
-	// }
+	}
 	if (retval)
 		goto out_cleanup_sched;
 	

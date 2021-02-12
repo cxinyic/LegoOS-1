@@ -515,6 +515,11 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		BUG_ON(!f);
 		newf->fd_array[fd] = f;
 		get_file(f);
+		if (f->f_op != NULL){
+			printk("f_op address is %lx", f->f_op);
+			if (f->f_op->open != NULL)
+			{printk("open address is %lx", f->f_op->open);}
+		}
 
 		/*
 		 * Let special files know what is going on
@@ -524,8 +529,6 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		if (pipe_file(f->f_name))
 		{	
 			f->f_op->open(f);
-			printk("f_op address is %lx", f->f_op);
-			printk("open address is %lx", f->f_op->open);
 		}
 	}
 	spin_unlock(&oldf->file_lock);

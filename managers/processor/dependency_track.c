@@ -364,23 +364,7 @@ static int dependency_track(void *unused){
                 printk("DepTrack: kill the process\n");
 
                 flush_flag +=1;
-                /*int pid;
-                DEFINE_COMPLETION(done);
-                pid = do_fork(SIGCHLD, (unsigned long)toy_func, (unsigned long)&done, NULL, NULL, 0);
-                if(pid<0){
-                    printk("DepTrack: fork fails\n");
-                }
-                else{
-                    printk("DepTrack: fork succeeds\n");
-                }
-                wait_for_completion(&done);
-                printk("DepTrack: after wait\n");*/
-                
-               
-               // kill_pid_info(SIGCONT, (struct siginfo *) 2, current_pid);
 
-               
-               // printk("DepTrack: called flush_register_value successfully\n");
                
            }
            printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);

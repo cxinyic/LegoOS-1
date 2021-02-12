@@ -663,11 +663,5 @@ int pcache_handle_fault(struct mm_struct *mm,
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));
 
-	if (current->tgid == 25){
-		printk("pid 25 pcache_handle_fault addr is %lx\n", address);
-	}
-	if (current->tgid == 24){
-		printk("pid 24 pcache_handle_fault addr is %lx\n", address);
-	}
 	return pcache_handle_pte_fault(mm, address, pte, pmd, flags);
 }

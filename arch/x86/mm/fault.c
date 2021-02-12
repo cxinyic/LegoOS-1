@@ -623,9 +623,6 @@ dotraplinkage void do_page_fault(struct pt_regs *regs, long error_code)
 	unsigned long address = read_cr2();
 	unsigned long flags = FAULT_FLAG_KILLABLE;
 	PROFILE_POINT_TIME(pcache_handle_fault)
-	if(current->pid == 25){
-		printk("pid 25 page fault address is %lx\n", address);
-	}
 
 #if 0
 	pr_info("%s %d ip: %#lx(%pS) fault addr: %#lx error_code:%#lx\n",

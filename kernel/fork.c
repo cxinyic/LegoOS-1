@@ -522,7 +522,11 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		 * - socket?
 		 */
 		if (pipe_file(f->f_name))
+		{	
 			f->f_op->open(f);
+			printk("f_op address is %lx", f->f_op);
+			printk("open address is %lx", f->f_op->open);
+		}
 	}
 	spin_unlock(&oldf->file_lock);
 
@@ -831,7 +835,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	if (retval)
 		goto out_cleanup_creds;
 
-	/*if(pid == 25){
+	if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
@@ -840,9 +844,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 #endif
 	}
-	else{*/
+	else{
 		retval = copy_files(clone_flags, p);
-	// }
+	}
 	if (retval)
 		goto out_cleanup_sched;
 	

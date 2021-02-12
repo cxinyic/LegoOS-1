@@ -895,14 +895,14 @@ struct task_struct *copy_process(unsigned long clone_flags,
 
 	if (retval)
 		goto out_cleanup_sighand;
-	if(pid==25){
+/*	if(pid==25){
 
 #ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);
 #endif
 
-	}
+	}*/
 
 	/*
 	 * copy_mm may use the memory home node of p

@@ -49,8 +49,7 @@ static inline void handle_zerofill_debug(const char *fmt, ...) { }
 #endif
 
 struct shadow_copy_meta_struct shadow_copy_meta;
-shadow_copy_meta.nr_curr = 0;
-shadow_copy_meta.nr_max = 0;
+
 
 /*
  * Processor manager rely on the length of replied
@@ -60,8 +59,8 @@ shadow_copy_meta.nr_max = 0;
 long do_shadow_copy(unsigned long addr, unsigned long* page){
 	unsigned long vaddr;
 	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
-		*page = shadow_copy_meta.page_addrs[nr_curr];
-		shadow_copy_meta.user_addrs[nr_curr] = addr;
+		*page = shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr];
+		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
 		shadow_copy_meta.nr_curr +=1;
 		return 1;
 	}
@@ -72,7 +71,7 @@ long do_shadow_copy(unsigned long addr, unsigned long* page){
 		*page = vaddr;
 		shadow_copy_meta.user_addrs[nr_curr] = addr;
 		shadow_copy_meta.nr_curr +=1;
-		shadow_copy_meta.max_curr +=1;
+		shadow_copy_meta.nr_max +=1;
 		return 1;
 
 	}

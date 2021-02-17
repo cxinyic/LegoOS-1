@@ -49,6 +49,8 @@ static inline void handle_zerofill_debug(const char *fmt, ...) { }
 #endif
 
 struct shadow_copy_meta_struct shadow_copy_meta;
+shadow_copy_meta.nr_curr = 0;
+shadow_copy_meta.nr_max = 0;
 
 /*
  * Processor manager rely on the length of replied

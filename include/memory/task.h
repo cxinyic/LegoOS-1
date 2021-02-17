@@ -86,8 +86,8 @@ struct shadow_copy_meta_struct{
 	unsigned long new_version_id; // the version id here is the latest one
 	unsigned long page_addrs[16384];  // store the address of the allocated pages
 	unsigned long user_addrs[16384];  // store user virtual addresses
-	unsigned long nr_max = 0;    // how many pages have been allocated
-	unsigned long nr_curr = 0;	// how many pages are used in this shadow copy
+	unsigned long nr_max;    // how many pages have been allocated
+	unsigned long nr_curr;	// how many pages are used in this shadow copy
 
 };
 

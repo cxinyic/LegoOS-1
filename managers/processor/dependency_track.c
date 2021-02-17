@@ -70,6 +70,96 @@ static inline void sleep(unsigned sec)
 
 }*/
 
+static int shadow_copy_begin(void *unused)
+{
+    long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_shadow_copy_begin_payload *payload;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+    printk("shadow copy begin\n");
+
+    hdr = msg;
+    hdr->opcode = P2M_SHADOW_COPY_BEGIN;
+    hdr->src_nid = LEGO_LOCAL_NID;
+    payload = msg + sizeof(*hdr);
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
+    payload->version_id = 1;
+
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+}
+
+static int shadow_copy_end(void *unused)
+{
+    long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_shadow_copy_end_payload *payload;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+    printk("shadow copy end\n");
+
+    hdr = msg;
+    hdr->opcode = P2M_SHADOW_COPY_END;
+    hdr->src_nid = LEGO_LOCAL_NID;
+    payload = msg + sizeof(*hdr);
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
+    payload->version_id = 1;
+
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+}
+
 static int get_register_value(void *unused){
     unsigned long retval;
     ssize_t retlen;
@@ -224,6 +314,9 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     }
                 }
                 pdi->last_pcm = pcm;
+                if (pdi->nr_dirty_pages == 1){
+                    shadow_copy_begin(NULL);
+                }
 				pcache_flush_one(pcm, 1);
 				printk("flush one pcm,addr is %lx\n", rmap->address);
             }
@@ -301,6 +394,8 @@ static int dependency_track(void *unused){
             pcache_for_each_way(pcm, nr) {
                 rmap_walk(pcm, &rwc);
             }
+
+            shadow_copy_end(NULL);
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL ){
                 

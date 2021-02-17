@@ -69,7 +69,7 @@ long do_shadow_copy(unsigned long addr, unsigned long* page){
 		if (!vaddr)
 			return VM_FAULT_OOM;
 		*page = vaddr;
-		shadow_copy_meta.user_addrs[nr_curr] = addr;
+		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
 		shadow_copy_meta.nr_curr +=1;
 		shadow_copy_meta.nr_max +=1;
 		return 1;
@@ -387,6 +387,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 	struct lego_task_struct *p;
     unsigned long reply;
 	unsigned long dst_page;
+	int ret;
 	
 	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
 	if (unlikely(!p)) {

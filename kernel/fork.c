@@ -515,7 +515,6 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		BUG_ON(!f);
 		newf->fd_array[fd] = f;
 		get_file(f);
-		printk("stdio_file_op address is %lx\n", &stdio_file_op);
 		if (f->f_op != NULL){
 			printk("f_op address is %lx\n", f->f_op);
 			if (f->f_op->open != NULL)

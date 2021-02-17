@@ -48,10 +48,33 @@ static inline void handle_pcache_debug(const char *fmt, ...) { }
 static inline void handle_zerofill_debug(const char *fmt, ...) { }
 #endif
 
+struct shadow_copy_meta_struct shadow_copy_meta;
+
 /*
  * Processor manager rely on the length of replied
  * message to know if us succeed or failed.
  */
+
+long do_shadow_copy(unsigned long addr, unsigned long* page){
+	unsigned long vaddr;
+	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
+		*page = shadow_copy_meta.page_addrs[nr_curr];
+		shadow_copy_meta.user_addrs[nr_curr] = addr;
+		shadow_copy_meta.nr_curr +=1;
+		return 1;
+	}
+	else{
+		vaddr = __get_free_page(GFP_KERNEL | __GFP_ZERO);
+		if (!vaddr)
+			return VM_FAULT_OOM;
+		*page = vaddr;
+		shadow_copy_meta.user_addrs[nr_curr] = addr;
+		shadow_copy_meta.nr_curr +=1;
+		shadow_copy_meta.max_curr +=1;
+		return 1;
+
+	}
+}
 static void pcache_miss_error(u32 retval, struct lego_task_struct *p,
 			      u64 vaddr, struct thpool_buffer *tb)
 {
@@ -191,15 +214,30 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb)
 		goto out;
 	}
 
-	down_read(&p->mm->mmap_sem);
-	ret = get_user_pages(p, msg->user_va, 1, 0, &dst_page, NULL);
-	up_read(&p->mm->mmap_sem);
-	if (likely(ret == 1)) {
-		memcpy((void *)dst_page, msg->pcacheline, PCACHE_LINE_SIZE);
-		reply = 0;
-	} else
-		reply = -EFAULT;
+	if (msg->shadow_copy_flag == 1){
+		ret = do_shadow_copy(msg->user_va, &dst_page);
+		if (likely(ret == 1)) {
+			memcpy((void *)dst_page, msg->pcacheline, PCACHE_LINE_SIZE);
+			reply = 0;
+		} else
+		{	
+			reply = -EFAULT;
+		}
+		goto out;
+		
+	}
+	else{
+		down_read(&p->mm->mmap_sem);
+		ret = get_user_pages(p, msg->user_va, 1, 0, &dst_page, NULL);
+		up_read(&p->mm->mmap_sem);
+		if (likely(ret == 1)) {
+			memcpy((void *)dst_page, msg->pcacheline, PCACHE_LINE_SIZE);
+			reply = 0;
+		} else
+			reply = -EFAULT;
+	}
 
+	
 out:
 	*(int *)thpool_buffer_tx(tb) = reply;
 	tb_set_tx_size(tb, sizeof(int));
@@ -260,13 +298,7 @@ void handle_p2m_pcache_miss(struct p2m_pcache_miss_msg *msg,
 	flags  = msg->flags;
 	vaddr  = msg->missing_vaddr;
 
-	if (tgid == 25){
-		printk("pid 25 miss addr: %lx\n", vaddr);
-	}
-
-	if (tgid == 24){
-		printk("pid 24 miss addr: %lx\n", vaddr);
-	}
+	
 
 	handle_pcache_debug("I nid:%u pid:%u tgid:%u flags:%x vaddr:%#Lx",
 		src_nid, msg->pid, tgid, flags, vaddr);
@@ -324,4 +356,61 @@ void handle_p2m_zerofill(struct p2m_zerofill_msg *msg,
 
 	handle_zerofill_debug("O nid:%u pid:%u tgid:%u flags:%x vaddr:%#Lx",
 		src_nid, msg->pid, tgid, flags, vaddr);
+}
+
+
+void handle_p2m_shadow_copy_begin(struct p2m_shadow_copy_begin_payload *payload, 
+        struct common_header *hdr, struct thpool_buffer *tb) {
+	
+	struct lego_task_struct *p;
+    unsigned long reply;
+	
+	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
+	if (unlikely(!p)) {
+		reply = -ESRCH;
+		goto out;
+	}
+
+	shadow_copy_meta.p = p;
+	reply = 0;
+
+out:
+    *(long *)thpool_buffer_tx(tb) = reply;
+	tb_set_tx_size(tb, sizeof(long));
+
+}
+
+void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload, 
+        struct common_header *hdr, struct thpool_buffer *tb) {
+	
+	struct lego_task_struct *p;
+    unsigned long reply;
+	unsigned long dst_page;
+	
+	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
+	if (unlikely(!p)) {
+		reply = -ESRCH;
+		goto out;
+	}
+
+	shadow_copy_meta.new_version_id = payload->version_id;
+	int i = 0;
+	for(i=0; i<shadow_copy_meta.nr_curr; i++){
+		down_read(&p->mm->mmap_sem);
+		ret = get_user_pages(p, shadow_copy_meta.user_addrs[i], 1, 0, &dst_page, NULL);
+		up_read(&p->mm->mmap_sem);
+		if (likely(ret == 1)) {
+			memcpy((void *)dst_page, (void *)(shadow_copy_meta.page_addrs[i]), PCACHE_LINE_SIZE);
+			reply = 0;
+		} else
+			reply = -EFAULT;
+			goto out;
+
+	}
+	shadow_copy_meta.nr_curr = 0;
+	reply = 0;
+
+out:
+    *(long *)thpool_buffer_tx(tb) = reply;
+	tb_set_tx_size(tb, sizeof(long));
 }

@@ -209,6 +209,15 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 		inc_mm_stat(HANDLE_P2M_READ_REGISTER);
 		handle_p2m_read_register(payload, hdr, buffer);
 		break;
+/* XY: shadow copy */
+	case P2M_SHADOW_COPY_BEGIN:
+		inc_mm_stat(HANDLE_P2M_SHADOW_COPY_BEGIN);
+		handle_p2m_shadow_copy_begin(payload, hdr, buffer);
+		break;
+	case P2M_SHADOW_COPY_END:
+		inc_mm_stat(HANDLE_P2M_SHADOW_COPY_END);
+		handle_p2m_shadow_copy_end(payload, hdr, buffer);
+		break;
 
 #ifdef CONFIG_MEM_PAGE_CACHE
 	case P2M_LSEEK:

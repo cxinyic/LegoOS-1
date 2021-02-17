@@ -352,13 +352,13 @@ struct p2m_read_register_payload{
  * begin; flush; end
  * */
 
-struct p2m_shadow_copy_begin{
+struct p2m_shadow_copy_begin_payload{
 	u32 pid;
 	u32 tgid;
 	u32 version_id;
 };
 
-struct p2m_shadow_copy_end{
+struct p2m_shadow_copy_end_payload{
 	u32 pid;
 	u32 tgid;
 	u32 version_id;
@@ -368,6 +368,10 @@ struct p2m_shadow_copy_end{
 void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 
 void handle_p2m_read_register(struct p2m_read_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+void handle_p2m_shadow_copy_begin(struct p2m_shadow_copy_begin_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {

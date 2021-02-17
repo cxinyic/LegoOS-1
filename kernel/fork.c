@@ -773,13 +773,13 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	}
 	
 	p->pid = pid;
-	/*if(pid == 25){
+	if(pid == 25){
 		printk("pid is 25\n");
 		p->fs = current_tsk->fs;
 	}
-	else{*/
+	else{
 		printk("pid is not 25\n");
-	// }
+	}
 	if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	}
@@ -791,7 +791,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	/*
 	 * Now do the dirty work.
 	 */
-	/*if (pid == 25){
+	if (pid == 25){
 		strcpy(p->fs.cwd, current_tsk->fs.cwd);
 		strcpy(p->fs.root, current_tsk->fs.root);
 		memcpy((void*)(&p->fs.lock), (void*)(&current_tsk->fs.lock), sizeof(p->fs.lock));
@@ -800,9 +800,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		retval = 0;
 
 	}
-	else{*/
+	else{
 		retval = copy_fs(p);
-	// }
+	}
 	if (retval < 0)
 		goto out_free;
 
@@ -902,14 +902,14 @@ struct task_struct *copy_process(unsigned long clone_flags,
 
 	if (retval)
 		goto out_cleanup_sighand;
-	if(pid==25){
+/*	if(pid==25){
 
 #ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);
 #endif
 
-	}
+	}*/
 
 	/*
 	 * copy_mm may use the memory home node of p

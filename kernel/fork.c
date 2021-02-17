@@ -773,6 +773,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	}
 	
 	p->pid = pid;
+#ifdef CONFIG_COMP_PROCESSOR
 	if(pid == 25){
 		printk("pid is 25\n");
 		p->fs = current_tsk->fs;
@@ -780,6 +781,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	else{
 		printk("pid is not 25\n");
 	}
+#endif
 	if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	}
@@ -791,6 +793,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	/*
 	 * Now do the dirty work.
 	 */
+#ifdef CONFIG_COMP_PROCESSOR
 	if (pid == 25){
 		strcpy(p->fs.cwd, current_tsk->fs.cwd);
 		strcpy(p->fs.root, current_tsk->fs.root);
@@ -803,6 +806,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	else{
 		retval = copy_fs(p);
 	}
+#endif
 	if (retval < 0)
 		goto out_free;
 

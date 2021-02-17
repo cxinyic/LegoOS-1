@@ -131,7 +131,7 @@ static void victim_flush_one(struct pcache_victim_meta *victim)
 	 */
 	list_for_each_entry(entry, &victim->hits, next)
 		__clflush_one(entry->tgid, entry->address,
-			      entry->m_nid, entry->rep_nid, cache_kva);
+			      entry->m_nid, entry->rep_nid, cache_kva, 0);
 }
 
 void __victim_flush_func(struct victim_flush_job *job)

@@ -224,7 +224,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     }
                 }
                 pdi->last_pcm = pcm;
-				pcache_flush_one(pcm);
+				pcache_flush_one(pcm, 1);
 				printk("flush one pcm,addr is %lx\n", rmap->address);
             }
         }

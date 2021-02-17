@@ -286,6 +286,26 @@ int deptrack_checkpoint_thread(struct task_struct *p){
 
 }
 
+struct file *deptrack_fdget(struct task_struct *p, int fd)
+{
+	struct files_struct *files = p->files;
+	struct file *filp = NULL;
+
+	spin_lock(&files->file_lock);
+	if (likely(test_bit(fd, files->fd_bitmap))) {
+		filp = files->fd_array[fd];
+		if (!filp){
+			pr_info("fd=%d not found!!!", fd);
+		}
+		BUG_ON(!filp);
+		get_file(filp);
+	}
+	spin_unlock(&files->file_lock);
+
+	return filp;
+}
+
+
 static int deptrack_restore_sys_open(struct task_struct *p, struct ss_files *ss_f)
 {
     printk("Restore: open1\n");
@@ -294,7 +314,7 @@ static int deptrack_restore_sys_open(struct task_struct *p, struct ss_files *ss_
 	char *f_name = ss_f->f_name;
     printk("Restore: open2\n");
 
-	fd = alloc_fd(current->files, f_name);
+	fd = alloc_fd(p->files, f_name);
     printk("Restore: open3\n");
 	if (unlikely(fd != ss_f->fd)) {
 		pr_err("Unmactched fd: %d:%s\n",
@@ -303,7 +323,7 @@ static int deptrack_restore_sys_open(struct task_struct *p, struct ss_files *ss_
 	}
     printk("Restore: open4\n");
 
-	f = fdget(fd);
+	f = deptrack_fdget(p, fd);   
     printk("Restore: open5\n");
 	f->f_flags = ss_f->f_flags;
 	f->f_mode = ss_f->f_mode;
@@ -335,6 +355,7 @@ static int deptrack_restore_sys_open(struct task_struct *p, struct ss_files *ss_
 	ret = f->f_op->open(f);
 	if (ret)
 		free_fd(p->files, fd);
+	p->files->fd_array[fd] = f;
 
 put:
 	put_file(f);
@@ -370,7 +391,7 @@ int deptrack_restore_files(struct task_struct *p, struct process_snapshot *pss)
 			continue;
 		}
 printk("Restore: step35\n");
-		ret = deptrack_restore_sys_open(p, ss_f);
+		ret = deptrack_restore_sys_open(p, ss_f); 
         printk("Restore: step36\n");
 		if (ret)
 			goto out;

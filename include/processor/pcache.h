@@ -551,10 +551,10 @@ enum piggyback_options {
 struct pcache_meta *pcache_alloc(unsigned long address,
 				 enum piggyback_options piggyback);
 
-int pcache_flush_one(struct pcache_meta *pcm);
-void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr);
+int pcache_flush_one(struct pcache_meta *pcm, unsigned long shadow_copy_flag);
+void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr, unsigned long shadow_copy_flag);
 void __clflush_one(pid_t tgid, unsigned long user_va,
-		   unsigned int m_nid, unsigned int rep_nid, void *cache_addr);
+		   unsigned int m_nid, unsigned int rep_nid, void *cache_addr, unsigned long shadow_copy_flag);
 
 /* eviction */
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,

@@ -85,13 +85,13 @@ static inline int
 evict_line_wrprotect(struct pcache_set *pset, struct pcache_meta *pcm)
 {
 	/* 1) write-protect from all threads */
-	pcache_wrprotect(pcm);
+	pcache_wrprotect(pcm, 0);
 
 	/* 2) Safely flush back */
-	pcache_flush_one(pcm);
+	pcache_flush_one(pcm, 0);
 
 	/* 3) unmap all PTEs */
-	pcache_try_to_unmap(pcm);
+	pcache_try_to_unmap(pcm, 0);
 
 	return 0;
 }
@@ -154,7 +154,7 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 			if (likely(pte_dirty(*pte))) {
 				*pte = pte_mkclean(*pte);
 				pcm->prev_dirty = 1;
-				pcache_flush_one(pcm);
+				pcache_flush_one(pcm, 1);
 				fdi->nr_dirty_pages += 1;
 			}
 		}
@@ -268,7 +268,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			dp_vector_delete(pcms_to_flush,0);
 			if (tmp_pcm->prev_dirty == 1 && tmp_pcm!=pcm){
 				PROFILE_START(evict_line_perset_flush);
-				pcache_flush_one(tmp_pcm);
+				pcache_flush_one(tmp_pcm, 1);
 				PROFILE_LEAVE(evict_line_perset_flush);
 			}
 		}
@@ -281,42 +281,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
 	}
-	/*
-	if (nr_dp_info!=0){
-		spin_lock(&dp_spinlock);
-		
-		for (index = 0; index < dp_vector_size(dp_info_list); index++){
-			curr_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, index);
-            for(i=0;i<curr_dp_info->nr_pages;i++){
-				
-				if(*(curr_dp_info->pcm_list+i) == pcm){
-					// printk("DepTrack: find one\n");
-					nr_flush_lines = 0;
-					for (j=0; j<dp_vector_size(curr_dp_info->dp_pages+i); j++){
-						tmp_dp_idx = dp_vector_Nth(curr_dp_info->dp_pages+i, j);
-						tmp_dp_info = (struct dp_info*)dp_vector_Nth(dp_info_list, tmp_dp_idx->list_idx);
-						if (tmp_dp_info->dirty_page_list[tmp_dp_idx->addr_idx] == 1 ){
-							if (*(tmp_dp_info->pcm_list+tmp_dp_idx->addr_idx) !=NULL){
-								pcm_to_flush = *(tmp_dp_info->pcm_list+tmp_dp_idx->addr_idx);
-								PROFILE_START(evict_line_perset_flush);
-								pcache_flush_one(pcm_to_flush);
-								PROFILE_LEAVE(evict_line_perset_flush);
-								nr_flush_lines+=1;
-								tmp_dp_info->dirty_page_list[tmp_dp_idx->addr_idx] = 0;
-
-							}
-						}
-					}
-					if(nr_flush_lines>0)
-					{printk("DepTrack: flush %d lines \n", nr_flush_lines);}
-					
-				}
-			}
-		}
-		spin_unlock(&dp_spinlock);
-
-	}*/
-
+	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
 	BUG_ON(nr_mapped < 1);

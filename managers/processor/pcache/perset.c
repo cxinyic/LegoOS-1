@@ -258,7 +258,7 @@ int evict_line_perset_list(struct pcache_set *pset, struct pcache_meta *pcm,
 		}
 
 		PROFILE_START(evict_line_perset_flush);
-		pcache_flush_one(pcm);
+		pcache_flush_one(pcm, 0);
 		pcm->prev_dirty = 0;
 		PROFILE_LEAVE(evict_line_perset_flush);
 	}

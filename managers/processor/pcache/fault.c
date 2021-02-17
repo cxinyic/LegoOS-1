@@ -85,7 +85,7 @@ static void piggyback_fallback(struct pcache_meta *pcm)
 	void *va_cache = pcache_meta_to_kva(pcm);
 
 	__clflush_one(pb->tgid, pb->user_addr, pb->memory_nid,
-		      pb->replication_nid, va_cache);
+		      pb->replication_nid, va_cache, 0);
 
 	pset = pcache_meta_to_pcache_set(pcm);
 	pset_remove_eviction(pset, pcm, 1);

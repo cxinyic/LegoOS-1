@@ -44,6 +44,7 @@ struct p2m_flush_msg {
 	u32			pid;
 	unsigned long		user_va;
 	char			pcacheline[PCACHE_LINE_SIZE];
+	u32 shadow_copy_flag;
 };
 
 void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb);
@@ -343,8 +344,26 @@ struct p2m_flush_register_payload{
 struct p2m_read_register_payload{
 	u32 pid;
 	u32 tgid;
-
+	u32 version_id;
 };
+
+/*
+ * XY: shadow copy 
+ * begin; flush; end
+ * */
+
+struct p2m_shadow_copy_begin{
+	u32 pid;
+	u32 tgid;
+	u32 version_id;
+}
+
+struct p2m_shadow_copy_end{
+	u32 pid;
+	u32 tgid;
+	u32 version_id;
+}
+
 
 void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 

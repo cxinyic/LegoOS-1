@@ -48,7 +48,7 @@ DEFINE_PROFILE_POINT(pcache_flush_net)
  * we should use IB sg list to send both metadate and in-place cache data out.
  */
 void __clflush_one(pid_t tgid, unsigned long user_va,
-		   unsigned int m_nid, unsigned int rep_nid, void *cache_addr)
+		   unsigned int m_nid, unsigned int rep_nid, void *cache_addr, unsigned long shadow_copy_flag)
 {
 	int reply, cpu;
 	struct p2m_flush_msg *msg;
@@ -66,6 +66,7 @@ void __clflush_one(pid_t tgid, unsigned long user_va,
 	fill_common_header(msg, P2M_PCACHE_FLUSH);
 	msg->pid = tgid;
 	msg->user_va = user_va & PCACHE_LINE_MASK;
+	msg->shadow_copy_flag = shadow_copy_flag;
 	memcpy(msg->pcacheline, cache_addr, PCACHE_LINE_SIZE);
 	barrier();
 
@@ -103,24 +104,28 @@ void __clflush_one(pid_t tgid, unsigned long user_va,
  * Because this function will be called in ASYNC code path, and we DO NOT have
  * any further checking against liveness.
  */
-void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr)
+void clflush_one(struct task_struct *tsk, unsigned long user_va, void *cache_addr, unsigned long shadow_copy_flag)
 {
 	unsigned int m_nid, rep_nid;
 
 	m_nid = get_memory_node(tsk, user_va);
 	rep_nid = get_replica_node_by_addr(tsk, user_va);
-	__clflush_one(tsk->tgid, user_va, m_nid, rep_nid, cache_addr);
+	__clflush_one(tsk->tgid, user_va, m_nid, rep_nid, cache_addr, shadow_copy_flag);
 }
 
+struct pcache_flush_one_arg{
+	int nr_flushed;
+	unsigned long shadow_copy_flag;
+};
 static int __pcache_flush_one(struct pcache_meta *pcm,
-			      struct pcache_rmap *rmap, void *arg)
+			      struct pcache_rmap *rmap, void *arg, unsigned long shadow_copy_flag)
 {
-	int *nr_flushed = arg;
+	struct pcache_flush_one_arg *p_arg = arg;
 
 	clflush_one(rmap->owner_process, rmap->address,
-		    pcache_meta_to_kva(pcm));
+		    pcache_meta_to_kva(pcm), p_arg->shadow_copy_flag);
 
-	(*nr_flushed)++;
+	(p_arg->nr_flushed)++;
 	return PCACHE_RMAP_AGAIN;
 }
 
@@ -133,11 +138,15 @@ static int __pcache_flush_one(struct pcache_meta *pcm,
  * multiple memory components, we need to take care of.
  * @pcm must be locked on entry.
  */
-int pcache_flush_one(struct pcache_meta *pcm)
+
+int pcache_flush_one(struct pcache_meta *pcm, unsigned long shadow_copy_flag)
 {
 	int nr_flushed = 0;
+	struct pcache_flush_one_arg arg;
+	arg.nr_flushed = 0;
+	arg.shadow_copy_flag = shadow_copy_flag;
 	struct rmap_walk_control rwc = {
-		.arg = &nr_flushed,
+		.arg = &arg,
 		.rmap_one = __pcache_flush_one,
 	};
 

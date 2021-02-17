@@ -515,10 +515,11 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		BUG_ON(!f);
 		newf->fd_array[fd] = f;
 		get_file(f);
+		printk("stdio_file_op address is %lx\n", &stdio_file_op);
 		if (f->f_op != NULL){
-			printk("f_op address is %lx", f->f_op);
+			printk("f_op address is %lx\n", f->f_op);
 			if (f->f_op->open != NULL)
-			{printk("open address is %lx", f->f_op->open);}
+			{printk("open address is %lx\n", f->f_op->open);}
 		}
 
 		/*
@@ -902,14 +903,14 @@ struct task_struct *copy_process(unsigned long clone_flags,
 
 	if (retval)
 		goto out_cleanup_sighand;
-/*	if(pid==25){
+	if(pid==25){
 
 #ifdef CONFIG_COMP_PROCESSOR
 		deptrack_restore_files(p, current_info.pss);
 		deptrack_restore_signals(p, current_info.pss);
 #endif
 
-	}*/
+	}
 
 	/*
 	 * copy_mm may use the memory home node of p

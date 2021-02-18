@@ -217,6 +217,7 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb)
 	}
 
 	if (msg->shadow_copy_flag == 1){
+		printk("handle_p2m_shadow_copy_flush: step1\n");
 		ret = do_shadow_copy(msg->user_va, &dst_page);
 		if (likely(ret == 1)) {
 			memcpy((void *)dst_page, msg->pcacheline, PCACHE_LINE_SIZE);
@@ -366,6 +367,7 @@ void handle_p2m_shadow_copy_begin(struct p2m_shadow_copy_begin_payload *payload,
 	
 	struct lego_task_struct *p;
     unsigned long reply;
+	printk("handle_p2m_shadow_copy_begin: step1\n");
 	
 	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
 	if (unlikely(!p)) {

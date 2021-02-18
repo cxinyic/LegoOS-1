@@ -18,6 +18,7 @@
 #include <lego/random.h>
 #include <lego/jiffies.h>
 #include <lego/profile.h>
+#include <lego/fit_ibapi.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
 #include <processor/dependency_track.h>

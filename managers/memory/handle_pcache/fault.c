@@ -412,8 +412,9 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 			memcpy((void *)dst_page, (void *)(shadow_copy_meta.page_addrs[i]), PCACHE_LINE_SIZE);
 			reply = 0;
 		} else
-			reply = -EFAULT;
-			goto out;
+		{reply = -EFAULT;
+			goto out;}
+		printk("handle_p2m_shadow_copy_end: step4, i is %d\n", i);
 
 	}
 	shadow_copy_meta.nr_curr = 0;

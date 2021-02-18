@@ -22,6 +22,8 @@
 #include <processor/processor.h>
 #include <processor/dependency_track.h>
 
+unsigned long curr_version_id = 1;
+
 /**
  * evict_find_line
  * @pset: the pcache set in question
@@ -163,6 +165,96 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 		
 }
 
+static int shadow_copy_begin(void *unused)
+{
+    long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_shadow_copy_begin_payload *payload;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+    printk("shadow copy begin\n");
+
+    hdr = msg;
+    hdr->opcode = P2M_SHADOW_COPY_BEGIN;
+    hdr->src_nid = LEGO_LOCAL_NID;
+    payload = msg + sizeof(*hdr);
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
+    payload->version_id = curr_version_id;
+
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+}
+
+static int shadow_copy_end(void *unused)
+{
+    long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_shadow_copy_end_payload *payload;
+
+    len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+    printk("shadow copy end\n");
+
+    hdr = msg;
+    hdr->opcode = P2M_SHADOW_COPY_END;
+    hdr->src_nid = LEGO_LOCAL_NID;
+    payload = msg + sizeof(*hdr);
+    payload->pid = current_pid;
+    payload->tgid = current_tgid;
+    payload->version_id = 1;
+
+    retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
+
+}
+
 int nr_evict_lines = 0;
 int nr_flush_lines = 1;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
@@ -261,6 +353,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		if (size>1){
 			printk("DepTrack: flush %d pages\n",size);
 		}
+		if (dp_vector_size(pcms_to_flush)>0){
+			shadow_copy_begin(NULL);
+		}
 
 		while (dp_vector_size(pcms_to_flush)>0){
 			tmp = (struct pcache_meta **)dp_vector_Nth(pcms_to_flush, 0);
@@ -271,6 +366,11 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 				pcache_flush_one(tmp_pcm, 1);
 				PROFILE_LEAVE(evict_line_perset_flush);
 			}
+		}
+
+		if (dp_vector_size(pcms_to_flush)>0){
+			shadow_copy_end(NULL);
+			curr_version_id += 1;
 		}
 		
 

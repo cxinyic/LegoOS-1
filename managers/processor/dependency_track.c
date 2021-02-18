@@ -101,7 +101,7 @@ static int shadow_copy_begin1(void *unused)
     payload = msg + sizeof(*hdr);
     payload->pid = current_pid;
     payload->tgid = current_tgid;
-    payload->version_id = curr_version_id;
+    payload->version_id = 1;
 
     retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
 

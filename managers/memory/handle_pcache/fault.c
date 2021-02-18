@@ -70,6 +70,7 @@ long do_shadow_copy(unsigned long addr, unsigned long* page){
 			return VM_FAULT_OOM;
 		*page = vaddr;
 		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
+		shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr] = vaddr;
 		shadow_copy_meta.nr_curr +=1;
 		shadow_copy_meta.nr_max +=1;
 		return 1;
@@ -394,14 +395,17 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 		reply = -ESRCH;
 		goto out;
 	}
+	printk("handle_p2m_shadow_copy_end: step1\n");
 
 	shadow_copy_meta.new_version_id = payload->version_id;
 	int i = 0;
 	for(i=0; i<shadow_copy_meta.nr_curr; i++){
 		down_read(&p->mm->mmap_sem);
 		ret = get_user_pages(p, shadow_copy_meta.user_addrs[i], 1, 0, &dst_page, NULL);
+		printk("handle_p2m_shadow_copy_end: step2, i is %d\n", i);
 		up_read(&p->mm->mmap_sem);
 		if (likely(ret == 1)) {
+			printk("handle_p2m_shadow_copy_end: step3, page addr is %lx\n", shadow_copy_meta.page_addrs[i]);
 			memcpy((void *)dst_page, (void *)(shadow_copy_meta.page_addrs[i]), PCACHE_LINE_SIZE);
 			reply = 0;
 		} else

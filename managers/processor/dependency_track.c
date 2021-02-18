@@ -323,7 +323,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     if (pdi->nr_dirty_pages == 1){
                         shadow_copy_begin1(NULL);
                     }
-                    if (pdi->nr_dirty_pages < 8){
+                    if (pdi->nr_dirty_pages < 8)
 				    {pcache_flush_one(pcm, 1);
 				    printk("flush one pcm,addr is %lx\n", rmap->address);}
                 }

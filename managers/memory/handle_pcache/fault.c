@@ -58,6 +58,7 @@ struct shadow_copy_meta_struct shadow_copy_meta;
 
 long do_shadow_copy(unsigned long addr, unsigned long* page){
 	unsigned long vaddr;
+	printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);
 	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
 		*page = shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr];
 		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
@@ -397,7 +398,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 		reply = -ESRCH;
 		goto out;
 	}
-	printk("handle_p2m_shadow_copy_end: step1\n");
+	printk("handle_p2m_shadow_copy_end: step1, number is %d\n", shadow_copy_meta.nr_curr);
 
 	shadow_copy_meta.new_version_id = payload->version_id;
 	int i = 0;

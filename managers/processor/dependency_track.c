@@ -320,12 +320,12 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                 pdi->last_pcm = pcm;
                 if (flush_flag == 0)
                 {
-                    if (pdi->nr_dirty_pages == 1){
+                    /*if (pdi->nr_dirty_pages == 1){
                         shadow_copy_begin1(NULL);
-                    }
-                    if (pdi->nr_dirty_pages < 8)
-				    {pcache_flush_one(pcm, 1);
-				    printk("flush one pcm,addr is %lx\n", rmap->address);}
+                    }*/
+                    
+				    pcache_flush_one(pcm, 0);
+				    printk("flush one pcm,addr is %lx\n", rmap->address);
                 }
             }
         }
@@ -356,7 +356,7 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
-            /*if (flush_flag == 1){
+            if (flush_flag == 1){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                flush_flag +=1;
                struct task_struct *ret1 __maybe_unused;
@@ -389,7 +389,7 @@ static int dependency_track(void *unused){
                 flush_flag +=1;
 
                
-           }*/
+           }
 
             pdi.first_pcm = NULL;
             pdi.last_pcm = NULL;

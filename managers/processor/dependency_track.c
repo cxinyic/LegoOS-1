@@ -405,7 +405,7 @@ static int dependency_track(void *unused){
 
             if (flush_flag == 0)
                 shadow_copy_end1(NULL);
-            flush_flag += 1;
+            
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL ){
                 

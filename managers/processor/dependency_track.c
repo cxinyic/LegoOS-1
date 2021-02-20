@@ -318,15 +318,14 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     }
                 }
                 pdi->last_pcm = pcm;
-                if (flush_flag == 0)
-                {
+                
                     /*if (pdi->nr_dirty_pages == 1){
                         shadow_copy_begin1(NULL);
                     }*/
                     
 				    pcache_flush_one(pcm, 0);
 				    printk("flush one pcm,addr is %lx\n", rmap->address);
-                }
+                
             }
         }
     }

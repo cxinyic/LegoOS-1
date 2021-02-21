@@ -52,6 +52,7 @@ int seq_open(struct file *file, const struct seq_operations *op)
 		return -ENOMEM;
 
 	file->private_data = p;
+	file->size_private_data = sizeof(*p);
 
 	spin_lock_init(&p->lock);
 	p->op = op;

@@ -736,6 +736,7 @@ SYSCALL_DEFINE1(epoll_create1, int, flags)
 		return -ENFILE;
 	f->f_op = &eventpoll_fops;
 	f->private_data = ep;
+	f->size_private_data = sizeof(*ep);
 
 	ep->file = f;
 	

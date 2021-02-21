@@ -470,11 +470,13 @@ static int do_pipe_create(int *flides, int flags)
 	filps[1] = fdget(fds[1]);
 
 	filps[0]->private_data = pipe;
+	filps[0]->size_private_data = sizeof(*pipe);
 	filps[0]->f_flags = O_RDONLY | (flags & O_NONBLOCK);
 	filps[0]->f_mode = FMODE_READ;
 	filps[0]->f_op = &pipefifo_fops;
 
 	filps[1]->private_data = pipe;
+	filps[1]->size_private_data = sizeof(*pipe);
 	filps[1]->f_flags = O_WRONLY | (flags & O_NONBLOCK);
 	filps[1]->f_mode = FMODE_WRITE;
 	filps[1]->f_op = &pipefifo_fops;

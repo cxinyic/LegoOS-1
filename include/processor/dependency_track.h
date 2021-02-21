@@ -30,6 +30,18 @@ struct dp_info{
     struct dp_vector* dp_pages;
 };
 
+struct file_reduced{
+    fmode_t f_mode;
+    atomic_t f_count;
+    unsigned int f_flags;
+    loff_t f_pos;
+    char f_name[FILENAME_LEN_DEFAULT];
+    int fd;
+    const struct file_operations *f_op;
+    int ready_state;
+    int ready_size;
+};
+
 /*
  * list_idx: index in dp_info_list
  * addr_idx: index in dp_info

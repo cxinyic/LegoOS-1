@@ -30,17 +30,6 @@ static inline void sleep(unsigned sec)
     schedule_timeout(sec * HZ);
 }
 
-struct file_reduced{
-    fmode_t f_mode;
-    atomic_t f_count;
-    unsigned int f_flags;
-    loff_t f_pos;
-    char f_name[FILENAME_LEN_DEFAULT];
-    int fd;
-    const struct file_operations *f_op;
-    int ready_state;
-    int ready_size;
-};
 
 void read_files_value(void* data){
 	long retval;

@@ -493,6 +493,17 @@ void exit_files(struct task_struct *tsk)
  * Allocate a new files structure and copy contents from the
  * passed in files structure.
  */
+struct file_reduced{
+    fmode_t f_mode;
+    atomic_t f_count;
+    unsigned int f_flags;
+    loff_t f_pos;
+    char f_name[FILENAME_LEN_DEFAULT];
+    int fd;
+    const struct file_operations *f_op;
+    int ready_state;
+    int ready_size;
+};
 static struct files_struct *dup_fd(struct files_struct *oldf)
 {
 	struct files_struct *newf;
@@ -544,6 +555,8 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 static struct files_struct *restore_fd(struct files_struct *oldf)
 {
 	struct files_struct *newf;
+	struct file_reduced *tmp_file;
+	tmp_file = kmalloc(sizeof(*tmp_file), GFP_KERNEL);
 	int fd;
 	newf = kzalloc(sizeof(*newf), GFP_KERNEL);
 	if (!newf)
@@ -557,17 +570,19 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 	memcpy(newf->close_on_exec, files_meta, 8);
 	memcpy(newf->fd_bitmap, files_meta+8, 8);
 	int i = 0;
+	int size = 16;
+	
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
 		printk("restore_fd, new i is %d\n",i);
+		memcpy(tmp_file, files_meta+size, sizeof(*tmp_file));
+		size += sizeof(*tmp_file);
+		struct file *f;
+		f = kmalloc(sizeof(*f), GFP_KERNEL);
+		f->f_mode = tmp_file->node;
+		printk("restore_fd, mode i is %d\n",f->f_mode);
 		i = i+1;
 	}
-	i = 0;
-	printk("newf bitmap is %d\n",newf->fd_bitmap[0]);
-	for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
-		printk("restore_fd, old i is %d\n",i);
-		i = i+1;
-	}
-	printk("oldf bitmap is %d\n",oldf->fd_bitmap[0]);
+	
 	return newf;
 
 	

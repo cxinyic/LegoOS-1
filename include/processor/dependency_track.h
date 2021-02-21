@@ -43,6 +43,13 @@ struct file_reduced{
     unsigned long size_private_data;
 };
 
+struct file_system_reduced{
+    int users;
+    char cwd[FILENAME_LEN_DEFAULT];
+	char root[FILENAME_LEN_DEFAULT];
+    int umask;
+};
+
 /*
  * list_idx: index in dp_info_list
  * addr_idx: index in dp_info

@@ -78,6 +78,7 @@ static int flush_files_value(struct task_struct* p){
     int fd;
     struct files_struct * files = p->files;
     struct file_reduced * tmp_file = (struct file_reduced*)kmalloc(sizeof(struct file_reduced), GFP_KERNEL);
+	struct file_system_reduced *tmp_fs = (struct file_system_reduced*)kmalloc(sizeof(struct file_system_reduced), GFP_KERNEL);
 
 	long retval;
     ssize_t retlen;
@@ -107,9 +108,15 @@ static int flush_files_value(struct task_struct* p){
 
     
     data =   (void *)payload->data;
-    memcpy(data,files->close_on_exec,8);
-    memcpy(data+8,files->fd_bitmap,8);
-    size  = sizeof(*(files->fd_bitmap)) + sizeof(*(files->close_on_exec));
+	tmp_fs->users = p->fs.users;
+	tmp_fs->umask = p->fs.umask;
+	memcpy(tmp_fs->cwd, p->fs.cwd, FILENAME_LEN_DEFAULT);
+	memcpy(tmp_fs->root, p->fs.root, FILENAME_LEN_DEFAULT);
+	memcpy(data, tmp_fs, sizeof(*tmp_fs));
+	size += sizeof(*tmp_fs);
+    memcpy(data+size,files->close_on_exec,8);
+    memcpy(data+8+size,files->fd_bitmap,8);
+    size += 16;
     for_each_set_bit(fd, files->fd_bitmap, NR_OPEN_DEFAULT){
         struct file* f = files->fd_array[fd];
         tmp_file->f_mode = f->f_mode;

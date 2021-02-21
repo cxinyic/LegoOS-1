@@ -552,11 +552,13 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 	return newf;
 }
 
-static struct files_struct *restore_fd(struct files_struct *oldf)
+static struct files_struct *restore_fd(struct file_system *fs)
 {
 	struct files_struct *newf;
 	struct file_reduced *tmp_file;
+	struct file_system_reduced *tmp_fs;
 	tmp_file = kmalloc(sizeof(*tmp_file), GFP_KERNEL);
+	tmp_fs = kmalloc(sizeof(*tmp_fs), GFP_KERNEL);
 	int fd;
 	newf = kzalloc(sizeof(*newf), GFP_KERNEL);
 	if (!newf)
@@ -567,10 +569,22 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 	void * files_meta;
 	files_meta = kmalloc(4096, GFP_KERNEL);
 	read_files_value(files_meta);
-	memcpy(newf->close_on_exec, files_meta, 8);
-	memcpy(newf->fd_bitmap, files_meta+8, 8);
+
+	memcpy(tmp_fs, files_meta, sizeof(*tmp_fs));
+	fs->users = tmp_fs->users;
+	fs->umask = tmp_fs->umask;
+	memcpy(fs->cwd, tmp_fs->cwd, FILENAME_LEN_DEFAULT);
+	memcpy(fs->root, tmp_fs->root, FILENAME_LEN_DEFAULT);
+	spin_lock_init(&fs->lock);
+	int size = sizeof(*tmp_fs);
+
+
+	
+	memcpy(newf->close_on_exec, files_meta+size, 8);
+	memcpy(newf->fd_bitmap, files_meta+8+size, 8);
 	int i = 0;
-	int size = 16;
+	size+=16;
+
 	
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
 		printk("restore_fd, new i is %d\n",i);
@@ -885,11 +899,11 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
 	if (pid == 25){
-		strcpy(p->fs.cwd, current_tsk->fs.cwd);
+		/*strcpy(p->fs.cwd, current_tsk->fs.cwd);
 		strcpy(p->fs.root, current_tsk->fs.root);
 		memcpy((void*)(&p->fs.lock), (void*)(&current_tsk->fs.lock), sizeof(p->fs.lock));
 		p->fs.umask = current_tsk->fs.umask;
-		p->fs.users = current_tsk->fs.users;
+		p->fs.users = current_tsk->fs.users;*/
 		retval = 0;
 
 	}
@@ -936,8 +950,10 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
-		newf = restore_fd(oldf);
-		// newf = dup_fd(oldf);
+		struct file_system* fs;
+		fs = kmalloc(sizeof(*fs), GFP_KERNEL);
+		newf = restore_fd(fs);
+		p->fs = fs;
 		p->files = newf;
 		retval = 0;
 #endif

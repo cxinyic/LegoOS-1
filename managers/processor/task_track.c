@@ -48,9 +48,35 @@ static int flush_files_value(struct task_struct* p){
     int fd;
     struct files_struct * files = p->files;
     struct file_reduced * tmp_file = (struct file_reduced*)kmalloc(sizeof(struct file_reduced), GFP_KERNEL);
+
+	long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_flush_files_payload *payload;
+	len_retbuf = sizeof(long);
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+
+	hdr = msg;
+    hdr->opcode = P2M_FLUSH_REGISTER;
+    hdr->src_nid = LEGO_LOCAL_NID;
+	payload->pid = current_pid;
+	payload = msg + sizeof(*hdr);
+    payload->tgid = current_tgid;
+	payload->version_id = 1;
+
     
-    
-    data =   (void *)kmalloc(DEFAULT_FILES_META_SIZE, GFP_KERNEL);
+    data =   (void *)payload->data;
     memcpy(data,files->close_on_exec,8);
     memcpy(data+8,files->fd_array,8);
     size  = sizeof(*(files->fd_array)) + sizeof(*(files->close_on_exec));
@@ -71,6 +97,19 @@ static int flush_files_value(struct task_struct* p){
     printk("flush_files_value, total size is %d\n", size);
     printk("sizeof(struct file_reduced) is %d\n", sizeof(struct file_reduced));
 
+	retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+
+
+out:
+    kfree(msg);
+    kfree(retbuf);
+    return 0;
 
 
 }

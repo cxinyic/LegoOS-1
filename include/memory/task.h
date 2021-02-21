@@ -91,6 +91,12 @@ struct shadow_copy_meta_struct{
 
 };
 
+struct files_meta_struct{
+	struct lego_task_struct * p;
+	unsigned long version_id;
+	char data[4096];
+};
+
 void dump_lego_tasks(void);
 struct lego_task_struct *alloc_lego_task_struct(void);
 void free_lego_task_struct(struct lego_task_struct *tsk);

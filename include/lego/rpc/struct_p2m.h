@@ -365,8 +365,10 @@ struct p2m_shadow_copy_end_payload{
 };
 
 struct p2m_flush_files_payload{
-	void * data;
-	
+	u32 pid;
+	u32 tgid;
+	u32 version_id;
+	char data[4096];	
 };
 
 

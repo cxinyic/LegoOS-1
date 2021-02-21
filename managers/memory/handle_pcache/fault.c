@@ -49,6 +49,7 @@ static inline void handle_zerofill_debug(const char *fmt, ...) { }
 #endif
 
 struct shadow_copy_meta_struct shadow_copy_meta;
+struct files_meta_struct files_meta;
 
 
 /*
@@ -423,4 +424,22 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 out:
     *(long *)thpool_buffer_tx(tb) = reply;
 	tb_set_tx_size(tb, sizeof(long));
+}
+
+void handle_p2m_flush_files(struct p2m_flush_files_payload *payload, 
+        struct common_header *hdr, struct thpool_buffer *tb) {
+
+	struct lego_task_struct *p;
+    unsigned long reply;
+	unsigned long dst_page;
+	int ret;
+	
+	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
+	if (unlikely(!p)) {
+		reply = -ESRCH;
+		goto out;
+	}
+	printk("handle_p2m_flush_files step1\n");
+	memcpy(files_meta.data, payload->data, 4096);
+	files_meta.version_id = payload->version_id;
 }

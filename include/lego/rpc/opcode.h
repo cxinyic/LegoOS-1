@@ -38,6 +38,7 @@
 #define P2M_READ_REGISTER ((__u32)0x30000004)
 #define P2M_SHADOW_COPY_BEGIN ((__u32)0x30000005)
 #define P2M_SHADOW_COPY_END ((__u32)0x30000006)
+#define P2M_FLUSH_FILES ((__u32)0x30000007)
 
 
 #define P2M_READ		((__u32)__NR_read)

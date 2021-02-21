@@ -218,6 +218,12 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 		inc_mm_stat(HANDLE_P2M_SHADOW_COPY_END);
 		handle_p2m_shadow_copy_end(payload, hdr, buffer);
 		break;
+/* XY: flush files */
+	case P2M_FLUSH_FILES:
+		inc_mm_stat(HANDLE_P2M_FLUSH_FILES);
+		handle_p2m_flush_files(payload, hdr, buffer);
+		break;
+
 
 #ifdef CONFIG_MEM_PAGE_CACHE
 	case P2M_LSEEK:

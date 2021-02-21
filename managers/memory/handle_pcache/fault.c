@@ -449,7 +449,7 @@ out:
 	tb_set_tx_size(tb, sizeof(long));
 }
 
-void handle_p2m_read_files((struct p2m_flush_files_payload *payload, 
+void handle_p2m_read_files(struct p2m_flush_files_payload *payload, 
         struct common_header *hdr, struct thpool_buffer *tb) {
 
 	tb_set_private_tx(tb, (void *)(files_meta.data));

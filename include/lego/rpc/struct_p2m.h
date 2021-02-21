@@ -380,6 +380,7 @@ void handle_p2m_shadow_copy_begin(struct p2m_shadow_copy_begin_payload *payload,
 
 void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 
+void handle_p2m_flush_files(struct p2m_flush_files_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {
 	char filename[MAX_FILENAME_LENGTH];

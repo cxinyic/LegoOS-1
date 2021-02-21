@@ -11,9 +11,10 @@
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
 #include <lego/checkpoint.h>
+#include <lego/files.h>
 #include <asm/prctl.h>
 
-
+#define DEFAULT_FILES_META_SIZE = 4096
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;
@@ -288,6 +289,9 @@ out:
     return 0;
 
 }
+
+
+
 
 struct pcache_dependency_info{
     struct pcache_meta * first_pcm;

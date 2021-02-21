@@ -10,6 +10,7 @@
 #include <lego/kthread.h>
 #include <lego/comp_common.h>
 #include <lego/fit_ibapi.h>
+#include <lego/files.h>
 #include <asm/prctl.h>
 
 static LIST_HEAD(pss_list);
@@ -25,6 +26,51 @@ static inline void sleep(unsigned sec)
 {
     __set_current_state(TASK_INTERRUPTIBLE);
     schedule_timeout(sec * HZ);
+}
+
+struct file_reduced{
+    fmode_t f_mode;
+    atomic_t f_count;
+    unsigned int f_flags;
+    loff_t f_pos;
+    char f_name[FILENAME_LEN_DEFAULT];
+    int fd;
+    const struct file_operations *f_op;
+    int ready_state;
+    int ready_size;
+};
+
+static int flush_files_value(struct task_struct* p){ 
+    void * data;
+    unsigned long size;
+    int fd;
+    struct files_struct * files = p->files;
+    struct file_reduced * tmp_file = (struct file_reduced*)kmalloc(sizeof(struct file_reduced), GFP_KERNEL);
+    
+    
+    data =   (void *)kmalloc(DEFAULT_FILES_META_SIZE, GFP_KERNEL);
+    memcpy(data,files->close_on_exec,8);
+    memcpy(data+8,files->fd_array,8);
+    size  = sizeof(*(files->fd_array)) + sizeof(*(files->close_on_exec));
+    for_each_set_bit(fd, files->fd_bitmap, NR_OPEN_DEFAULT){
+        struct file* f = files->fd_array[fd];
+        tmp_file->f_mode = f->f_mode;
+        tmp_file->f_count = f->f_count;
+        tmp_file->f_flags = f->flags;
+        tmp_file->f_pos = f->f_pos;
+        memcpy(tmp_file->f_name, f->f_name, FILENAME_LEN_DEFAULT);
+        tmp_file->fd = f->fd;
+        tmp_file->f_op = f->f_op;
+        tmp_file->ready_state = f->ready_state;
+        tmp_file->ready_size = f->ready_size;
+        memcpy(data+size, tmp_file, sizeof(struct file_reduced));
+        size += sizeof(struct file_reduced);
+    }
+    printk("flush_files_value, total size is %d\n", size);
+    printk("sizeof(struct file_reduced) is %d\n", sizeof(struct file_reduced));
+
+
+
 }
 
 static void deptrack_save_thread_regs(struct task_struct *p, struct ss_task_struct *ss)
@@ -222,6 +268,9 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
 		deptrack_save_thread_regs(t, ss_task);
     }
     printk("DepTrack: __deptrack_do_checkpoint_process step3\n");
+
+	flush_files_value(leader);
+	printk("DepTrack: __deptrack_do_checkpoint_process step4\n");
 
     deptrack_enqueue_pss(pss);
     

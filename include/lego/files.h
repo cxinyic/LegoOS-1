@@ -125,6 +125,7 @@ struct file {
 	int			ready_size;
 
 	void			*private_data;
+	unsigned long size_private_data;
 };
 
 #define NR_OPEN_DEFAULT		64

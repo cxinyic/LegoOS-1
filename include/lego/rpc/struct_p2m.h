@@ -364,10 +364,10 @@ struct p2m_shadow_copy_end_payload{
 	u32 version_id;
 };
 
-/*struct p2m_flush_files_payload{
+struct p2m_flush_files_payload{
 	void * data;
 	
-}*/
+}
 
 
 void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);

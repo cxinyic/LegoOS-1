@@ -864,7 +864,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
 		void *file_meta = kmalloc(4096, GFP_KERNEL);
-		read_files_value(data);
+		read_files_value(file_meta);
 		newf = dup_fd(oldf);
 		p->files = newf;
 		retval = 0;

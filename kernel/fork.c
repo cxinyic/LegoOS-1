@@ -579,8 +579,12 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 		struct file *f;
 		f = kmalloc(sizeof(*f), GFP_KERNEL);
 		f->f_mode = tmp_file->node;
-		printk("restore_fd, mode i is %d\n",f->f_mode);
+		printk("restore_fd, old mode i is %d\n",f->f_mode);
 		i = i+1;
+	}
+	for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
+		struct file *f = oldf->fd_array[fd];
+		printk("restore_fd, new mode i is %d\n",f->f_mode);
 	}
 	
 	return newf;

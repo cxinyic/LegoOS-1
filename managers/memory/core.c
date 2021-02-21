@@ -223,6 +223,10 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 		inc_mm_stat(HANDLE_P2M_FLUSH_FILES);
 		handle_p2m_flush_files(payload, hdr, buffer);
 		break;
+	case P2M_READ_FILES:
+		inc_mm_stat(HANDLE_P2M_READ_FILES);
+		handle_p2m_read_files(payload, hdr, buffer);
+		break;
 
 
 #ifdef CONFIG_MEM_PAGE_CACHE

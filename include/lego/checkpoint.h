@@ -114,6 +114,7 @@ void dump_process_snapshot_signals(struct process_snapshot *pss);
 void dump_process_snapshot_thread(struct ss_task_struct *t);
 void dump_process_snapshot_threads(struct process_snapshot *pss);
 int toy_func(void* _done);
+void read_files_value(void* data);
 
 
 #define DUMP_SS_SIGNAL	0x1

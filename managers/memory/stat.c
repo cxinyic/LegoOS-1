@@ -29,6 +29,7 @@ static const char *const memory_manager_stat_text[] = {
 	"handle_p2m_shadow_copy_end",
 
 	"handle_p2m_flush_files",
+	"handle_p2m_read_files"
 
 	"handle_m2m_mmap",
 	"handle_m2m_munmap",

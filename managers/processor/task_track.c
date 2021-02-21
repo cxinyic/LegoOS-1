@@ -42,6 +42,47 @@ struct file_reduced{
     int ready_size;
 };
 
+void read_files_value(void* data){
+	long retval;
+    ssize_t retlen;
+    ssize_t *retval_ptr;
+    u32 len_retbuf, len_msg;
+    void *retbuf, *msg;
+    struct common_header *hdr;
+    struct p2m_read_files_payload *payload;
+	len_retbuf = 4096;
+    retbuf = kmalloc(len_retbuf, GFP_KERNEL);
+    if (!retbuf)
+        return -ENOMEM;
+    len_msg = sizeof(*hdr) + sizeof(*payload);
+    msg = kmalloc(len_msg, GFP_KERNEL);
+    if (!msg) {
+        kfree(retbuf);
+        return -ENOMEM;
+    }
+
+	hdr = msg;
+    hdr->opcode = P2M_READ_FILES;
+    hdr->src_nid = LEGO_LOCAL_NID;
+	payload = msg + sizeof(*hdr);
+	payload->pid = current_pid;
+    payload->tgid = current_tgid;
+	payload->version_id = 1;
+	printk("read_files_value\n");
+	retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
+
+    if(retlen != len_retbuf){
+        WARN_ON_ONCE(1);
+        retval = -EIO;
+        goto out;
+    }
+	memcpy(data, retbuf, 4096); 
+out:
+    kfree(msg);
+    kfree(retbuf);
+
+}
+
 static int flush_files_value(struct task_struct* p){ 
     void * data;
     unsigned long size;

@@ -578,7 +578,7 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 		size += sizeof(*tmp_file);
 		struct file *f;
 		f = kmalloc(sizeof(*f), GFP_KERNEL);
-		f->f_mode = tmp_file->node;
+		f->f_mode = tmp_file->f_mode;
 		printk("restore_fd, old mode i is %d\n",f->f_mode);
 		i = i+1;
 	}

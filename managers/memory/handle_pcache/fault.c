@@ -452,7 +452,8 @@ out:
 void handle_p2m_read_files(struct p2m_read_files_payload *payload, 
         struct common_header *hdr, struct thpool_buffer *tb) {
 
-	tb_set_private_tx(tb, (void *)(files_meta.data));
+	// tb_set_private_tx(tb, (void *)(files_meta.data));
+	memcpy(thpool_buffer_tx(tb), (void *)(files_meta.data),4096)
 	tb_set_tx_size(tb, 4096);
 	printk("handle_p2m_read_files step1\n");
 

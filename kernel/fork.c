@@ -541,7 +541,7 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 	return newf;
 }
 
-static struct files_struct *restore_fd(void* unused)
+static struct files_struct *restore_fd(struct files_struct *oldf)
 {
 	struct files_struct *newf;
 	int fd;
@@ -558,8 +558,16 @@ static struct files_struct *restore_fd(void* unused)
 	memcpy(newf->fd_bitmap, files_meta+8, 8);
 	int i = 0;
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
-		printk("restore_fd, i is %d\n",i);
+		printk("restore_fd, new i is %d\n",i);
+		i = i+1;
 	}
+	i = 0;
+	printk("newf bitmap is %d\n",newf->fd_bitmap[0]);
+	for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
+		printk("restore_fd, old i is %d\n",i);
+		i = i+1;
+	}
+	printk("oldf bitmap is %d\n",oldf->fd_bitmap[0]);
 	return newf;
 
 	
@@ -723,16 +731,7 @@ static int copy_signal(unsigned long clone_flags, struct task_struct *tsk)
  * flags). The actual kick-off is left to the caller.
  */
 
-/*static struct files_struct *restore_fd()
-{
-	struct file_struct *newf;
-	int fd;
-	newf = kzalloc(sizeof(*newf), GFP_KERNEL);
-	if (!newf)
-		return NULL;
-	atomic_set(&newf->count, 1);
-	spin_lock_init(&newf->file_lock);
-}*/
+
 
 struct task_struct *copy_process(unsigned long clone_flags,
 				 unsigned long stack_start,
@@ -887,7 +886,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
-		restore_fd(NULL);
+		restore_fd(oldf);
 		newf = dup_fd(oldf);
 		p->files = newf;
 		retval = 0;

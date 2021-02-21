@@ -68,10 +68,10 @@ static int flush_files_value(struct task_struct* p){
     }
 
 	hdr = msg;
-    hdr->opcode = P2M_FLUSH_REGISTER;
+    hdr->opcode = P2M_FLUSH_FILES;
     hdr->src_nid = LEGO_LOCAL_NID;
-	payload->pid = current_pid;
 	payload = msg + sizeof(*hdr);
+	payload->pid = current_pid;
     payload->tgid = current_tgid;
 	payload->version_id = 1;
 

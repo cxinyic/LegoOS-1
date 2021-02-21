@@ -13,6 +13,8 @@
 #include <lego/files.h>
 #include <asm/prctl.h>
 
+#define DEFAULT_FILES_META_SIZE = 4096
+
 static LIST_HEAD(pss_list);
 static DEFINE_SPINLOCK(pss_lock);
 static LIST_HEAD(restorer_work_list);
@@ -56,7 +58,7 @@ static int flush_files_value(struct task_struct* p){
         struct file* f = files->fd_array[fd];
         tmp_file->f_mode = f->f_mode;
         tmp_file->f_count = f->f_count;
-        tmp_file->f_flags = f->flags;
+        tmp_file->f_flags = f->f_flags;
         tmp_file->f_pos = f->f_pos;
         memcpy(tmp_file->f_name, f->f_name, FILENAME_LEN_DEFAULT);
         tmp_file->fd = f->fd;

@@ -14,7 +14,7 @@
 #include <lego/files.h>
 #include <asm/prctl.h>
 
-#define DEFAULT_FILES_META_SIZE = 4096
+
 
 struct pt_regs * current_registers;
 struct task_struct * current_tsk = NULL;

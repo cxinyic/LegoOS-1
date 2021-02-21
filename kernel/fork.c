@@ -541,7 +541,7 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 	return newf;
 }
 
-static struct files_struct *restore_fd()
+static struct files_struct *restore_fd(void* unused)
 {
 	struct files_struct *newf;
 	int fd;
@@ -887,7 +887,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
-		restore_fd();
+		restore_fd(NULL);
 		newf = dup_fd(oldf);
 		p->files = newf;
 		retval = 0;

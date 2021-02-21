@@ -579,13 +579,32 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 		struct file *f;
 		f = kmalloc(sizeof(*f), GFP_KERNEL);
 		f->f_mode = tmp_file->f_mode;
-		printk("restore_fd, old mode i is %d\n",f->f_mode);
+		f->f_count = tmp_file->f_count;
+		f->f_flags = tmp_file->f_flags;
+		f->f_pos = tmp_file->f_pos;
+		memcpy(f->f_name, tmp_file->f_name, FILENAME_LEN_DEFAULT);
+		f->fd = tmp_file->fd;
+		f->f_op = tmp_file->f_op;
+		f->ready_state = tmp_file->ready_state;
+		f->ready_size = tmp_file->ready_size;
+		spin_lock_init(&f->f_pos_lock);
+#ifdef CONFIG_EPOLL
+		INIT_LIST_HEAD(&f->f_epi_links);
+#endif 
+		INIT_LIST_HEAD(&f->f_poll_links);
+		newf->fd_array[fd] = f;
+		get_file(f);
+		if (pipe_file(f->f_name))
+		{	
+			f->f_op->open(f);
+		}
 		i = i+1;
 	}
-	for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
+
+	/*for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
 		struct file *f = oldf->fd_array[fd];
 		printk("restore_fd, new mode i is %d\n",f->f_mode);
-	}
+	}*/
 	
 	return newf;
 
@@ -905,8 +924,8 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
-		restore_fd(oldf);
-		newf = dup_fd(oldf);
+		newf = restore_fd(oldf);
+		// newf = dup_fd(oldf);
 		p->files = newf;
 		retval = 0;
 #endif

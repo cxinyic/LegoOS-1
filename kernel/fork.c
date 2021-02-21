@@ -543,7 +543,7 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 
 static struct files_struct *restore_fd()
 {
-	struct file_struct *newf;
+	struct files_struct *newf;
 	int fd;
 	newf = kzalloc(sizeof(*newf), GFP_KERNEL);
 	if (!newf)
@@ -554,10 +554,8 @@ static struct files_struct *restore_fd()
 	void * files_meta;
 	files_meta = kmalloc(4096, GFP_KERNEL);
 	read_files_value(files_meta);
-	// memcpy(newf->close_on_exec, files_meta, 8);
-	// memcpy(newf->fd_bitmap, files_meta+8, 8);
-	bitmap_copy(newf->close_on_exec, files_meta, NR_OPEN_DEFAULT);
-	bitmap_copy(newf->fd_bitmap, files_meta+8, NR_OPEN_DEFAULT);
+	memcpy(newf->close_on_exec, files_meta, 8);
+	memcpy(newf->fd_bitmap, files_meta+8, 8);
 	int i = 0;
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
 		printk("restore_fd, i is %d\n",i);

@@ -953,7 +953,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		struct file_system* fs;
 		fs = kmalloc(sizeof(*fs), GFP_KERNEL);
 		newf = restore_fd(fs);
-		p->fs = fs;
+		p->fs = *fs;
 		p->files = newf;
 		retval = 0;
 #endif

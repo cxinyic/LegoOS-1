@@ -493,7 +493,7 @@ void exit_files(struct task_struct *tsk)
  * Allocate a new files structure and copy contents from the
  * passed in files structure.
  */
-struct file_reduced{
+/*struct file_reduced{
     fmode_t f_mode;
     atomic_t f_count;
     unsigned int f_flags;
@@ -503,7 +503,7 @@ struct file_reduced{
     const struct file_operations *f_op;
     int ready_state;
     int ready_size;
-};
+};*/
 static struct files_struct *dup_fd(struct files_struct *oldf)
 {
 	struct files_struct *newf;

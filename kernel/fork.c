@@ -587,6 +587,7 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 		f->f_op = tmp_file->f_op;
 		f->ready_state = tmp_file->ready_state;
 		f->ready_size = tmp_file->ready_size;
+		f->size_private_data = tmp_file->size_private_data;
 		spin_lock_init(&f->f_pos_lock);
 #ifdef CONFIG_EPOLL
 		INIT_LIST_HEAD(&f->f_epi_links);
@@ -599,6 +600,17 @@ static struct files_struct *restore_fd(struct files_struct *oldf)
 			f->f_op->open(f);
 		}
 		i = i+1;
+	}
+	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
+		struct file *f;
+		f = newf->fd_array[fd];
+		if (f->size_private_data>0){
+			void * data;
+			data = kmalloc(f->size_private_data, GFP_KERNEL);
+			memcpy(data, files_meta+size, f->size_private_data);
+			size+=f->size_private_data;
+			f->private_data = data;
+		}
 	}
 
 	/*for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {

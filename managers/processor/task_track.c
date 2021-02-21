@@ -121,9 +121,19 @@ static int flush_files_value(struct task_struct* p){
         tmp_file->f_op = f->f_op;
         tmp_file->ready_state = f->ready_state;
         tmp_file->ready_size = f->ready_size;
+		tmp->size_private_data = f->size_private_data;
         memcpy(data+size, tmp_file, sizeof(struct file_reduced));
         size += sizeof(struct file_reduced);
     }
+	for_each_set_bit(fd, files->fd_bitmap, NR_OPEN_DEFAULT){
+		struct file* f = files->fd_array[fd];
+		if (f->size_private_data > 0){
+			memcpy(data+size, f->private_data, f->size_private_data);
+			size+=f->size_private_data;
+		}
+	}
+	
+
     printk("flush_files_value, total size is %d\n", size);
     printk("sizeof(struct file_reduced) is %d\n", sizeof(struct file_reduced));
 

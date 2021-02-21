@@ -40,6 +40,7 @@ struct file_reduced{
     const struct file_operations *f_op;
     int ready_state;
     int ready_size;
+    unsigned long size_private_data;
 };
 
 /*

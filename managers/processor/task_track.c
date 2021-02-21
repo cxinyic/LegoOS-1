@@ -13,7 +13,7 @@
 #include <lego/files.h>
 #include <asm/prctl.h>
 
-#define DEFAULT_FILES_META_SIZE = 4096
+#define DEFAULT_FILES_META_SIZE 4096
 
 static LIST_HEAD(pss_list);
 static DEFINE_SPINLOCK(pss_lock);

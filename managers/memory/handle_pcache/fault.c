@@ -442,4 +442,9 @@ void handle_p2m_flush_files(struct p2m_flush_files_payload *payload,
 	printk("handle_p2m_flush_files step1\n");
 	memcpy(files_meta.data, payload->data, 4096);
 	files_meta.version_id = payload->version_id;
+	reply = 0;
+
+out:
+    *(long *)thpool_buffer_tx(tb) = reply;
+	tb_set_tx_size(tb, sizeof(long));
 }

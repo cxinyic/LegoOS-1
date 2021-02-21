@@ -375,7 +375,7 @@ struct p2m_read_files_payload{
 	u32 pid;
 	u32 tgid;
 	u32 version_id;
-}
+};
 
 
 void handle_p2m_flush_register(struct p2m_flush_register_payload *payload, struct common_header *hdr, struct thpool_buffer *tb);

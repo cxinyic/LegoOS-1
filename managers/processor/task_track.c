@@ -121,7 +121,7 @@ static int flush_files_value(struct task_struct* p){
         tmp_file->f_op = f->f_op;
         tmp_file->ready_state = f->ready_state;
         tmp_file->ready_size = f->ready_size;
-		tmp->size_private_data = f->size_private_data;
+		tmp_file->size_private_data = f->size_private_data;
         memcpy(data+size, tmp_file, sizeof(struct file_reduced));
         size += sizeof(struct file_reduced);
     }

@@ -119,8 +119,8 @@ static int flush_files_value(struct task_struct* p){
     
     data =   (void *)payload->data;
     memcpy(data,files->close_on_exec,8);
-    memcpy(data+8,files->fd_array,8);
-    size  = sizeof(*(files->fd_array)) + sizeof(*(files->close_on_exec));
+    memcpy(data+8,files->fd_bitmap,8);
+    size  = sizeof(*(files->fd_bitmap)) + sizeof(*(files->close_on_exec));
     for_each_set_bit(fd, files->fd_bitmap, NR_OPEN_DEFAULT){
         struct file* f = files->fd_array[fd];
         tmp_file->f_mode = f->f_mode;

@@ -877,7 +877,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	}
 	
 	p->pid = pid;
-#ifdef CONFIG_COMP_PROCESSOR
+/*#ifdef CONFIG_COMP_PROCESSOR
 	if(pid == 25){
 		printk("pid is 25\n");
 		p->fs = current_tsk->fs;
@@ -885,7 +885,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	else{
 		printk("pid is not 25\n");
 	}
-#endif
+#endif*/
 	if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
 	}

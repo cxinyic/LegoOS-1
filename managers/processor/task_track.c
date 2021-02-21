@@ -70,10 +70,9 @@ void read_files_value(void* data){
 	payload->version_id = 1;
 	printk("read_files_value\n");
 	retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
-
+	printk("return len is %d\n", retlen);
     if(retlen != len_retbuf){
         // WARN_ON_ONCE(1);
-		printk("return len is %d\n", retlen);
         retval = -EIO;
         goto out;
     }

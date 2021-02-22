@@ -19,7 +19,6 @@
 #include <lego/fit_ibapi.h>
 #include <lego/signalfd.h>
 #include <lego/timekeeping.h>
-#include <processor/dependency_track.h>
 
 #include <processor/processor.h>
 #include <processor/pcache.h>
@@ -430,7 +429,6 @@ static int copy_mm(unsigned long clone_flags, struct task_struct *tsk)
 	}
 
 	mm = dup_mm_struct(tsk);
-
 	if (!mm)
 		return -ENOMEM;
 
@@ -493,17 +491,6 @@ void exit_files(struct task_struct *tsk)
  * Allocate a new files structure and copy contents from the
  * passed in files structure.
  */
-/*struct file_reduced{
-    fmode_t f_mode;
-    atomic_t f_count;
-    unsigned int f_flags;
-    loff_t f_pos;
-    char f_name[FILENAME_LEN_DEFAULT];
-    int fd;
-    const struct file_operations *f_op;
-    int ready_state;
-    int ready_size;
-};*/
 static struct files_struct *dup_fd(struct files_struct *oldf)
 {
 	struct files_struct *newf;
@@ -520,22 +507,12 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 	/* Copy fd bitmap and get each open file */
 	spin_lock(&oldf->file_lock);
 	bitmap_copy(newf->fd_bitmap, oldf->fd_bitmap, NR_OPEN_DEFAULT);
-	printk("close on exec size is %d\n", sizeof(*(newf->close_on_exec)));
-	printk("fd_bitmap size is %d\n", sizeof(*(newf->fd_bitmap)));
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
 		struct file *f = oldf->fd_array[fd];
 
 		BUG_ON(!f);
 		newf->fd_array[fd] = f;
 		get_file(f);
-		if (f->f_op != NULL){
-			printk("f_op address is %lx\n", f->f_op);
-			if (f->f_op->open != NULL)
-			{printk("open address is %lx\n", f->f_op->open);}
-		}
-		if (f->private_data!=NULL){
-			{printk("f->private_data is %lx\n", f->private_data);}
-		}
 
 		/*
 		 * Let special files know what is going on
@@ -543,99 +520,11 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 		 * - socket?
 		 */
 		if (pipe_file(f->f_name))
-		{	
 			f->f_op->open(f);
-		}
 	}
 	spin_unlock(&oldf->file_lock);
 
 	return newf;
-}
-
-static struct files_struct *restore_fd(struct file_system *fs)
-{
-	struct files_struct *newf;
-	struct file_reduced *tmp_file;
-	struct file_system_reduced *tmp_fs;
-	tmp_file = kmalloc(sizeof(*tmp_file), GFP_KERNEL);
-	tmp_fs = kmalloc(sizeof(*tmp_fs), GFP_KERNEL);
-	int fd;
-	newf = kzalloc(sizeof(*newf), GFP_KERNEL);
-	if (!newf)
-		return NULL;
-
-	atomic_set(&newf->count, 1);
-	spin_lock_init(&newf->file_lock);
-	void * files_meta;
-	files_meta = kmalloc(4096, GFP_KERNEL);
-	read_files_value(files_meta);
-
-	memcpy(tmp_fs, files_meta, sizeof(*tmp_fs));
-	fs->users = tmp_fs->users;
-	fs->umask = tmp_fs->umask;
-	memcpy(fs->cwd, tmp_fs->cwd, FILENAME_LEN_DEFAULT);
-	memcpy(fs->root, tmp_fs->root, FILENAME_LEN_DEFAULT);
-	spin_lock_init(&fs->lock);
-	int size = sizeof(*tmp_fs);
-
-
-	
-	memcpy(newf->close_on_exec, files_meta+size, 8);
-	memcpy(newf->fd_bitmap, files_meta+8+size, 8);
-	int i = 0;
-	size+=16;
-
-	
-	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
-		printk("restore_fd, new i is %d\n",i);
-		memcpy(tmp_file, files_meta+size, sizeof(*tmp_file));
-		size += sizeof(*tmp_file);
-		struct file *f;
-		f = kmalloc(sizeof(*f), GFP_KERNEL);
-		f->f_mode = tmp_file->f_mode;
-		f->f_count = tmp_file->f_count;
-		f->f_flags = tmp_file->f_flags;
-		f->f_pos = tmp_file->f_pos;
-		memcpy(f->f_name, tmp_file->f_name, FILENAME_LEN_DEFAULT);
-		f->fd = tmp_file->fd;
-		f->f_op = tmp_file->f_op;
-		f->ready_state = tmp_file->ready_state;
-		f->ready_size = tmp_file->ready_size;
-		f->size_private_data = tmp_file->size_private_data;
-		spin_lock_init(&f->f_pos_lock);
-#ifdef CONFIG_EPOLL
-		INIT_LIST_HEAD(&f->f_epi_links);
-#endif 
-		INIT_LIST_HEAD(&f->f_poll_links);
-		newf->fd_array[fd] = f;
-		get_file(f);
-		if (pipe_file(f->f_name))
-		{	
-			f->f_op->open(f);
-		}
-		printk("restore_fd, new mode i is %d\n",f->f_mode);
-		i = i+1;
-	}
-	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
-		struct file *f;
-		f = newf->fd_array[fd];
-		if (f->size_private_data>0){
-			void * data;
-			data = kmalloc(f->size_private_data, GFP_KERNEL);
-			memcpy(data, files_meta+size, f->size_private_data);
-			size+=f->size_private_data;
-			f->private_data = data;
-		}
-	}
-
-	/*for_each_set_bit(fd, oldf->fd_bitmap, NR_OPEN_DEFAULT) {
-		struct file *f = oldf->fd_array[fd];
-		printk("restore_fd, new mode i is %d\n",f->f_mode);
-	}*/
-	
-	return newf;
-
-	
 }
 
 static int copy_fs(struct task_struct *tsk){
@@ -795,7 +684,6 @@ static int copy_signal(unsigned long clone_flags, struct task_struct *tsk)
  * parts of the process environment (as per the clone
  * flags). The actual kick-off is left to the caller.
  */
-
 struct task_struct *copy_process(unsigned long clone_flags,
 				 unsigned long stack_start,
 				 unsigned long stack_size,
@@ -1047,13 +935,9 @@ out_free:
 	return ERR_PTR(retval);;
 }
 
-
-
-
 /*
  * Lego's main fork-routine
  */
-
 pid_t do_fork(unsigned long clone_flags,
 	      unsigned long stack_start,
 	      unsigned long stack_size,
@@ -1064,8 +948,6 @@ pid_t do_fork(unsigned long clone_flags,
 	struct task_struct *p;
 	struct completion vfork;
 	pid_t pid;
-	printk("do_fork here\n");
-
 
 	p = copy_process(clone_flags, stack_start, stack_size,
 			 child_tidptr, tls, NUMA_NO_NODE);
@@ -1079,9 +961,6 @@ pid_t do_fork(unsigned long clone_flags,
 	 * might get invalid after that point, if the thread exits quickly.
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
-    /*if (p->pid == 25){
-		clone_flags |= CLONE_GLOBAL_THREAD;
-	}*/
 	if (clone_flags & CLONE_GLOBAL_THREAD) {
 		void *vmainfo;
 		int ret;
@@ -1091,28 +970,17 @@ pid_t do_fork(unsigned long clone_flags,
 			WARN_ON_ONCE(1);
 			return PTR_ERR(vmainfo);
 		}
-		ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
-		if (ret) {
-			WARN_ON_ONCE(1);
-			return ret;
-		}
 
 		/*
 		 * This step has to be postponed here after
 		 * we got VMA info from remote memory.
 		 * Walk through page table entries.
 		 */
-		/*if(p->pid == 25){
-			ret = fork_dup_pcache(p, p->mm, current_tsk->mm, vmainfo);
-			printk("pid 25 ret is %d\n", ret);
-		}
-		else{
-			ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
-		}
+		ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
 		if (ret) {
 			WARN_ON_ONCE(1);
 			return ret;
-		}*/
+		}
 	}
 #endif
 
@@ -1125,36 +993,7 @@ pid_t do_fork(unsigned long clone_flags,
 		init_completion(&vfork);
 		get_task_struct(p);
 	}
-	
-	printk("Pid is %d\n", p->pid);
-	printk("sp is %lx\n", task_pt_regs(p)->sp);
-	printk("ip is %lx\n", task_pt_regs(p)->ip);
-	printk("cs is %lx\n", task_pt_regs(p)->cs);
-	/*
-	if (p->pid == 25){
-		deptrack_restore_files(current_info.pss);
-		deptrack_restore_signals(current_info.pss);
-		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
-		ss_task = &ss_tasks[0];
-		deptrack_restore_thread_state(p, ss_task);
-		
-		printk("clone flags is %lx\n", clone_flags);
-		printk("stack_start is %lx\n", stack_start);
-		printk("stack_size is %lx\n", stack_size);
-		printk("child_tidptr is %lx\n", child_tidptr);
-		printk("tls is %lx\n", tls);
 
-
-		printk("2525\n");
-	}
-	
-
-    printk("sp is %lx\n", task_pt_regs(p)->sp);
-	printk("ip is %lx\n", task_pt_regs(p)->ip);
-	printk("cs is %lx\n", task_pt_regs(p)->cs);*/
-#ifdef CONFIG_COMP_PROCESSOR
-	p->pm_data.home_node = 1;
-#endif
 	wake_up_new_task(p);
 
 	if (clone_flags & CLONE_VFORK)

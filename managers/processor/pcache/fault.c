@@ -185,6 +185,7 @@ static DEFINE_PER_CPU(struct p2m_pcache_miss_flush_combine_msg, pb_msg_array);
  * Callback for common fill code
  * Fill the pcache line from remote memory.
  */
+int nr_pcache_do_fill_page = 0;
 static int
 __pcache_do_fill_page(unsigned long address, unsigned long flags,
 		      struct pcache_meta *pcm, void *unused)
@@ -279,9 +280,12 @@ fallback:
 		PROFILE_LEAVE(__pcache_fill_remote_net);
 	}
 
-	/*if (current->tgid == 25){
-		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
-	}*/
+	if (current->tgid == 25){
+		if (nr_pcache_do_fill_page %10000 == 0){
+			printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
+		}
+		nr_pcache_do_fill_page+=1;
+	}
 
 	
 

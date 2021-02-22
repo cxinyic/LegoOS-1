@@ -280,12 +280,12 @@ fallback:
 		PROFILE_LEAVE(__pcache_fill_remote_net);
 	}
 
-	if (current->tgid == 25){
+	/*if (current->tgid == 25){
 		
 		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
 		
-		//  nr_pcache_do_fill_page+=1;
-	}
+		
+	}*/
 
 	
 

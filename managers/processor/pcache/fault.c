@@ -281,10 +281,10 @@ fallback:
 	}
 
 	if (current->tgid == 25){
-		if (nr_pcache_do_fill_page %10000 == 0){
-			printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
-		}
-		nr_pcache_do_fill_page+=1;
+		
+		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
+		
+		//  nr_pcache_do_fill_page+=1;
 	}
 
 	

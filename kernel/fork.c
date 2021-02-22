@@ -613,6 +613,7 @@ static struct files_struct *restore_fd(struct file_system *fs)
 		{	
 			f->f_op->open(f);
 		}
+		printk("restore_fd, new mode i is %d\n",f->f_mode);
 		i = i+1;
 	}
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {

@@ -887,9 +887,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		printk("pid is not 25\n");
 	}
 #endif*/
-	if(pid == 25){
+	/*if(pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
+	}*/
 	/*if(pid == 25){
 		arch_dup_task_struct(p, current_tsk);
 	}*/
@@ -1053,7 +1053,6 @@ struct task_struct *copy_process(unsigned long clone_flags,
 #endif
 	}
 	else{*/
-	    printk("size of mm stuct is %d",sizeof(*(current->mm)));
 		retval = copy_mm(clone_flags, p);
 	// }
 	if (retval)
@@ -1227,9 +1226,9 @@ pid_t do_fork(unsigned long clone_flags,
 	 * might get invalid after that point, if the thread exits quickly.
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
-    if (p->pid == 25){
+    /*if (p->pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
+	}*/
 	if (clone_flags & CLONE_GLOBAL_THREAD) {
 		void *vmainfo;
 		int ret;
@@ -1240,6 +1239,10 @@ pid_t do_fork(unsigned long clone_flags,
 			return PTR_ERR(vmainfo);
 		}
 		ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
+		if (ret) {
+			WARN_ON_ONCE(1);
+			return ret;
+		}
 
 		/*
 		 * This step has to be postponed here after

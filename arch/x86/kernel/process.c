@@ -143,8 +143,8 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	
 	printk("p->flags is %d\n", p->flags);
 
-
-	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
+	// if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
+	if (unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */
 		memset(childregs, 0, sizeof(struct pt_regs));
 		frame->bx = sp;		/* function */

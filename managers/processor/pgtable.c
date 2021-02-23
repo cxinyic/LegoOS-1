@@ -349,9 +349,8 @@ pcache_copy_pte_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 		pte_t ptecont = *src_pte;
 
 		if (pte_none(ptecont))
-		{	
 			continue;
-		}
+		
 		
 
 		if (!pte_present(ptecont)) {
@@ -459,7 +458,6 @@ int pcache_copy_page_range(struct mm_struct *dst, struct mm_struct *src,
 	ret = 0;
 	dst_pgd = pgd_offset(dst, addr);
 	src_pgd = pgd_offset(src, addr);
-	
 	do {
 		next = pgd_addr_end(addr, end);
 		if (pgd_none_or_clear_bad(src_pgd))

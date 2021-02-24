@@ -840,9 +840,17 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		return ERR_PTR(-EINVAL);
 
 	/* Duplicate task_struct and create new stack */
-	if(pid == 25){
-		clone_flags |= CLONE_GLOBAL_THREAD;
+
+	if (!(clone_flags & CLONE_IDLE_THREAD)) {
+		pid = alloc_pid(p);
+		if (!pid)
+			goto out_cleanup_thread;
 	}
+	if(pid == 25){
+        clone_flags |= CLONE_GLOBAL_THREAD;
+    }
+
+	
 	p = dup_task_struct(current, node);
 	if (!p)
 		return ERR_PTR(-ENOMEM);
@@ -925,11 +933,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		goto out_cleanup_mm;
 
 	/* clone idle thread, whose pid is 0 */
-	if (!(clone_flags & CLONE_IDLE_THREAD)) {
-		pid = alloc_pid(p);
-		if (!pid)
-			goto out_cleanup_thread;
-	}
+	
 
 	p->set_child_tid = (clone_flags & CLONE_CHILD_SETTID) ? child_tidptr : NULL;
 	/*

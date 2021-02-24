@@ -868,7 +868,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	 * Now do the dirty work.
 	 */
 
-	retval = copy_fs(p);
+	
 	if (retval < 0)
 		goto out_free;
 
@@ -880,8 +880,21 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	retval = setup_sched_fork(clone_flags, p);
 	if (retval)
 		goto out_cleanup_creds;
-
-	retval = copy_files(clone_flags, p);
+	if(pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
+		struct files_struct *oldf, *newf;
+		oldf = current_tsk->files;
+		struct file_system* fs;
+		fs = kmalloc(sizeof(*fs), GFP_KERNEL);
+		newf = restore_fd(fs);
+		p->fs = *fs;
+		p->files = newf;
+		retval = 0;
+#endif
+	}else{
+		retval = copy_fs(p);
+		retval = copy_files(clone_flags, p);
+	}
 	if (retval)
 		goto out_cleanup_sched;
 

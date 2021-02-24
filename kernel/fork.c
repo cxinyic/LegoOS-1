@@ -846,7 +846,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		if (!pid)
 			goto out_cleanup_thread;
 	}
-	if(pid == 25){
+	if (pid == 25){
         clone_flags |= CLONE_GLOBAL_THREAD;
 	}
 

@@ -25,6 +25,8 @@
 #include <asm/switch_to.h>
 #include <asm/fpu/internal.h>
 
+#include <processor/dependency_track.h>
+
 __visible DEFINE_PER_CPU(unsigned long, rsp_scratch);
 
 /*
@@ -112,14 +114,17 @@ SYSCALL_DEFINE2(arch_prctl, int, code, unsigned long, addr)
 int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		unsigned long arg, struct task_struct *p, unsigned long tls)
 {
+
 	struct pt_regs *childregs;
 	struct fork_frame *fork_frame;
 	struct inactive_task_frame *frame;
 	struct task_struct *me = current;
 	int err;
+	
 
 	p->thread.sp0 = (unsigned long)task_stack_page(p) + THREAD_SIZE;
 	childregs = task_pt_regs(p);
+	
 	fork_frame = container_of(childregs, struct fork_frame, regs);
 	frame = &fork_frame->frame;
 	frame->bp = 0;
@@ -135,7 +140,10 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	p->thread.fsbase = p->thread.fsindex ? 0 : me->thread.fsbase;
 	savesegment(es, p->thread.es);
 	savesegment(ds, p->thread.ds);
+	
+	printk("p->flags is %d\n", p->flags);
 
+	// if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
 	if (unlikely(p->flags & PF_KTHREAD)) {
 		/* kernel thread */
 		memset(childregs, 0, sizeof(struct pt_regs));
@@ -144,11 +152,39 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		return 0;
 	}
 	frame->bx = 0;
-	*childregs = *current_pt_regs();
+	/*if(p->pid == 25){
+#ifdef CONFIG_COMP_PROCESSOR
+		*childregs = *task_pt_regs(current_tsk);
+#endif
+	}
+	else{*/
+		*childregs = *current_pt_regs();
+	// }
+	/*if(p->pid==25){
+		printk("pid 25 restore registers\n");
+#ifdef CONFIG_COMP_PROCESSOR
+		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
+		ss_task = &ss_tasks[0];
+		deptrack_restore_thread_state(p, ss_task);
+#endif
+
+	}*/
+	
+	printk("childregs sp is %lx\n",childregs->sp);
+	printk("childregs ip is %lx\n",childregs->ip);
+	printk("childregs cs is %lx\n",childregs->cs);
+	printk("child thread sp is %lx\n",p->thread.sp );
+	
 
 	childregs->ax = 0;
-	if (sp)
+	/*if (p->pid!=25 && sp){
 		childregs->sp = sp;
+	}*/
+	if (sp){
+		childregs->sp = sp;
+	}
+
+		
 
 	/*
 	 * Set a new TLS for the child thread?

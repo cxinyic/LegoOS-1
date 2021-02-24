@@ -520,22 +520,12 @@ static struct files_struct *dup_fd(struct files_struct *oldf)
 	/* Copy fd bitmap and get each open file */
 	spin_lock(&oldf->file_lock);
 	bitmap_copy(newf->fd_bitmap, oldf->fd_bitmap, NR_OPEN_DEFAULT);
-	printk("close on exec size is %d\n", sizeof(*(newf->close_on_exec)));
-	printk("fd_bitmap size is %d\n", sizeof(*(newf->fd_bitmap)));
 	for_each_set_bit(fd, newf->fd_bitmap, NR_OPEN_DEFAULT) {
 		struct file *f = oldf->fd_array[fd];
 
 		BUG_ON(!f);
 		newf->fd_array[fd] = f;
 		get_file(f);
-		if (f->f_op != NULL){
-			printk("f_op address is %lx\n", f->f_op);
-			if (f->f_op->open != NULL)
-			{printk("open address is %lx\n", f->f_op->open);}
-		}
-		if (f->private_data!=NULL){
-			{printk("f->private_data is %lx\n", f->private_data);}
-		}
 
 		/*
 		 * Let special files know what is going on
@@ -841,14 +831,6 @@ struct task_struct *copy_process(unsigned long clone_flags,
 
 	/* Duplicate task_struct and create new stack */
 
-	if (!(clone_flags & CLONE_IDLE_THREAD)) {
-		pid = alloc_pid(p);
-		if (!pid)
-			goto out_cleanup_thread;
-	}
-	if (pid == 25){
-		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
 	
 
 	p = dup_task_struct(current, node);
@@ -880,8 +862,15 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	 */
 
 	
-	if (retval < 0)
-		goto out_free;
+	if (!(clone_flags & CLONE_IDLE_THREAD)) {
+		pid = alloc_pid(p);
+		if (!pid)
+			goto out_cleanup_thread;
+	}
+	if (pid == 25){
+		clone_flags |= CLONE_GLOBAL_THREAD;
+	}
+	
 
 	retval = copy_creds(p, clone_flags);
 	if (retval < 0)

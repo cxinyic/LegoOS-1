@@ -143,14 +143,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	
 	printk("p->flags is %d\n", p->flags);
 
-	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
-	// if (unlikely(p->flags & PF_KTHREAD)) {
-		/* kernel thread */
-		memset(childregs, 0, sizeof(struct pt_regs));
-		frame->bx = sp;		/* function */
-		frame->r12 = arg;
-		return 0;
-	}
+	
 	frame->bx = 0;
 	if(p->pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
@@ -179,6 +172,15 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	childregs->ax = 0;
 	if (p->pid!=25 && sp){
 		childregs->sp = sp;
+	}
+	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
+	// if (unlikely(p->flags & PF_KTHREAD)) {
+		/* kernel thread */
+		printk("enter here\n");
+		memset(childregs, 0, sizeof(struct pt_regs));
+		frame->bx = sp;		/* function */
+		frame->r12 = arg;
+		return 0;
 	}
 	/*if (sp){
 		childregs->sp = sp;

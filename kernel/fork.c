@@ -840,6 +840,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		return ERR_PTR(-EINVAL);
 
 	/* Duplicate task_struct and create new stack */
+	if(pid == 25){
+		clone_flags |= CLONE_GLOBAL_THREAD;
+	}
 	p = dup_task_struct(current, node);
 	if (!p)
 		return ERR_PTR(-ENOMEM);
@@ -1092,9 +1095,9 @@ pid_t do_fork(unsigned long clone_flags,
 	 * might get invalid after that point, if the thread exits quickly.
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
-    /*if (p->pid == 25){
+    if (p->pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
-	}*/
+	}
 	if (clone_flags & CLONE_GLOBAL_THREAD) {
 		void *vmainfo;
 		int ret;
@@ -1104,11 +1107,11 @@ pid_t do_fork(unsigned long clone_flags,
 			WARN_ON_ONCE(1);
 			return PTR_ERR(vmainfo);
 		}
-		ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
+		/*ret = fork_dup_pcache(p, p->mm, current->mm, vmainfo);
 		if (ret) {
 			WARN_ON_ONCE(1);
 			return ret;
-		}
+		}*/
 
 		/*
 		 * This step has to be postponed here after

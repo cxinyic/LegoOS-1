@@ -617,6 +617,9 @@ void handle_p2m_fork(struct p2m_fork_struct *payload,
 	tb_set_tx_size(tb, sizeof(int));
 
 	parent = find_lego_task_by_pid(nid, parent_tgid);
+	if(tgid == 25){
+		printk("parent_tgid is %d\n", parent_tgid);
+	}
 	if (!parent && parent_tgid != 1)
 		WARN_ONCE(1, "From processor-daemon?");
 

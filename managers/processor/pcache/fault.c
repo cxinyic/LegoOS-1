@@ -646,5 +646,8 @@ int pcache_handle_fault(struct mm_struct *mm,
 	inc_pcache_event(PCACHE_FAULT);
 	inc_pcache_event_cond(PCACHE_FAULT_CODE, !!(flags & FAULT_FLAG_INSTRUCTION));
 
+	if (current->pid == 25){
+		printk("pid 25 fail on this addr: %lx\n", address);
+	}
 	return pcache_handle_pte_fault(mm, address, pte, pmd, flags);
 }

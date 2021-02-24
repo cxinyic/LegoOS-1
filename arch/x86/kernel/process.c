@@ -122,6 +122,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	int err;
 	
 
+	
 	p->thread.sp0 = (unsigned long)task_stack_page(p) + THREAD_SIZE;
 	childregs = task_pt_regs(p);
 	

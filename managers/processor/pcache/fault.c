@@ -85,7 +85,7 @@ static void piggyback_fallback(struct pcache_meta *pcm)
 	void *va_cache = pcache_meta_to_kva(pcm);
 
 	__clflush_one(pb->tgid, pb->user_addr, pb->memory_nid,
-		      pb->replication_nid, va_cache, 0);
+		      pb->replication_nid, va_cache,0);
 
 	pset = pcache_meta_to_pcache_set(pcm);
 	pset_remove_eviction(pset, pcm, 1);
@@ -185,7 +185,6 @@ static DEFINE_PER_CPU(struct p2m_pcache_miss_flush_combine_msg, pb_msg_array);
  * Callback for common fill code
  * Fill the pcache line from remote memory.
  */
-int nr_pcache_do_fill_page = 0;
 static int
 __pcache_do_fill_page(unsigned long address, unsigned long flags,
 		      struct pcache_meta *pcm, void *unused)
@@ -280,17 +279,6 @@ fallback:
 		PROFILE_LEAVE(__pcache_fill_remote_net);
 	}
 
-	/*if (current->tgid == 25){
-		
-		printk("pid 25 __pcache_do_fill_page addr is %lx\n", address);
-		
-		
-	}*/
-
-	
-
-
-
 	if (unlikely(len < (int)PCACHE_LINE_SIZE)) {
 		if (likely(len == sizeof(int))) {
 			/* remote reported error */
@@ -339,9 +327,6 @@ static int
 __pcache_do_zerofill_page(unsigned long address, unsigned long flags,
 			  struct pcache_meta *pcm, void *unused)
 {
-	/*if (current->pid == 25){
-		printk("__pcache_do_zerofill_page: address is %lx\n", address);
-	}*/
 	void *pcache_kva;
 	PROFILE_POINT_TIME(__pcache_fill_zerofill)
 
@@ -413,12 +398,6 @@ static int pcache_do_wp_page(struct mm_struct *mm, unsigned long address,
 			     pte_t *page_table, pmd_t *pmd, spinlock_t *ptl,
 			     pte_t orig_pte) __releases(ptl)
 {
-	if (current->tgid == 25){
-		printk("pid 25 pcache_do_wp_page is %lx\n", address);
-	}
-	if (current->tgid == 24){
-		printk("pid 24 pcache_do_wp_page is %lx\n", address);
-	}
 	struct pcache_meta *old_pcm;
 	int ret;
 

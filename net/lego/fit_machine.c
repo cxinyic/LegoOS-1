@@ -45,9 +45,9 @@ static const char *lego_cluster_hostnames[CONFIG_FIT_NR_NODES] = {
 };
 
 static struct fit_machine_info ZEBRA_CLUSTER[] = {
-[0]	= {	.hostname =	"zebra02",	.lid =	12,	},
-[1]	= {	.hostname =	"zebra01",	.lid =	15,	},
-[2]	= {	.hostname =	"zebra06",	.lid =	17,	},
+[0]	= {	.hostname =	"zebra02",	.lid =	45,	},
+[1]	= {	.hostname =	"zebra01",	.lid =	150,	},
+[2]	= {	.hostname =	"zebra06",	.lid =	127,	},
 /*[3]	= {	.hostname =	"wuklab03",	.lid =	9,	},
 [4]	= {	.hostname =	"wuklab04",	.lid =	7,	},
 [5]	= {	.hostname =	"wuklab05",	.lid =	3,	},

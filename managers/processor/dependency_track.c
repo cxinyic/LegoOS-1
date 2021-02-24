@@ -359,7 +359,7 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
-            if (flush_flag == 3){
+            if (flush_flag == 2){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                // flush_flag +=1;
                struct task_struct *ret1 __maybe_unused;
@@ -375,7 +375,7 @@ static int dependency_track(void *unused){
                
            }
             
-           if (flush_flag == 2){
+           if (flush_flag == 1){
                
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);

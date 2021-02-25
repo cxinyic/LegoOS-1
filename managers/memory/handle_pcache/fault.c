@@ -59,7 +59,8 @@ struct files_meta_struct files_meta;
 
 long do_shadow_copy(unsigned long addr, unsigned long* page){
 	unsigned long vaddr;
-	// printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);
+	if (shadow_copy_meta.nr_curr%100==0)
+	{printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);}
 	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
 		*page = shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr];
 		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;

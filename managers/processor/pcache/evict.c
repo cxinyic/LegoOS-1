@@ -258,6 +258,7 @@ out:
 
 int nr_evict_lines = 0;
 int nr_flush_lines = 1;
+int shadow_copy_flag = 0;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
@@ -356,6 +357,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);
+			shadow_copy_flag = 1;
 		}
 
 		while (dp_vector_size(pcms_to_flush)>0){
@@ -369,9 +371,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			}
 		}
 
-		if (dp_vector_size(pcms_to_flush)>0){
+		if (shadow_copy_flag == 1){
 			shadow_copy_end(NULL);
 			curr_version_id += 1;
+			shadow_copy_flag = 0;
 		}
 		
 

@@ -412,7 +412,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 		// printk("handle_p2m_shadow_copy_end: step2, i is %d\n", i);
 		up_read(&p->mm->mmap_sem);
 		if (likely(ret == 1)) {
-			printk("handle_p2m_shadow_copy_end: step3, page addr is %lx\n", shadow_copy_meta.page_addrs[i]);
+			// printk("handle_p2m_shadow_copy_end: step3, page addr is %lx\n", shadow_copy_meta.page_addrs[i]);
 			memcpy((void *)dst_page, (void *)(shadow_copy_meta.page_addrs[i]), PCACHE_LINE_SIZE);
 			reply = 0;
 		} else

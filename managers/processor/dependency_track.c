@@ -359,9 +359,8 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
-            if (flush_flag == 1){
+            /*if (flush_flag == 1){
                printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
-               // flush_flag +=1;
                struct task_struct *ret1 __maybe_unused;
 
 	            ret1 = kthread_run(toy_func, NULL, "toy_func");
@@ -389,10 +388,10 @@ static int dependency_track(void *unused){
                 kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
                 printk("DepTrack: kill the process\n");
 
-                // flush_flag +=1;
+                
 
                
-           }
+           }*/
            flush_flag+=1;
 
             pdi.first_pcm = NULL;

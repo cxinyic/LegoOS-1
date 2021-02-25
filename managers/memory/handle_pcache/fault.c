@@ -59,7 +59,7 @@ struct files_meta_struct files_meta;
 
 long do_shadow_copy(unsigned long addr, unsigned long* page){
 	unsigned long vaddr;
-	printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);
+	// printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);
 	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
 		*page = shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr];
 		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
@@ -219,7 +219,7 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb)
 	}
 
 	if (msg->shadow_copy_flag == 1){
-		printk("handle_p2m_shadow_copy_flush: step1\n");
+		// printk("handle_p2m_shadow_copy_flush: step1\n");
 		ret = do_shadow_copy(msg->user_va, &dst_page);
 		if (likely(ret == 1)) {
 			memcpy((void *)dst_page, msg->pcacheline, PCACHE_LINE_SIZE);
@@ -232,7 +232,7 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb)
 		
 	}
 	else{
-		printk("handle_p2m_shadow_nocopy_flush: step1\n");
+		// printk("handle_p2m_shadow_nocopy_flush: step1\n");
 		down_read(&p->mm->mmap_sem);
 		ret = get_user_pages(p, msg->user_va, 1, 0, &dst_page, NULL);
 		up_read(&p->mm->mmap_sem);
@@ -407,7 +407,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 	for(i=0; i<shadow_copy_meta.nr_curr; i++){
 		down_read(&p->mm->mmap_sem);
 		ret = get_user_pages(p, shadow_copy_meta.user_addrs[i], 1, 0, &dst_page, NULL);
-		printk("handle_p2m_shadow_copy_end: step2, i is %d\n", i);
+		// printk("handle_p2m_shadow_copy_end: step2, i is %d\n", i);
 		up_read(&p->mm->mmap_sem);
 		if (likely(ret == 1)) {
 			printk("handle_p2m_shadow_copy_end: step3, page addr is %lx\n", shadow_copy_meta.page_addrs[i]);
@@ -416,7 +416,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 		} else
 		{reply = -EFAULT;
 			goto out;}
-		printk("handle_p2m_shadow_copy_end: step4, i is %d\n", i);
+		// printk("handle_p2m_shadow_copy_end: step4, i is %d\n", i);
 
 	}
 	shadow_copy_meta.nr_curr = 0;

@@ -314,7 +314,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 	
 
-	if (current_pid>0){
+	/*if (current_pid>0){
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
@@ -354,9 +354,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		if (size>1){
 			printk("DepTrack: flush %d pages\n",size);
 		}
-		/*if (dp_vector_size(pcms_to_flush)>0){
+		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);
-		}*/
+		}
 
 		while (dp_vector_size(pcms_to_flush)>0){
 			tmp = (struct pcache_meta **)dp_vector_Nth(pcms_to_flush, 0);
@@ -369,10 +369,10 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			}
 		}
 
-		/*if (dp_vector_size(pcms_to_flush)>0){
+		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_end(NULL);
 			curr_version_id += 1;
-		}*/
+		}
 		
 
 
@@ -381,7 +381,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}
+	}*/
 	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);

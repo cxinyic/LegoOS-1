@@ -232,6 +232,7 @@ void handle_p2m_flush_one(struct p2m_flush_msg *msg, struct thpool_buffer *tb)
 		
 	}
 	else{
+		printk("handle_p2m_shadow_nocopy_flush: step1\n");
 		down_read(&p->mm->mmap_sem);
 		ret = get_user_pages(p, msg->user_va, 1, 0, &dst_page, NULL);
 		up_read(&p->mm->mmap_sem);

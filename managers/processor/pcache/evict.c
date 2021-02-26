@@ -186,7 +186,7 @@ static int shadow_copy_begin(void *unused)
         kfree(retbuf);
         return -ENOMEM;
     }
-    printk("shadow copy begin\n");
+    // printk("shadow copy begin\n");
 
     hdr = msg;
     hdr->opcode = P2M_SHADOW_COPY_BEGIN;
@@ -231,7 +231,7 @@ static int shadow_copy_end(void *unused)
         kfree(retbuf);
         return -ENOMEM;
     }
-    printk("shadow copy end\n");
+    // printk("shadow copy end\n");
 
     hdr = msg;
     hdr->opcode = P2M_SHADOW_COPY_END;
@@ -353,7 +353,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 		size = dp_vector_size(pcms_to_flush);
 		if (size>1){
-			printk("DepTrack: flush %d pages\n",size);
+			// printk("DepTrack: flush %d pages\n",size);
 		}
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);

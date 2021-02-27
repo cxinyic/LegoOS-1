@@ -1274,7 +1274,8 @@ relock:
 
 		if (unlikely(current->jobctl & JOBCTL_STOP_PENDING) &&
 		    do_signal_stop(0))
-			goto relock;
+			{ printk("do_signal_stop here\n");
+			goto relock;}
 
 		if (unlikely(current->jobctl & JOBCTL_TRAP_MASK)) {
 			do_jobctl_trap();
@@ -1291,6 +1292,7 @@ relock:
 		 * No signal to handle
 		 * Wil return 0
 		 */
+		printk("signal dequeue is %d\n", signr);
 		if (!signr)
 			break;
 

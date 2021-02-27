@@ -391,7 +391,7 @@ static int dependency_track(void *unused){
 			        kick_process(current_tsk);
                 spin_unlock_irqrestore(&tasklist_lock, flags);
                 printk("DepTrack: finished the checkpoint\n");*/
-                kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+                kill_pid_info(SIGKILL, (struct siginfo *) 0, current_pid);
                 printk("DepTrack: kill the process\n");
 
                 

@@ -439,6 +439,28 @@ static void complete_signal(int sig, struct task_struct *p, int group)
 }
 
 /**
+ *XY: add this function to handle SIGCONT
+ */
+static void prepare_signal(int sig, struct task_struct *p){
+	struct signal_struct *signal = p->signal;
+	struct task_struct *t;
+	sigset_t flush;
+	if (sig == SIGCONT){
+		printk("prepare_signal here %d\n");
+		siginitset(&flush, SIG_KERNEL_STOP_MASK);
+		flush_sigqueue_mask(&flush, &signal->shared_pending);
+		for_each_thread(p, t) {
+			flush_sigqueue_mask(&flush, &t->pending);
+			task_clear_jobctl_pending(t, JOBCTL_STOP_PENDING);
+			if (likely(!(t->ptrace & PT_SEIZED)))
+				wake_up_state(t, __TASK_STOPPED);
+			else
+				ptrace_trap_notify(t);
+		}
+	}
+}
+
+/**
  * send_signal
  * @sig: the signal to deliver
  * @info: information of how signal is generated
@@ -457,6 +479,8 @@ send_signal(int sig, struct siginfo *info, struct task_struct *t, int group)
 	int ret = 0;
 
 	BUG_ON(!spin_is_locked(&t->sighand->siglock));
+
+	prepare_signal(sig,t);
 
 	pending = group ? &t->signal->shared_pending : &t->pending;
 

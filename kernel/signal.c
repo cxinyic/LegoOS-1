@@ -920,7 +920,8 @@ static bool task_participate_group_stop(struct task_struct *task)
  */
 static bool do_signal_stop(int signr)
 	__releases(&current->sighand->siglock)
-{
+{	
+	printk("do_signal_stop called here\n");
 
 	struct signal_struct *sig = current->signal;
 

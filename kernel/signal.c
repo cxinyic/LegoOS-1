@@ -438,6 +438,25 @@ static void complete_signal(int sig, struct task_struct *p, int group)
 	return;
 }
 
+static int flush_sigqueue_mask(sigset_t *mask, struct sigpending *s)
+{
+	struct sigqueue *q, *n;
+	sigset_t m;
+
+	sigandsets(&m, mask, &s->signal);
+	if (sigisemptyset(&m))
+		return 0;
+
+	sigandnsets(&s->signal, &s->signal, mask);
+	list_for_each_entry_safe(q, n, &s->list, list) {
+		if (sigismember(mask, q->info.si_signo)) {
+			list_del_init(&q->list);
+			__sigqueue_free(q);
+		}
+	}
+	return 1;
+}
+
 /**
  *XY: add this function to handle SIGCONT
  */
@@ -452,10 +471,8 @@ static void prepare_signal(int sig, struct task_struct *p){
 		for_each_thread(p, t) {
 			flush_sigqueue_mask(&flush, &t->pending);
 			task_clear_jobctl_pending(t, JOBCTL_STOP_PENDING);
-			if (likely(!(t->ptrace & PT_SEIZED)))
+			if (likely(!(t->ptrace)))
 				wake_up_state(t, __TASK_STOPPED);
-			else
-				ptrace_trap_notify(t);
 		}
 	}
 }
@@ -2042,24 +2059,7 @@ static int sig_handler_ignored(void __user *handler, int sig)
  *
  * All callers must be holding the siglock.
  */
-static int flush_sigqueue_mask(sigset_t *mask, struct sigpending *s)
-{
-	struct sigqueue *q, *n;
-	sigset_t m;
 
-	sigandsets(&m, mask, &s->signal);
-	if (sigisemptyset(&m))
-		return 0;
-
-	sigandnsets(&s->signal, &s->signal, mask);
-	list_for_each_entry_safe(q, n, &s->list, list) {
-		if (sigismember(mask, q->info.si_signo)) {
-			list_del_init(&q->list);
-			__sigqueue_free(q);
-		}
-	}
-	return 1;
-}
 
 int do_sigaction(int sig, struct k_sigaction *act, struct k_sigaction *oact)
 {

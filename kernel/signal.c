@@ -1275,7 +1275,7 @@ relock:
 
 		if (unlikely(current->jobctl & JOBCTL_STOP_PENDING) &&
 		    do_signal_stop(0))
-			{ printk("do_signal_stop here\n");
+			{ printk("do_signal_stop here1\n");
 			goto relock;}
 
 		if (unlikely(current->jobctl & JOBCTL_TRAP_MASK)) {
@@ -1362,6 +1362,7 @@ relock:
 
 			if (likely(do_signal_stop(ksig->info.si_signo))) {
 				/* It released the siglock.  */
+				printk("do_signal_stop here2\n");
 				goto relock;
 			}
 

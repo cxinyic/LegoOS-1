@@ -990,7 +990,7 @@ static bool do_signal_stop(int signr)
 		if (task_participate_group_stop(current))
 			notify = CLD_STOPPED;
 
-		printk("notification state = %d\n", notify);
+		
 		__set_current_state(TASK_STOPPED);
 		spin_unlock_irq(&current->sighand->siglock);
 
@@ -1010,7 +1010,9 @@ static bool do_signal_stop(int signr)
 		}
 
 		/* Now we don't run again until woken by SIGCONT or SIGKILL */
+		printk("before schedule\n");
 		schedule();
+		printk("after schedule\n");
 		return true;
 	} else {
 		/*

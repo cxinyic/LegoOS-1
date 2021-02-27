@@ -359,12 +359,12 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
-            if (flush_flag == 10){
+            /*if (flush_flag == 10){
                 printk("DepTrack: stop tracking\n");
                 current_pid = -1;
             }
             if (flush_flag == 1){
-               /*printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
+               printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                struct task_struct *ret1 __maybe_unused;
 
 	            ret1 = kthread_run(toy_func, NULL, "toy_func");
@@ -372,7 +372,7 @@ static int dependency_track(void *unused){
 		                panic("Fail to create toy func thread!");
                 else{
                     printk("DepTrack: okk\n");
-                }*/
+                }
                 kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
                 printk("DepTrack: continue the process\n");
                 
@@ -384,20 +384,29 @@ static int dependency_track(void *unused){
                
                // printk("DepTrack: the ip value is %lu\n", current_registers->ip);
                //  flush_register_value(NULL);
-               /*printk("DepTrack: checkpoint the process\n");
-               spin_lock_irqsave(&tasklist_lock, flags);
-               set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
-               if (!wake_up_state(current_tsk, TASK_ALL))
+                printk("DepTrack: checkpoint the process\n");
+                spin_lock_irqsave(&tasklist_lock, flags);
+                set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
+                if (!wake_up_state(current_tsk, TASK_ALL))
 			        kick_process(current_tsk);
                 spin_unlock_irqrestore(&tasklist_lock, flags);
-                printk("DepTrack: finished the checkpoint\n");*/
-                kill_pid_info(SIGKILL, (struct siginfo *) 0, current_pid);
-                printk("DepTrack: kill the process\n");
+                printk("DepTrack: finished the checkpoint\n");
+                kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+                printk("DepTrack: stop the process\n");
 
                 
 
                
-           }
+           }*/
+            printk("DepTrack: checkpoint the process\n");
+            spin_lock_irqsave(&tasklist_lock, flags);
+            set_tsk_thread_flag(current_tsk, TIF_NEED_CHECKPOINT);
+            if (!wake_up_state(current_tsk, TASK_ALL))
+			    kick_process(current_tsk);
+            spin_unlock_irqrestore(&tasklist_lock, flags);
+            printk("DepTrack: finished the checkpoint\n");
+            kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+            printk("DepTrack: stop the process\n");
            flush_flag+=1;
 
             pdi.first_pcm = NULL;
@@ -482,8 +491,10 @@ static int dependency_track(void *unused){
 
                
            }*/
-          // if (pdi.nr_dirty_pages>0)
-          // {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+          if (pdi.nr_dirty_pages>0)
+          {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+          kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
+           printk("DepTrack: continue the process\n");
 
 
            

@@ -465,7 +465,7 @@ static void prepare_signal(int sig, struct task_struct *p){
 	struct task_struct *t;
 	sigset_t flush;
 	if (sig == SIGCONT){
-		printk("prepare_signal here %d\n");
+		printk("prepare_signal here\n");
 		siginitset(&flush, SIG_KERNEL_STOP_MASK);
 		flush_sigqueue_mask(&flush, &signal->shared_pending);
 		for_each_thread(p, t) {
@@ -1318,8 +1318,7 @@ relock:
 
 		if (unlikely(current->jobctl & JOBCTL_STOP_PENDING) &&
 		    do_signal_stop(0))
-			{ printk("do_signal_stop here1\n");
-			goto relock;}
+			goto relock;
 
 		if (unlikely(current->jobctl & JOBCTL_TRAP_MASK)) {
 			do_jobctl_trap();
@@ -1339,15 +1338,13 @@ relock:
 		printk("signal dequeue is %d\n", signr);
 		if (!signr)
 			break;
-
 		ka = &sighand->action[signr-1];
-		printk("step1\n");
+		
 		/*
 		 * Signal catched, but ignore it:
 		 */
 		if (ka->sa.sa_handler == SIG_IGN)
 			continue;
-		printk("step2\n");
 		/*
 		 * Signal catched with customized signal handler.
 		 * Then return and let arch code run the handler:
@@ -1360,14 +1357,13 @@ relock:
 
 			break; /* will return non-zero "signr" value */
 		}
-		printk("step3\n");
 
 		/*
 		 * Signal catched with default action:
 		 */
 		if (sig_kernel_ignore(signr)) /* Default is nothing. */
 			continue;
-		printk("step4\n");
+
 		/*
 		 * Global init gets no signals it doesn't want.
 		 * Container-init gets no signals it doesn't want from same
@@ -1381,9 +1377,7 @@ relock:
 		if (unlikely(signal->flags & SIGNAL_UNKILLABLE) &&
 				!sig_kernel_only(signr))
 			continue;
-		printk("step5\n");
 		if (sig_kernel_stop(signr)) {
-			printk("enter here0\n");
 			/*
 			 * The default action is to stop all threads in
 			 * the thread group.  The job control signals
@@ -1404,13 +1398,10 @@ relock:
 
 				spin_lock_irq(&sighand->siglock);
 			}
-			printk("enter here1\n");
 			if (likely(do_signal_stop(ksig->info.si_signo))) {
 				/* It released the siglock.  */
-				printk("do_signal_stop here2\n");
 				goto relock;
 			}
-			printk("enter here2\n");
 
 			/*
 			 * We didn't actually stop, due to a race

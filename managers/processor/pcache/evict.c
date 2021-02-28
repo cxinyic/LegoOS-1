@@ -341,6 +341,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 					continue;
 				}
 				size = dp_vector_size(tmp_pcm->dependency_list);
+				printk("DepTrack: flush pcm: %lx, number of pages are : %d\n",tmp_pcm, size);
 				for (j=0; j<size; j++){
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
 				}

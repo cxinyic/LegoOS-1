@@ -491,8 +491,8 @@ static int dependency_track(void *unused){
 
                
            }*/
-          if (pdi.nr_dirty_pages>0)
-          {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
+          // if (pdi.nr_dirty_pages>0)
+          // {printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);}
           /*kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
            printk("DepTrack: continue the process\n");*/
 

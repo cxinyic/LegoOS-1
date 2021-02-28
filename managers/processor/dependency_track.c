@@ -409,7 +409,7 @@ static int dependency_track(void *unused){
             printk("DepTrack: finished the checkpoint\n");
             kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
             printk("DepTrack: stop the process\n");*/
-           flush_flag+=1;
+           // flush_flag+=1;
 
             pdi.first_pcm = NULL;
             pdi.last_pcm = NULL;
@@ -423,8 +423,7 @@ static int dependency_track(void *unused){
                 rmap_walk(pcm, &rwc);
             }
 
-            if (flush_flag == 0)
-                shadow_copy_end1(NULL);
+            
             
             
             if (pdi.first_pcm != NULL && pdi.last_pcm != NULL ){

@@ -353,7 +353,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 		size = dp_vector_size(pcms_to_flush);
 		if (size>1){
-			// printk("DepTrack: flush %d pages\n",size);
+			printk("DepTrack: flush %d pages\n",size);
 		}
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);

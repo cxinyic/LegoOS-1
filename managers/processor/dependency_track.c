@@ -492,7 +492,7 @@ static int dependency_track(void *unused){
 
                
            }*/
-          if (pdi.nr_dirty_pages>0)
+          if (pdi.nr_dirty_pages>0 && flush_flag == 0)
           {
                 printk("DepTrack: in this periods, the number of dirty pages are %d\n", pdi.nr_dirty_pages);
                 flush_flag = 1;

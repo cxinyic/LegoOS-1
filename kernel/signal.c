@@ -465,7 +465,7 @@ static void prepare_signal(int sig, struct task_struct *p){
 	struct task_struct *t;
 	sigset_t flush;
 	if (sig == SIGCONT){
-		printk("prepare_signal here\n");
+		// printk("prepare_signal here\n");
 		siginitset(&flush, SIG_KERNEL_STOP_MASK);
 		flush_sigqueue_mask(&flush, &signal->shared_pending);
 		for_each_thread(p, t) {
@@ -489,7 +489,7 @@ static void prepare_signal(int sig, struct task_struct *p){
 static int
 send_signal(int sig, struct siginfo *info, struct task_struct *t, int group)
 {
-	printk("Deptrack: send signal: %d\n", sig);
+	// printk("Deptrack: send signal: %d\n", sig);
 	struct sigpending *pending;
 	struct sigqueue *q;
 	int override_rlimit;
@@ -1335,7 +1335,7 @@ relock:
 		 * No signal to handle
 		 * Wil return 0
 		 */
-		printk("signal dequeue is %d\n", signr);
+		// printk("signal dequeue is %d\n", signr);
 		if (!signr)
 			break;
 		ka = &sighand->action[signr-1];

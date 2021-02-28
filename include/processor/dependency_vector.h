@@ -66,8 +66,14 @@ static int dp_vector_size(struct dp_vector* v){
 
 static bool dp_vector_in(struct dp_vector* v, void* elem_addr){
     int i=0;
+    struct pcache_meta ** tmp1, **tmp2;
+    struct pcache_meta *tmp_pcm1, *tmp_pcm2;
+    tmp2 = (struct pcache_meta **)elem_addr;
+    tmp_pcm2 = *tmp2;
     for(i=0; i<dp_vector_size(v); i++){
-        if ((struct pcache_meta *)(*dp_vector_Nth(v,i)) == (struct pcache_meta *)(*elem_addr)){
+        tmp1 = (struct pcache_meta **)dp_vector_Nth(v,i);
+        tmp_pcm1 = *tmp1;
+        if (tmp_pcm1 == tmp_pcm2){
             return true;
         }
     }

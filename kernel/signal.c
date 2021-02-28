@@ -962,7 +962,7 @@ static bool task_participate_group_stop(struct task_struct *task)
 static bool do_signal_stop(int signr)
 	__releases(&current->sighand->siglock)
 {	
-	printk("do_signal_stop called here\n");
+	// printk("do_signal_stop called here\n");
 
 	struct signal_struct *sig = current->signal;
 
@@ -1051,9 +1051,7 @@ static bool do_signal_stop(int signr)
 		}
 
 		/* Now we don't run again until woken by SIGCONT or SIGKILL */
-		printk("before schedule\n");
 		schedule();
-		printk("after schedule\n");
 		return true;
 	} else {
 		/*

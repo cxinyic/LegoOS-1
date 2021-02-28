@@ -299,6 +299,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	pcm = evict_find_line(pset);
 	__ClearPsetEvicting(pset);
 	PROFILE_LEAVE(pcache_alloc_evict_do_find);
+	
 
 	if (IS_ERR_OR_NULL(pcm)) {
 		if (likely(PTR_ERR(pcm) == -EAGAIN)) {
@@ -316,6 +317,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 
 	if (current_pid>0){
+		printk("the evicted page is %lx\n",pcm);
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
 		dp_vector_new(dependency_queue, sizeof(struct pcache_meta* ));
@@ -341,7 +343,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 					continue;
 				}
 				size = dp_vector_size(tmp_pcm->dependency_list);
-				printk("DepTrack: flush pcm: %lx, number of pages are : %d\n",tmp_pcm, size);
+				// printk("DepTrack: flush pcm: %lx, number of pages are : %d\n",tmp_pcm, size);
 				for (j=0; j<size; j++){
 					dp_vector_pushback(dependency_queue, dp_vector_Nth(tmp_pcm->dependency_list,j));
 				}

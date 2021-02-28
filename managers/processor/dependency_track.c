@@ -327,7 +327,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                         shadow_copy_begin1(NULL);
                     }*/
                     if (flush_flag == 0){
-                        printk("dirty page at first run is %lx\n", rmap->address);
+                        printk("dirty page at first run is %lx\n", pcm);
                     }
 				    // pcache_flush_one(pcm, 0);
 				    // printk("flush one pcm,addr is %lx\n", rmap->address);

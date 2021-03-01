@@ -316,7 +316,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 	
 
-	/*if (current_pid>0){
+	if (current_pid>0){
 		// printk("the evicted page is %lx\n",pcm);
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -355,9 +355,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		size = dp_vector_size(pcms_to_flush);
-		if (size>1){
+		/*if (size>1){
 			printk("DepTrack: flush %d pages\n",size);
-		}
+		}*/
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);
 			shadow_copy_flag = 1;
@@ -387,7 +387,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}*/
+	}
 	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);

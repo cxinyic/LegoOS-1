@@ -407,7 +407,7 @@ static int dependency_track(void *unused){
 			    kick_process(current_tsk);
             spin_unlock_irqrestore(&tasklist_lock, flags);
             printk("DepTrack: finished the checkpoint\n");*/
-            // kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+             kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
             // printk("DepTrack: stop the process\n");
            // flush_flag+=1;
 
@@ -497,7 +497,7 @@ static int dependency_track(void *unused){
                 printk("DepTrack: in the %d run, the number of dirty pages are %d\n", flush_flag, pdi.nr_dirty_pages);
                 flush_flag += 1;
           }*/
-          // kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
+          kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
             // printk("DepTrack: continue the process\n");
 
 

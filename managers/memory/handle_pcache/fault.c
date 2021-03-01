@@ -59,8 +59,8 @@ struct files_meta_struct files_meta;
 
 long do_shadow_copy(unsigned long addr, unsigned long* page){
 	unsigned long vaddr;
-	if (shadow_copy_meta.nr_curr%100 == 0)
-	{printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);}
+	/*if (shadow_copy_meta.nr_curr%100 == 0)
+	{printk("do_shadow_copy: number is %d\n", shadow_copy_meta.nr_curr);}*/
 	if  (shadow_copy_meta.nr_curr<shadow_copy_meta.nr_max){
 		*page = shadow_copy_meta.page_addrs[shadow_copy_meta.nr_curr];
 		shadow_copy_meta.user_addrs[shadow_copy_meta.nr_curr] = addr;
@@ -372,7 +372,7 @@ void handle_p2m_shadow_copy_begin(struct p2m_shadow_copy_begin_payload *payload,
 	
 	struct lego_task_struct *p;
     unsigned long reply;
-	printk("handle_p2m_shadow_copy_begin: step1\n");
+	// printk("handle_p2m_shadow_copy_begin: step1\n");
 	
 	p = find_lego_task_by_pid(hdr->src_nid, payload->tgid);
 	if (unlikely(!p)) {
@@ -402,7 +402,7 @@ void handle_p2m_shadow_copy_end(struct p2m_shadow_copy_end_payload *payload,
 		reply = -ESRCH;
 		goto out;
 	}
-	printk("handle_p2m_shadow_copy_end: step1, number is %d\n", shadow_copy_meta.nr_curr);
+	// printk("handle_p2m_shadow_copy_end: step1, number is %d\n", shadow_copy_meta.nr_curr);
 
 	shadow_copy_meta.new_version_id = payload->version_id;
 	int i = 0;
@@ -442,7 +442,6 @@ void handle_p2m_flush_files(struct p2m_flush_files_payload *payload,
 		reply = -ESRCH;
 		goto out;
 	}
-	printk("handle_p2m_flush_files step1\n");
 	memcpy(files_meta.data, payload->data, 4096);
 	files_meta.version_id = payload->version_id;
 	reply = 0;
@@ -458,6 +457,5 @@ void handle_p2m_read_files(struct p2m_read_files_payload *payload,
 	// tb_set_private_tx(tb, (void *)(files_meta.data));
 	memcpy(thpool_buffer_tx(tb), (void *)(files_meta.data),4096);
 	tb_set_tx_size(tb, 4096);
-	printk("handle_p2m_read_files step1\n");
 
 }

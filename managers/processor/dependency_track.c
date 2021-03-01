@@ -327,7 +327,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                         shadow_copy_begin1(NULL);
                     }*/
                     
-                    printk("dirty page in this run is %lx, addr is %lx\n", pcm, rmap->address);
+                    // printk("dirty page in this run is %lx, addr is %lx\n", pcm, rmap->address);
                     
 				    // pcache_flush_one(pcm, 0);
 				    // printk("flush one pcm,addr is %lx\n", rmap->address);
@@ -492,11 +492,11 @@ static int dependency_track(void *unused){
 
                
            }*/
-          if (pdi.nr_dirty_pages>0)
+          /*if (pdi.nr_dirty_pages>0)
           {
                 printk("DepTrack: in the %d run, the number of dirty pages are %d\n", flush_flag, pdi.nr_dirty_pages);
                 flush_flag += 1;
-          }
+          }*/
           kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
             // printk("DepTrack: continue the process\n");
 

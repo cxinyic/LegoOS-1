@@ -141,8 +141,7 @@ static int flush_files_value(struct task_struct* p){
 	}
 	
 
-    printk("flush_files_value, total size is %d\n", size);
-    printk("sizeof(struct file_reduced) is %d\n", sizeof(struct file_reduced));
+
 
 	retlen= ibapi_send_reply_imm(1, msg, len_msg, retbuf, len_retbuf, false);
 
@@ -309,7 +308,6 @@ struct task_struct *restore_process_snapshot(struct process_snapshot *pss)
 
 	result = info.result;
 
-	printk("finish restore processs snapshot\n");
 	return result;
 }
 
@@ -319,7 +317,6 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
     struct process_snapshot *pss;
     struct ss_task_struct *ss_tasks, *ss_task;
     int ret = 0, i = 0;
-    printk("DepTrack: __deptrack_do_checkpoint_process called\n");
 
     pss = kmalloc(sizeof(*pss), GFP_KERNEL);
     if (!pss)
@@ -333,15 +330,13 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
     pss->tasks = ss_tasks;
     memcpy(pss->comm, leader->comm, TASK_COMM_LEN);
 
-    ret = deptrack_save_files(leader, pss);
+    /*ret = deptrack_save_files(leader, pss);
     if (ret)
         goto out;
-    printk("DepTrack: __deptrack_do_checkpoint_process step1\n");
     
     ret =deptrack_save_signals(leader, pss);
     if (ret)
-		goto free_files;
-    printk("DepTrack: __deptrack_do_checkpoint_process step2\n");
+		goto free_files;*/
     
 
     for_each_thread(leader, t){
@@ -355,10 +350,8 @@ static int __deptrack_do_checkpoint_process(struct task_struct *leader)
 
 		deptrack_save_thread_regs(t, ss_task);
     }
-    printk("DepTrack: __deptrack_do_checkpoint_process step3\n");
 
 	flush_files_value(leader);
-	printk("DepTrack: __deptrack_do_checkpoint_process step4\n");
 
     deptrack_enqueue_pss(pss);
     
@@ -402,7 +395,6 @@ static void deptrack_wake_up_thread_group(struct task_struct *leader)
 }
 
 int deptrack_checkpoint_thread(struct task_struct *p){
-    printk("DepTrack: deptrack_checkpoint_thread is called here\n");
     struct task_struct *leader;
     long saved_state =p->state;
 

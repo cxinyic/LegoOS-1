@@ -326,7 +326,7 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     /*if (pdi->nr_dirty_pages == 1){
                         shadow_copy_begin1(NULL);
                     }*/
-                    
+                
                 printk("dirty page in this run is %lx, addr is %lx\n", pcm, rmap->address);
                     
 				    // pcache_flush_one(pcm, 0);
@@ -361,6 +361,7 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
+            printk("program stack addr is %lx\n", task_stack_page(current_tsk));
             /*if (flush_flag == 10){
                 printk("DepTrack: stop tracking\n");
                 current_pid = -1;

@@ -364,6 +364,7 @@ static int dependency_track(void *unused){
             struct pt_regs *childregs;
 	        childregs = task_pt_regs(current_tsk);
             printk("program sp is %lx\n", childregs->sp);
+            printk("program ip is %lx\n", childregs->ip);
             /*if (flush_flag == 10){
                 printk("DepTrack: stop tracking\n");
                 current_pid = -1;

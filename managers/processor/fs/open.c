@@ -252,7 +252,7 @@ out:
 	if (1){
 		pr_info("Opening %s; abs:%s, fd=%d\n", pathname, kname, ret);
 	}
-	printk("f_op , open, read are: %lx, %lx, %lx\n", f->f_op, f->f_op->open, f->f_op->read);
+	
 	return fd;
 }
 

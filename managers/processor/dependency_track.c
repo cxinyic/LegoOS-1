@@ -361,7 +361,9 @@ static int dependency_track(void *unused){
     while (1){
         if(current_pid>0){
             spin_lock(&dp_spinlock);
-            printk("program stack addr is %lx\n", task_stack_page(current_tsk));
+            struct pt_regs *childregs;
+	        childregs = task_pt_regs(current_tsk);
+            printk("program sp is %lx\n", childregs->sp);
             /*if (flush_flag == 10){
                 printk("DepTrack: stop tracking\n");
                 current_pid = -1;

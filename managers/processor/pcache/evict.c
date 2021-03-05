@@ -342,6 +342,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
         pcache_for_each_way(pcm, nr) {
             rmap_walk(pcm, &rwc);
         }
+		printk("dirty page number is %d\n", nr_flushed);
 		shadow_copy_end(NULL);
 	}
 	

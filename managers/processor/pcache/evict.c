@@ -514,8 +514,8 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
         pcache_for_each_way(pcm, nr) {
             rmap_walk(pcm, &rwc);
         }
-		if (fdi.nr_dirty_pages>1)
-			printk("dirty page number is %d\n", fdi.nr_dirty_pages);
+		// if (fdi.nr_dirty_pages>1)
+		//	printk("dirty page number is %d\n", fdi.nr_dirty_pages);
 		shadow_copy_end(NULL);
 		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
 	}

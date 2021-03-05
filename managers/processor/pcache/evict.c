@@ -180,6 +180,9 @@ static int __flush_all_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rma
 			}
 		}
 	}
+	else{
+		printk("pcm is pcm_to_evict one\n");
+	}
 	return PCACHE_RMAP_AGAIN;
 }
 
@@ -425,7 +428,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
-	BUG_ON(nr_mapped < 1);
+	// BUG_ON(nr_mapped < 1);
 	PROFILE_START(pcache_alloc_evict_do_evict);
 	ret = evict_line(pset, pcm, address, piggyback);
 	PROFILE_LEAVE(pcache_alloc_evict_do_evict);

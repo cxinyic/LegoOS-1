@@ -166,7 +166,7 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 		
 }
 
-static int __flush_all_if_dirty((struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
+static int __flush_all_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
 {
 	int *nr_flushed = arg;
 	pte_t *pte;

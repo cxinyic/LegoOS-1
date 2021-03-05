@@ -344,6 +344,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
         }
 		printk("dirty page number is %d\n", nr_flushed);
 		shadow_copy_end(NULL);
+		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
 	}
 	
 	

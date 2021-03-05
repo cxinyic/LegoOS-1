@@ -335,22 +335,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 
-	if(current_pid>0){
-		kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
-		// shadow_copy_begin(NULL);
-		fdi.pcm_to_evict = pcm;
-		fdi.nr_dirty_pages = 0;
-		struct rmap_walk_control rwc = {
-                .arg = &fdi,
-                .rmap_one = __flush_all_if_dirty,
-        }; 
-        pcache_for_each_way(pcm, nr) {
-            rmap_walk(pcm, &rwc);
-        }
-		printk("dirty page number is %d\n", fdi.nr_dirty_pages);
-		// shadow_copy_end(NULL);
-		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
-	}
+	
 	
 	
 
@@ -516,6 +501,23 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		if (fdi.nr_dirty_pages>1)
 		{printk("DepTrack: flush %d pages\n", fdi.nr_dirty_pages);}
 	}*/
+
+	if(current_pid>0){
+		kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+		// shadow_copy_begin(NULL);
+		fdi.pcm_to_evict = pcm;
+		fdi.nr_dirty_pages = 0;
+		struct rmap_walk_control rwc = {
+                .arg = &fdi,
+                .rmap_one = __flush_all_if_dirty,
+        }; 
+        pcache_for_each_way(pcm, nr) {
+            rmap_walk(pcm, &rwc);
+        }
+		printk("dirty page number is %d\n", fdi.nr_dirty_pages);
+		// shadow_copy_end(NULL);
+		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
+	}
 	
 	return PCACHE_EVICT_SUCCEED;
 }

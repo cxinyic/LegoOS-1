@@ -175,7 +175,7 @@ static int __flush_all_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rma
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
                 *pte = pte_mkclean(*pte);
-				pcache_flush_one(pcm, 1);
+				pcache_flush_one(pcm, 0);
 				fdi->nr_dirty_pages += 1;
 			}
 		}
@@ -336,7 +336,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	if(current_pid>0){
 		kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
-		shadow_copy_begin(NULL);
+		// shadow_copy_begin(NULL);
 		fdi.pcm_to_evict = pcm;
 		fdi.nr_dirty_pages = 0;
 		struct rmap_walk_control rwc = {
@@ -347,7 +347,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
             rmap_walk(pcm, &rwc);
         }
 		printk("dirty page number is %d\n", fdi.nr_dirty_pages);
-		shadow_copy_end(NULL);
+		// shadow_copy_end(NULL);
 		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
 	}
 	
@@ -428,7 +428,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);
-	// BUG_ON(nr_mapped < 1);
+	BUG_ON(nr_mapped < 1);
 	PROFILE_START(pcache_alloc_evict_do_evict);
 	ret = evict_line(pset, pcm, address, piggyback);
 	PROFILE_LEAVE(pcache_alloc_evict_do_evict);

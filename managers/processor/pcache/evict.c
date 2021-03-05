@@ -168,15 +168,15 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 
 static int __flush_all_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
 {
-	int *nr_flushed = arg;
+	struct flush_if_dirty_info * fdi = arg;
 	pte_t *pte;
-	if (rmap->owner_process->pid == current_pid){
+	if (pcm!= fdi->pcm_to_evict && rmap->owner_process->pid == current_pid){
         pte = rmap->page_table;
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
                 *pte = pte_mkclean(*pte);
 				pcache_flush_one(pcm, 1);
-				(*nr_flushed)++;
+				fdi->nr_dirty_pages += 1;
 			}
 		}
 	}
@@ -334,15 +334,16 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	if(current_pid>0){
 		kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
 		shadow_copy_begin(NULL);
-		int nr_flushed = 0;
+		fdi.pcm_to_evict = pcm;
+		fdi.nr_dirty_pages = 0;
 		struct rmap_walk_control rwc = {
-                .arg = &nr_flushed,
+                .arg = &fdi,
                 .rmap_one = __flush_all_if_dirty,
         }; 
         pcache_for_each_way(pcm, nr) {
             rmap_walk(pcm, &rwc);
         }
-		printk("dirty page number is %d\n", nr_flushed);
+		printk("dirty page number is %d\n", fdi.nr_dirty_pages);
 		shadow_copy_end(NULL);
 		kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
 	}

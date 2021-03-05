@@ -175,6 +175,7 @@ static int __flush_all_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rma
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {
                 *pte = pte_mkclean(*pte);
+				pcm->prev_dirty = 1;
 				pcache_flush_one(pcm, 0);
 				fdi->nr_dirty_pages += 1;
 			}

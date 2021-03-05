@@ -44,7 +44,6 @@ static ssize_t stdio_file_write(struct file *f, const char __user *buf,
 	}
 
 	pr_info("STDOUT: ---[\n%s\n]---\n", kbuf);
-	printk("STDOUT user buf addr is %lx\n", &buf);
 	ret = count;
 
 out:

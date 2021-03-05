@@ -166,6 +166,23 @@ static int __flush_if_dirty(struct pcache_meta *pcm, struct pcache_rmap *rmap, v
 		
 }
 
+static int __flush_all_if_dirty((struct pcache_meta *pcm, struct pcache_rmap *rmap, void *arg)
+{
+	int *nr_flushed = arg;
+	pte_t *pte;
+	if (rmap->owner_process->pid == current_pid){
+        pte = rmap->page_table;
+        if (!pte_none(*pte) && pte_present(*pte)) {
+            if (likely(pte_dirty(*pte))) {
+                *pte = pte_mkclean(*pte);
+				pcache_flush_one(pcm, 1);
+				(*nr_flushed)++;
+			}
+		}
+	}
+	return PCACHE_RMAP_AGAIN;
+}
+
 static int shadow_copy_begin(void *unused)
 {
     long retval;
@@ -313,10 +330,24 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+
+	if(current_pid>0){
+		kill_pid_info(SIGSTOP, (struct siginfo *) 0, current_pid);
+		shadow_copy_begin(NULL);
+		int nr_flushed = 0;
+		struct rmap_walk_control rwc = {
+                .arg = &nr_flushed,
+                .rmap_one = __flush_all_if_dirty,
+        }; 
+        pcache_for_each_way(pcm, nr) {
+            rmap_walk(pcm, &rwc);
+        }
+		shadow_copy_end(NULL);
+	}
 	
 	
 
-	if (current_pid>0){
+	/*if (current_pid>0){
 		// printk("the evicted page is %lx\n",pcm);
 		spin_lock(&dp_spinlock);
 		dependency_queue = (struct dp_vector*)kmalloc(sizeof(struct dp_vector), GFP_KERNEL);
@@ -355,9 +386,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		size = dp_vector_size(pcms_to_flush);
-		/*if (size>1){
-			printk("DepTrack: flush %d pages\n",size);
-		}*/
+		// if (size>1){
+		// 	printk("DepTrack: flush %d pages\n",size);
+		// }
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);
 			shadow_copy_flag = 1;
@@ -387,7 +418,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		dp_vector_dispose(pcms_to_flush);
 		kfree(pcms_to_flush);
 		spin_unlock(&dp_spinlock);
-	}
+	}*/
 	
 	/* we locked, it can not be unmapped by others */
 	nr_mapped = pcache_mapcount(pcm);

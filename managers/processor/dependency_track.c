@@ -378,7 +378,7 @@ static int dependency_track(void *unused){
             spin_lock(&dp_spinlock);
             struct pt_regs *childregs;
 	        childregs = task_pt_regs(current_tsk);
-            printk("program sp is %lx\n", childregs->sp);
+            // printk("program sp is %lx\n", childregs->sp);
             /*if (flush_flag == 10){
                 printk("DepTrack: stop tracking\n");
                 current_pid = -1;
@@ -509,11 +509,11 @@ static int dependency_track(void *unused){
 
                
            }*/
-          if (pdi.nr_dirty_pages>0)
+          /*if (pdi.nr_dirty_pages>0)
           {
                 printk("DepTrack: in the %d run, the number of dirty pages are %d\n", flush_flag, pdi.nr_dirty_pages);
                 flush_flag += 1;
-          }
+          }*/
           kill_pid_info(SIGCONT, (struct siginfo *) 0, current_pid);
             // printk("DepTrack: continue the process\n");
 

@@ -305,8 +305,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
     struct pcache_dependency_info * pdi = arg;
     pte_t *pte;
     struct pcache_meta * tmp_pcm;
-    long addr1 = 0x7fffffffe000;
-    long addr2 = 0x7ffff78b9000;
+    unsigned long addr1 = 0x7fffffffe000;
+    unsigned long addr2 = 0x7ffff78b9000;
     
     if (rmap->owner_process->pid == current_pid){
         pte = rmap->page_table;
@@ -331,8 +331,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
                     }*/
                 printk("dirty page in this run is %lx, addr is %lx, addr is %d\n", pcm, rmap->address, rmap->address);
                 printk("addr1 is %lx, %d\n", addr1, addr1);
-                /*if (rmap->address == addr1 || rmap->address == addr2)
-                    printk("is the selected addr\n");*/
+                if (rmap->address == addr1 || rmap->address == addr2)
+                    printk("is the selected addr\n");
                     
                     
 				    // pcache_flush_one(pcm, 0);

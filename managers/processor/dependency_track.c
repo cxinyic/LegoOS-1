@@ -305,8 +305,8 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
     struct pcache_dependency_info * pdi = arg;
     pte_t *pte;
     struct pcache_meta * tmp_pcm;
-    int addr1 = 0x7fffffffe000;
-    int addr2 = 0x7ffff78b9000;
+    long addr1 = 0x7fffffffe000;
+    long addr2 = 0x7ffff78b9000;
     
     if (rmap->owner_process->pid == current_pid){
         pte = rmap->page_table;

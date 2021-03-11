@@ -249,9 +249,9 @@ static long do_sys_open(int dfd, const char __user *pathname, int flags, umode_t
 put:
 	put_file(f);
 out:
-	if (1){
+	/*if (1){
 		pr_info("Opening %s; abs:%s, fd=%d\n", pathname, kname, ret);
-	}
+	}*/
 	
 	return fd;
 }

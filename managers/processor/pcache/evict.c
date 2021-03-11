@@ -280,6 +280,7 @@ out:
 int nr_evict_lines = 0;
 int nr_flush_lines = 1;
 int shadow_copy_flag = 0;
+int max_num = 1000;
 int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		      enum piggyback_options piggyback)
 {
@@ -379,8 +380,9 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 
 		size = dp_vector_size(pcms_to_flush);
 		nr_flush_lines += size;
-		 if (nr_flush_lines%1000 == 0){
+		 if (nr_flush_lines> max_num){
 		 	printk("DepTrack: flush %d pages\n",nr_flush_lines);
+			 max_num+=1000;
 		 }
 		if (dp_vector_size(pcms_to_flush)>0){
 			shadow_copy_begin(NULL);

@@ -378,7 +378,7 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 		}
 
 		size = dp_vector_size(pcms_to_flush);
-		nr_flush_lines+ = size;
+		nr_flush_lines += size;
 		 if (nr_flush_lines%1000 == 0){
 		 	printk("DepTrack: flush %d pages\n",nr_flush_lines);
 		 }

@@ -51,13 +51,13 @@ void *p2m_fork(struct task_struct *p, unsigned long clone_flags)
 
 	payload.pid = p->pid;
 	payload.tgid = p->tgid;
-	if(payload.tgid ==25){
+	/*if(payload.tgid ==25){
 		payload.parent_tgid = 24;
 		printk("pid 25 parent is 24\n");
 	}
-	else{
+	else{*/
 		payload.parent_tgid = p->real_parent->tgid;
-	}
+	// }
 	payload.clone_flags = clone_flags;
 	memcpy(payload.comm, p->comm, TASK_COMM_LEN);
 

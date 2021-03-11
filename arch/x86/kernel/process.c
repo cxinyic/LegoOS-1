@@ -146,15 +146,15 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 
 	
 	frame->bx = 0;
-	if(p->pid == 25){
+	/*if(p->pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		*childregs = *task_pt_regs(current_tsk);
 #endif
 	}
-	else{
+	else{*/
 		*childregs = *current_pt_regs();
-	}
-	if(p->pid==25){
+	// }
+	/*if(p->pid==25){
 		printk("pid 25 restore registers\n");
 #ifdef CONFIG_COMP_PROCESSOR
 		struct ss_task_struct *ss_task, *ss_tasks = current_info.pss->tasks;
@@ -162,7 +162,7 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 		deptrack_restore_thread_state(p, ss_task);
 #endif
 
-	}
+	}*/
 	
 	printk("childregs sp is %lx\n",childregs->sp);
 	printk("childregs ip is %lx\n",childregs->ip);
@@ -171,21 +171,27 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,
 	
 
 	childregs->ax = 0;
-	if (p->pid!=25 && sp){
+	/*if (p->pid!=25 && sp){
 		childregs->sp = sp;
 	}
 	if (p->pid!=25 && unlikely(p->flags & PF_KTHREAD)) {
 	// if (unlikely(p->flags & PF_KTHREAD)) {
-		/* kernel thread */
+		
 		printk("enter here\n");
 		memset(childregs, 0, sizeof(struct pt_regs));
-		frame->bx = sp;		/* function */
+		frame->bx = sp;		
+		frame->r12 = arg;
+		return 0;
+	}*/
+	if ( unlikely(p->flags & PF_KTHREAD)) {
+		memset(childregs, 0, sizeof(struct pt_regs));
+		frame->bx = sp;		
 		frame->r12 = arg;
 		return 0;
 	}
-	/*if (sp){
+	if (sp){
 		childregs->sp = sp;
-	}*/
+	}
 
 		
 

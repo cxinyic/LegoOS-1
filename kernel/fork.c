@@ -868,9 +868,9 @@ struct task_struct *copy_process(unsigned long clone_flags,
 			goto out_cleanup_thread;
 	}
 	p->pid = pid;
-	if (pid == 25){
+	/*if (pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
+	}*/
 	
 
 	retval = copy_creds(p, clone_flags);
@@ -881,7 +881,7 @@ struct task_struct *copy_process(unsigned long clone_flags,
 	retval = setup_sched_fork(clone_flags, p);
 	if (retval)
 		goto out_cleanup_creds;
-	if(pid == 25){
+	/*if(pid == 25){
 #ifdef CONFIG_COMP_PROCESSOR
 		struct files_struct *oldf, *newf;
 		oldf = current_tsk->files;
@@ -892,10 +892,10 @@ struct task_struct *copy_process(unsigned long clone_flags,
 		p->files = newf;
 		retval = 0;
 #endif
-	}else{
+	}else{*/
 		retval = copy_fs(p);
 		retval = copy_files(clone_flags, p);
-	}
+	// }
 	if (retval)
 		goto out_cleanup_sched;
 
@@ -1089,9 +1089,9 @@ pid_t do_fork(unsigned long clone_flags,
 	 * might get invalid after that point, if the thread exits quickly.
 	 */
 #ifdef CONFIG_COMP_PROCESSOR
-    if (p->pid == 25){
+    /*if (p->pid == 25){
 		clone_flags |= CLONE_GLOBAL_THREAD;
-	}
+	}*/
 	if (clone_flags & CLONE_GLOBAL_THREAD) {
 		void *vmainfo;
 		int ret;

@@ -315,11 +315,11 @@ static int __add_dependency_if_dirty(struct pcache_meta *pcm, struct pcache_rmap
 
     
     if (rmap->owner_process->pid == current_pid){
-        /*if (rmap->address == addr1 || rmap->address == addr2
+        if (rmap->address == addr1 || rmap->address == addr2
                 || rmap->address == addr3 || rmap->address == addr4
                 || rmap->address == addr5 || rmap->address == addr6
                 || rmap->address == addr7 )
-                    return PCACHE_RMAP_AGAIN;*/
+                    return PCACHE_RMAP_AGAIN;
         pte = rmap->page_table;
         if (!pte_none(*pte) && pte_present(*pte)) {
             if (likely(pte_dirty(*pte))) {

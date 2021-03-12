@@ -337,7 +337,11 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
 
 	
-	
+	nr_flush_lines += 1;
+		 if (nr_flush_lines> max_num){
+		 	printk("DepTrack: in total evict %d pages\n",nr_flush_lines);
+			 max_num+=1000;
+		 }
 	
 
 	if (current_pid>0){
@@ -378,12 +382,12 @@ int pcache_evict_line(struct pcache_set *pset, unsigned long address,
 			
 		}
 
-		size = dp_vector_size(pcms_to_flush);
+		/*size = dp_vector_size(pcms_to_flush);
 		nr_flush_lines += 1;
 		 if (nr_flush_lines> max_num){
 		 	printk("DepTrack: in total evict %d pages\n",nr_flush_lines);
 			 max_num+=1000;
-		 }
+		 }*/
 		 /*if (size >0){
 		 	printk("DepTrack:  flush %d pages\n",size);
 			 
